@@ -15,7 +15,6 @@ export class ArrowDivDirective {
   }
 
   @HostListener('keydown', ['$event']) onKeyUp(e) {
-    e.preventDefault();
     switch (e.keyCode) {
       case 38:
         this.keyboardService.sendMessage({ element: this.element, action: 'UP'});
