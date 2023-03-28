@@ -1,0 +1,14 @@
+<app-dialog (close)="close.emit()">
+  <div class="header">
+    <p>Создание команды</p>
+  </div>
+  <div class="main">
+    <div class="box">
+      <div class="errorMessageBox">
+        {{errorMessageText}}
+      </div>
+      <input type="text" placeholder="Название команды" [(ngModel)]="teamName">
+      <button class="filled accent" (click)="createNewTeam()">СОЗДАТЬ</button>
+    </div>
+  </div>
+</app-dialog>

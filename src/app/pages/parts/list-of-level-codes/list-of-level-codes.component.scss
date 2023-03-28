@@ -1,0 +1,144 @@
+@import "../../../shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.head-box {
+  margin-bottom: 32px;
+  display: flex;
+
+  input {
+    width: calc(100% - 190px);
+    height: 38px;
+    margin-right: 40px;
+  }
+
+  button {
+    width: 150px;
+    height: 38px;
+  }
+
+  @include screen('phone') {
+    flex-direction: column-reverse;
+
+    input{
+      width: 100%;
+      margin: 0;
+    }
+
+    button {
+      width: 100%;
+      margin-bottom: 40px;
+    }
+  }
+}
+
+.custom-scroll {
+  width: 100%;
+
+  padding-bottom: 25px;
+
+  display: flex;
+  flex-wrap: nowrap;
+
+  overflow-x: scroll;
+
+  button.delete:focus-visible {
+    outline: none;
+    color: var(--text-color);
+  }
+
+  h2 {
+    margin-bottom: 12px;
+  }
+
+  .kode-box {
+    min-width: 560px;
+    max-width: 560px;
+    margin-right: 40px;
+
+    p.info {
+      margin-right: 0;
+    }
+  }
+
+  .result-box {
+    h2 span {
+      font-size: 14px;
+      font-weight: 400;
+      color: $accent-color;
+      margin-left: 81px;
+    }
+
+    .add-new-item-in-table {
+      input {
+        width: 150px;
+      }
+
+      button {
+        margin: 0 5px 0 12px;
+      }
+    }
+
+    .table {
+      display: flex;
+    }
+  }
+
+  .table {
+    .row {
+      height: 40px;
+    }
+
+    .id {
+      width: 69px;
+      margin-right: 20px;
+    }
+
+    .name {
+      width: 160px;
+      margin-right: 10px;
+    }
+
+    .type {
+      width: 125px;
+      margin-right: 15px;
+    }
+
+    .value {
+      width: 105px;
+      margin-right: 20px;
+
+      input {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .buttons {
+      width: 40px;
+    }
+
+    .column {
+      min-width: 145px;
+      width: auto;
+
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+
+      div {
+        white-space: nowrap;
+        width: auto;
+      }
+
+      button {
+        margin-right: 15px;
+        margin-left: auto;
+      }
+    }
+
+    .result {
+      margin-left: 10px;
+    }
+  }
+}

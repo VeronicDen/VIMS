@@ -1,0 +1,67 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="add-new-item" (click)="addNewBlock()">
+  <h2>БЛОКИ</h2>
+  <p>+</p>
+</div>
+<div class="block" *ngFor="let block of blocks">
+  <div class="main-block-info">
+    <div class="form-item">
+      <label>ID блока</label>
+      <input type="text" placeholder="0001" [(ngModel)]="block.inner_id" maxlength="20" innerIdText>
+    </div>
+    <div class="form-item">
+      <label>Название</label>
+      <input type="text" placeholder="Название" [(ngModel)]="block.info_caption">
+    </div>
+    <div class="form-item">
+      <label>Тип</label>
+      <p-dropdown [options]="blockTypes" [(ngModel)]="block.info_type"
+                  optionLabel="name" optionValue="code">
+      </p-dropdown>
+    </div>
+    <div class="button-box">
+      <button class="filled accent" (click)="saveChangedBlock(block, false)">СОХРАНИТЬ БЛОК</button>
+      <button class="outline" (click)="deleteBlock(block.id)"><p> + </p></button>
+    </div>
+  </div>
+  <div class="additional-block-info">
+    <div class="ordinary-block" *ngIf="block.info_type == 'SIMPLE'; else linkBlock">
+      <div class="form-item">
+        <label>Условия показа</label>
+        <input type="text" [(ngModel)]="block.condition_script">
+      </div>
+      <div class="form-item" style="margin-bottom: 0">
+        <label>Текст блока</label>
+        <p-editor [(ngModel)]="block.info_text" [style]="{'min-height': '185px'}">
+          <ng-template pTemplate="header">
+            <select class="ql-header">
+              <option value="1">Заголовок</option>
+              <option value="2">Подзаголовок</option>
+              <option value="3" selected>Обычный</option>
+            </select>
+            <button class="ql-bold"></button>
+            <button class="ql-italic"></button>
+            <button class="ql-underline"></button>
+            <button class="ql-image"></button>
+          </ng-template>
+        </p-editor>
+      </div>
+    </div>
+    <ng-template #linkBlock>
+      <div class="form-item">
+        <label>Ссылка на уровень</label>
+        <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.level_link"
+                    optionLabel="name" optionValue="code" class="big-block-dropdown">
+        </p-dropdown>
+      </div>
+    </ng-template>
+  </div>
+  <div class="button-box addit">
+    <button class="filled accent" (click)="saveChangedBlock(block, false)">СОХРАНИТЬ БЛОК</button>
+    <button class="outline cutted" (click)="deleteBlock(block.id)"><p> + </p></button>
+    <button class="outline full" (click)="deleteBlock(block.id)"><p> УДАЛИТЬ БЛОК </p></button>
+  </div>
+</div>
+
+<button class="filled accent save-all" (click)="saveAllChanges()">СОХРАНИТЬ</button>

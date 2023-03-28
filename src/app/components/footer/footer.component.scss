@@ -1,0 +1,30 @@
+@import "src/app/shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.container {
+  width: 1160px;
+
+  margin: 0 auto;
+  padding: 42px 0;
+
+  display: flex;
+
+  border-top: 1px solid var(--text-color);
+
+  .contact {
+    display: flex;
+    margin-right: 70px;
+
+    img {
+      width: 21px;
+      height: 17px;
+
+      margin-right: 10px;
+      user-select: none;
+    }
+  }
+
+  @include screen('phone') {
+    flex-direction: column;
+  }
+}

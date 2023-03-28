@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="new-game-box">
+    <p class="user-name"><span>ИГРОК</span> {{user ? user.login : '???'}}</p>
+    <h2>НОВАЯ ИГРА</h2>
+    <div>
+      <input type="text" placeholder="Введите название" [(ngModel)]="gameName">
+      <button class="filled accent" (click)="createNewGame()">ОК</button>
+    </div>
+  </div>
+
+  <div class="main-info-box">
+    <h2>МОИ ИГРЫ</h2>
+    <div class="list-box">
+      <div class="list-container" [ngStyle]="{'left.px': (activeSlide - 1) * -slidersTableWidth}"
+           *ngIf="games.length > 0, else beforeCreateBox">
+
+        <div class="table" *ngFor="let arr of gamesArrsArr">
+          <div class="row header" [ngStyle]="{'width.px': slidersTableWidth}">
+            <div class="number">Номер</div>
+            <div class="game">Игра</div>
+          </div>
+
+          <div class="row" *ngFor="let game of gamesArrsArr[activeSlide - 1]"
+               (click)="goToGame(game.id)" [ngStyle]="{'width.px': slidersTableWidth}">
+            <div class="number">#{{game.id}}</div>
+            <div class="game">{{game.caption}}</div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #beforeCreateBox>
+        <div class="alter-table-container">
+          Создайте игру
+        </div>
+      </ng-template>
+    </div>
+    <ng-template appRef></ng-template>
+  </div>
+</div>
+

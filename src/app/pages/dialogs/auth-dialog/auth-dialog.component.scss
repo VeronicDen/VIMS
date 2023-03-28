@@ -1,0 +1,64 @@
+@import "../../../shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.header {
+  width: 100%;
+
+  display: flex;
+
+  button {
+    width: 50%;
+
+    padding: 15px 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: var(--dialog-menu-button-color);
+    color: var(--text-color);
+
+    font-size: 16px;
+    font-weight: 400;
+
+    &.active {
+      background: none;
+      color: $accent-color;
+    }
+  }
+}
+
+.form-container {
+  padding-bottom: 50px;
+
+  form {
+    width: 360px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    button {
+      width: 160px;
+      height: 40px;
+
+      margin-top: 20px;
+
+      font-size: 16px;
+      font-weight: 400;
+
+      &.accent {
+        width: 220px;
+      }
+    }
+  }
+
+  @include screen('phone') {
+    form {
+      width: calc(100% - 60px);
+      margin: 0 30px;
+    }
+  }
+}
+

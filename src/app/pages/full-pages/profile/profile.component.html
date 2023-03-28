@@ -1,0 +1,72 @@
+<ng-template appRef></ng-template>
+
+<div class="container">
+  <p class="user-name"><span>ИГРОК</span> {{user ? user.login : '???'}}</p>
+  <div class="user-button-box">
+    <button class="accent" (click)="logout()">Выйти</button>
+    <button (click)="showChangePasswordDialog()">Изменить пароль</button>
+  </div>
+
+  <div class="main-info-box">
+    <div class="texts">
+      <div class="teams">
+        <h2>МОИ КОМАНДЫ</h2>
+        <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('teams')}">
+          <div class="list-container"
+               [ngStyle]="{'left.px': -(activeSlides.get('teams') - 1) * slidersWidths.get('teams')}">
+            <div class="list" *ngFor="let list of listOfCommandArr"
+                 [ngStyle]="{'width.px': slidersWidths.get('teams')}">
+              <p *ngFor="let item of list">{{item}}</p>
+            </div>
+          </div>
+        </div>
+        <app-slider [maxNumberOfSlides]="quantityOfCommandSlides.length"
+                    [activeSlideNumber]="activeSlides.get('teams')"
+                    (activeSlideNumberChange)="activeSlides.set('teams', $event)"></app-slider>
+      </div>
+      <div class="games">
+        <h2>ИГРЫ</h2>
+        <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('games')}">
+          <div class="list-container"
+               [ngStyle]="{'left.px': -(activeSlides.get('games') - 1) * slidersWidths.get('games')}">
+            <div class="list" *ngFor="let list of listOfGamesArr"
+                 [ngStyle]="{'width.px': slidersWidths.get('games')}">
+              <p *ngFor="let item of list">{{item}}</p>
+            </div>
+          </div>
+        </div>
+        <app-slider [maxNumberOfSlides]="quantityOfGamesSlides.length"
+                    [activeSlideNumber]="activeSlides.get('games')"
+                    (activeSlideNumberChange)="activeSlides.set('games', $event)"></app-slider>
+      </div>
+    </div>
+    <div class="results">
+      <h2>РЕЗУЛЬТАТЫ ИГР</h2>
+      <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('results')}">
+        <div class="list-container"
+             [ngStyle]="{'left.px': -(activeSlides.get('results') - 1) * slidersWidths.get('results')}">
+          <div class="list" *ngFor="let list of listOfResultsArr"
+               [ngStyle]="{'width.px': slidersWidths.get('results')}">
+            <div class="table">
+              <div class="header row">
+                <div class="date">Дата</div>
+                <div class="game">Игра</div>
+                <div class="team">Команда</div>
+                <div class="place">Место</div>
+              </div>
+              <div class="row" *ngFor="let item of list">
+                <div class="date">{{item.date}}</div>
+                <div class="game">{{item.name}}</div>
+                <div class="team">{{item.team}}</div>
+                <div class="place">{{item.place}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-slider [maxNumberOfSlides]="quantityOfResultsSlides.length"
+                  [activeSlideNumber]="activeSlides.get('results')"
+                  (activeSlideNumberChange)="activeSlides.set('results', $event)"></app-slider>
+    </div>
+  </div>
+</div>

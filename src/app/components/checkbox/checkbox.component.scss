@@ -1,0 +1,40 @@
+@import "src/app/shared/theme-colors/theme";
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 0 25px 0;
+
+  .checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkbox {
+    min-width: 20px;
+    max-width: 20px;
+    height: 20px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--checkbox-color);
+
+    background: none;
+    //color: var(--checkbox-color);
+
+    margin-right: 12px;
+
+    cursor: pointer;
+
+    svg path {
+      stroke: var(--checkbox-color);
+    }
+  }
+}

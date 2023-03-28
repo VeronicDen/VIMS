@@ -1,0 +1,346 @@
+@import "../../../shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.container {
+  margin: 0 auto;
+  padding: 66px 0;
+
+  .game-name-box {
+    .game-name {
+      margin-bottom: 42px;
+
+      font-size: 18px;
+      font-weight: 400;
+
+      span {
+        font-weight: 800;
+      }
+    }
+  }
+
+  .button-box {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 42px;
+
+    button {
+      margin-left: 35px;
+
+      font-size: 16px;
+      font-weight: 400;
+
+      &.filled,
+      &.outline {
+        height: 36px;
+
+        margin-left: 0;
+        margin-right: 15px;
+      }
+    }
+  }
+
+  .main-game-settings {
+    width: 100%;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    .game-info {
+      width: 360px;
+      margin-right: 40px;
+
+      transition-duration: 0.5s;
+
+      h2 {
+        margin-bottom: 20px;
+      }
+
+      input {
+        width: 100%;
+        height: 36px;
+
+        margin: 0 0 23px 0;
+      }
+
+      .script-label-box {
+        width: 100%;
+
+        margin-bottom: 10px;
+
+        display: flex;
+        justify-content: space-between;
+
+        label {
+          margin-bottom: 0;
+        }
+
+        button {
+          font-size: 16px;
+          font-weight: 400;
+
+          color: $additional-color;
+        }
+      }
+
+      textarea {
+        height: 253px;
+        margin-bottom: 25px;
+      }
+
+      button.filled {
+        width: 150px;
+      }
+
+      &.opened {
+        width: 100%;
+        margin-bottom: 48px;
+        margin-right: 0;
+        transition-duration: 0.5s;
+      }
+    }
+
+    .levels {
+      width: 760px;
+      transition-duration: 0.5s;
+
+      h2 {
+        margin-bottom: 57px;
+      }
+
+      .add-new-item-in-table {
+        margin-bottom: 25px;
+      }
+
+      .table {
+        width: 100%;
+
+        .id, .name,
+        .duration, .terms {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .id {
+          width: 69px;
+          margin: 0 21px 0 10px;
+        }
+
+        .name {
+          width: 210px;
+          margin-right: 25px;
+        }
+
+        .duration {
+          width: 110px;
+          margin-right: 25px;
+        }
+
+        .terms {
+          width: 180px;
+          margin-right: 17px;
+        }
+
+        .buttons {
+          width: 75px;
+
+          padding: 0 12px;
+
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+      }
+
+      &.opened {
+        width: 100%;
+        transition-duration: 0.5s;
+
+        h2 {
+          margin-bottom: 20px;
+        }
+
+        .id {
+          width: 106px !important;
+          margin-right: 39px !important;
+        }
+
+        .name {
+          width: 316px !important;
+          margin-right: 40px !important;
+        }
+
+        .duration {
+          margin-right: 30px !important;
+        }
+
+        .terms {
+          width: 401px !important;
+          margin-right: 40px !important;
+        }
+      }
+    }
+  }
+
+  .main-game-settings,
+  .levels {
+    &.disabled {
+
+    }
+  }
+
+  @include screen('desktop') {
+    .main-game-settings {
+
+      .game-info {
+        width: 260px;
+      }
+
+      .levels {
+        width: 600px;
+
+        .table {
+          .id {
+            width: 40px;
+            margin: 0 10px 0 0;
+          }
+
+          .name {
+            width: 130px;
+            margin-right: 10px;
+          }
+
+          .buttons {
+            width: 65px;
+            padding: 0 10px 0 5px;
+          }
+        }
+
+        &.opened .table {
+          .id {
+            width: 70px!important;
+            margin: 0 30px 0 10px !important;
+          }
+
+          .name {
+            width:250px!important;
+            margin-right: 40px !important;
+          }
+
+          .terms {
+            width: 250px!important;
+            margin-right: 30px !important;
+          }
+        }
+      }
+    }
+  }
+
+  @include screen('tablet-landscape') {
+    .button-box button {
+      &.outline {
+        margin-bottom: 15px;
+        padding: 8px 15px;
+      }
+
+      &:last-child {
+        margin-left: 0;
+      }
+    }
+
+    .main-game-settings {
+      .game-info .script-label-box button {
+        visibility: hidden;
+      }
+
+      .levels.opened .table {
+        .id {
+          width: 40px !important;
+          margin: 0 20px 0 0 !important;
+        }
+
+        .name {
+          width: 100px !important;
+          margin-right: 20px !important;
+        }
+
+        .duration {
+          margin-right: 20px !important;
+        }
+
+        .terms {
+          width: 180px !important;
+          margin-right: 20px !important;
+        }
+
+        .buttons {
+          width: 60px;
+          padding-left: 0;
+        }
+      }
+    }
+  }
+
+  @include screen('tablet-portrait') {
+    .button-box button {
+      &:nth-last-child(2) {
+        margin-bottom: 0;
+      }
+
+      &:last-child {
+        margin-left: 35px;
+      }
+    }
+
+    .main-game-settings .levels.opened .table {
+      .id {
+        width: 20% !important;
+      }
+
+      .name {
+        width: calc(80% - 65px) !important;
+      }
+
+      .buttons {
+        width: 65px !important;
+      }
+
+      .duration, .terms {
+        display: none;
+      }
+    }
+
+  }
+
+  @include screen('phone') {
+    padding-top: 0;
+
+    .button-box {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+        margin: 0 0 15px 0 !important;
+      }
+    }
+
+    .add-new-item-in-table {
+      flex-wrap: wrap;
+
+      p {
+        margin: 0;
+      }
+
+      input {
+        margin: 0 15px;
+      }
+
+      button {
+        width: 100%;
+        margin: 15px 0 0 0;
+      }
+
+    }
+  }
+}

@@ -1,0 +1,22 @@
+$background-color-dark: #000000;
+$background-color-light: #FBFBFB;
+
+$text-color-dark: #FFFFFF;
+$text-color-light: #000000;
+
+$accent-color: #D32E2E;
+$additional-color: #B6B6B6;
+$light-additional-color: #EBEBEB;
+$dark-additional-color: #252525;
+
+$colors: (
+  --background-color: ($background-color-dark, $background-color-light),
+  --text-color: ($text-color-dark, $text-color-light),
+  --backdrop-color: (#000000A6, #00000066),
+  --dialog-background-color: ($dark-additional-color, $background-color-light),
+  --dialog-menu-button-color: (#B6B6B63D, $light-additional-color),
+  --result-table-color: ($dark-additional-color, $light-additional-color),
+  --slider-inactive-icon-color: ($dark-additional-color, $additional-color),
+  --slider-active-icon-color: ($additional-color, $dark-additional-color),
+  --checkbox-color: ($light-additional-color, $dark-additional-color),
+);

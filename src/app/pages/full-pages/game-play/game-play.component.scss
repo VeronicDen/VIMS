@@ -1,0 +1,152 @@
+@import "../../../shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.container {
+  margin: 0 auto;
+  padding: 66px 0;
+
+  .game-name-box {
+    width: 100%;
+    margin-bottom: 34px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $accent-color;
+
+    .game-name {
+      font-size: 18px;
+      font-weight: 400;
+
+      span {
+        font-weight: 800;
+      }
+    }
+  }
+
+  .game-box {
+    display: flex;
+    justify-content: space-between;
+
+    .game-info-box {
+      width: calc((100% - 110px) / 2);
+
+      .level-name {
+        display: flex;
+
+        h2 {
+          margin-right: 10px;
+        }
+      }
+
+      h2.task {
+        margin-top: 2px;
+      }
+
+      .game-info-element {
+        margin-top: 25px;
+
+        p.label {
+          color: $accent-color;
+          margin-bottom: 12px;
+        }
+
+        .code-container {
+          display: flex;
+          justify-content: space-between;
+
+          input {
+            width: 300px;
+            min-height: 37px;
+          }
+
+          button {
+            width: 150px;
+          }
+        }
+      }
+    }
+  }
+
+  #secondCode {
+    display: none;
+  }
+
+  @include screen('desktop') {
+    .game-box .game-info-box .game-info-element .code-container {
+      input {
+        width: 220px;
+      }
+
+      button {
+        width: 120px;
+      }
+    }
+  }
+
+  @include screen('tablet-landscape') {
+    .game-box .game-info-box {
+      width: calc((100% - 70px) / 2);
+
+      .game-info-element .code-container {
+        flex-direction: column;
+
+        input, button {
+          width: 100%;
+        }
+
+        input {
+          margin-bottom: 10px;
+        }
+      }
+    }
+  }
+
+  @include screen('tablet-portrait') {
+    .game-box {
+      flex-direction: column;
+
+      .game-info-box {
+        width: 100%;
+
+        h2.task {
+          margin-top: 25px;
+        }
+
+        .game-info-element .code-container {
+          flex-direction: row;
+
+          button {
+            width: 120px;
+          }
+
+          input {
+            width: 290px;
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+    #firstCode {
+      display: none;
+    }
+
+    #secondCode {
+      display: block;
+    }
+  }
+
+  @include screen('phone') {
+    padding-top: 0;
+
+    .game-box .game-info-box .game-info-element .code-container {
+      flex-direction: column;
+
+      input, button {
+        width: 100%;
+      }
+
+      input {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}
+

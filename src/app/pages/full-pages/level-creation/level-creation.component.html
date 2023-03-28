@@ -1,0 +1,19 @@
+<div class="container">
+  <p class="level-name">СТРАНИЦА УРОВНЯ {{level ? level.inner_id : null}} / {{level ? level.caption : null}} /
+    <span (click)="backToLevel()"> {{game ? game.caption : null}}</span></p>
+
+  <div class="menu-box">
+    <button [class.accent]="isInactiveLink('settings')" (click)="menuClick('settings')">
+      НАСТРОЙКИ УРОВНЯ
+    </button>
+    <button [class.accent]="isInactiveLink('info-blocks')" (click)="menuClick('info-blocks')">
+      БЛОКИ ИНФОРМАЦИИ
+    </button>
+    <button [class.accent]="isInactiveLink('codes')" (click)="menuClick('codes')">
+      СПИСОК КОДОВ
+    </button>
+  </div>
+
+  <router-outlet></router-outlet>
+
+</div>

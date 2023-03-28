@@ -1,0 +1,82 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="head-box">
+  <input type="text" placeholder="Значение" #mainInput [ngModel]="chosenItem ? chosenItem[chosenField]: null"
+         (ngModelChange)="chosenItem ? chosenItem[chosenField] = $event : null" (keydown.enter)="returnFocus()">
+  <button class="filled accent" (click)="saveChanges()">СОХРАНИТЬ</button>
+</div>
+
+<div class="custom-scroll">
+  <div class="kode-box">
+    <h2>КОДЫ</h2>
+    <div class="add-new-item-in-table">
+      <p>Создать</p>
+      <input type="number" placeholder="0" [(ngModel)]="numberOfNewCodes">
+      <p>{{pluralCase(numberOfNewCodes, {one: 'код', few: 'кода', other: 'кодов'})}}</p>
+      <button class="outline" (click)="addCodes()">СОЗДАТЬ</button>
+      <p class="info">Всего кодов: {{codes ? codes.length : '0'}}</p>
+    </div>
+
+    <div class="table" *ngIf="codes">
+      <div class="row header">
+        <div class="id">ID</div>
+        <div class="name">Название</div>
+        <div class="type">Тип</div>
+        <div class="value">Значение</div>
+        <div class="buttons"></div>
+      </div>
+      <div class="row" *ngFor="let code of codes" [id]="code.code_order">
+        <div class="id">
+          <input type="text" [(ngModel)]="code.code_inner_id" placeholder="Значение"
+                 (focusin)="setChosenValue(code, 'code_inner_id')"
+                 (dblclick)="onDoubleClick($event)" arrow-div>
+        </div>
+        <div class="name">
+          <input type="text" [(ngModel)]="code.caption" placeholder="Значение"
+                 (focusin)="setChosenValue(code, 'caption')"
+                 (dblclick)="onDoubleClick($event)" arrow-div>
+        </div>
+        <div class="type">
+          <p-dropdown [options]="codeTypes" [(ngModel)]="code.code_type"
+                      optionLabel="name" optionValue="code" (focusin)="setChosenValue()"></p-dropdown>
+        </div>
+        <div class="value">
+          <input type="text" [(ngModel)]="code.code_values_info" placeholder="Значение"
+                 (focusin)="setChosenValue(code, 'code_values_info')"
+                 (dblclick)="onDoubleClick($event)" arrow-div>
+        </div>
+        <div class="buttons">
+          <button class="delete" (click)="deleteCode(code)" (keyup.enter)="deleteCode(code)"
+                  (focusin)="setChosenValue()" arrow-div>+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-box">
+    <h2>РЕЗУЛЬТАТ <span *ngIf="errorText">{{errorText}}</span></h2>
+    <div class="add-new-item-in-table">
+      <p>Создать</p>
+      <input type="text" placeholder="Код результата" [(ngModel)]="newResultCode">
+      <p>типа</p>
+      <p-dropdown [options]="resultTypes" [(ngModel)]="newResultType"
+                  optionLabel="name" optionValue="code"></p-dropdown>
+      <button class="outline" (click)="addResult()">СОЗДАТЬ</button>
+    </div>
+
+    <div class="table">
+      <div class="column" *ngFor="let entry of resultMap | keyvalue">
+        <div class="row header buttons">
+          <div>{{entry.key}}</div>
+          <button class="delete" (click)="deleteResult(entry.key)">+</button>
+        </div>
+        <div class="row" *ngFor="let resultItem of entry.value">
+          <input type="text" class="transposed"
+                 [(ngModel)]="resultItem.result_value" placeholder="Значение"
+                 (focusin)="setChosenValue(resultItem, 'result_value')"
+                 (dblclick)="onDoubleClick($event)" arrow-div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

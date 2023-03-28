@@ -1,0 +1,78 @@
+<ng-template appRef></ng-template>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="container">
+  <div class="game-name-box">
+    <p class="game-name"><span>СТРАНИЦА ИГРЫ</span> {{gameName}}</p>
+
+    <div class="button-box">
+      <button class="filled accent" *ngIf="!isGameStarted" (click)="isGameStarted = true">НАЧАТЬ ИГРУ</button>
+      <button class="outline" *ngIf="isGameStarted">ПРИОСТАНОВИТЬ ИГРУ</button>
+      <button class="outline accent" *ngIf="isGameStarted" (click)="isGameStarted = false">ЗАКОНЧИТЬ ИГРУ</button>
+      <button class="outline" *ngIf="isGameStarted">ВЕРНУТЬ ИГРУ</button>
+      <button (click)="showCommandDialog()">КОМАНДЫ</button>
+    </div>
+  </div>
+
+  <div class="main-game-settings">
+    <div class="game-info" [class.opened]="isMainInfoBoxOpened">
+      <h2>ИНФОРМАЦИЯ ОБ ИГРЕ</h2>
+      <form [formGroup]="formGroupInfo">
+        <label for="gameName">Название</label>
+        <input type="text"
+               id="gameName"
+               placeholder="Введите название"
+               [readonly]="isGameStarted"
+               formControlName="caption">
+
+        <div class="script-label-box">
+          <label for="script">Скрипт</label>
+          <button (click)="isMainInfoBoxOpened=!isMainInfoBoxOpened">
+            {{isMainInfoBoxOpened ? 'Свернуть поле <<' : 'Развернуть поле >>'}}
+          </button>
+        </div>
+        <textarea placeholder="Текст"
+                  id="script"
+                  formControlName="script"
+                  [readonly]="isGameStarted"></textarea>
+        <button class="filled accent"
+                [disabled]="isGameStarted"
+                (click)="saveInfo()">СОХРАНИТЬ
+        </button>
+      </form>
+    </div>
+
+    <div class="levels" [class.opened]="isMainInfoBoxOpened">
+      <h2>УРОВНИ</h2>
+      <div class="add-new-item-in-table">
+        <p>Создать</p>
+        <input type="number" placeholder="0" [readonly]="isGameStarted" [(ngModel)]="numberOfNewLevels">
+        <p>{{pluralCase(numberOfNewLevels, {one: 'уровень', few: 'уровня', other: 'уровней'})}}</p>
+        <button class="outline" [disabled]="isGameStarted" (click)="addLevels()">СОЗДАТЬ</button>
+      </div>
+
+      <div class="table" *ngIf="levels.length > 0">
+        <div class="row header">
+          <div class="id">ID</div>
+          <div class="name">Название</div>
+          <div class="duration">Длительность</div>
+          <div class="terms">Условие прохождения</div>
+          <div class="buttons"></div>
+        </div>
+        <div class="row" *ngFor="let level of levels">
+          <div class="id">{{level.inner_id}}</div>
+          <div class="name">{{level.caption}}</div>
+          <div class="duration"></div>
+          <div class="terms"></div>
+          <div class="buttons">
+            <button class="info" [disabled]="isGameStarted"
+                    (click)="goToLevel(level.id)" title="Редактировать">i</button>
+            <button class="delete" [disabled]="isGameStarted"
+                    (click)="deleteLevel(level.id)" title="Удалить">+</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

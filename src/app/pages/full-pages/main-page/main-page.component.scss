@@ -1,0 +1,144 @@
+@import "../../../shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+button {
+  margin-right: 24px;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.container {
+  width: 1160px;
+
+  margin: 0 auto;
+  padding: 66px 0 53px 0;
+
+  display: flex;
+  justify-content: space-between;
+
+  .users-box {
+    width: 360px;
+
+    .user-name {
+      margin-bottom: 24px;
+
+      font-size: 18px;
+      font-weight: 400;
+
+      span {
+        font-weight: 800;
+      }
+    }
+
+    .auth-button-box {
+      margin-top: 16px;
+    }
+  }
+
+  .games-box {
+    width: 610px;
+
+    & > h2 {
+      margin-bottom: 24px;
+    }
+
+    .current-game {
+      margin-bottom: 32px;
+
+      .game-name-box {
+        display: flex;
+        align-items: flex-start;
+
+        h2 {
+          text-transform: uppercase;
+
+          span {
+            font-size: 18px;
+            font-weight: 700;
+
+            color: $additional-color;
+          }
+        }
+
+        button {
+          margin: 0 0 0 24px;
+
+          font-size: 16px;
+          font-weight: 400;
+
+          color: $additional-color;
+        }
+      }
+
+      .game-info-box {
+        margin: 15px 0;
+
+        .info-item {
+          display: flex;
+          line-height: 22px;
+
+          h3 {
+            margin-right: 4px;
+          }
+        }
+
+        .additional-info {
+          display: none;
+
+          .info-item {
+            display: block;
+          }
+
+          &.open {
+            display: block;
+          }
+        }
+      }
+
+      &.unlocked {
+        border-left: 10px solid $accent-color;
+        padding-left: 14px;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  @include screen('desktop') {
+    .users-box {
+      width: 260px;
+    }
+  }
+
+  @include screen('tablet-landscape') {
+    flex-direction: column;
+
+    .users-box {
+      width: 100%;
+      margin-bottom: 35px;
+    }
+
+    .games-box {
+      width: 100%;
+    }
+  }
+
+  @include screen('phone') {
+    padding-top: 0;
+    .game-name-box {
+      display: flex;
+      flex-direction: column;
+
+      button {
+        align-self: flex-end;
+      }
+    }
+  }
+}
+
+.overflow {
+  overflow: hidden;
+}

@@ -1,0 +1,23 @@
+$breakpoints: (
+  'desktop': 1280px,
+  'tablet-landscape': 960px,
+  'tablet-portrait': 600px,
+  'phone': 500px,
+) !default;
+
+$big-desktop-width: 1160px;
+$desktop-width: 900px;
+$tablet-landscape-width: 580px;
+$tablet-portrait-width: 450px;
+$phone-width: calc(100% - 40px);
+
+@mixin screen($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+  @else {
+    @warn "Unfortunately, '#{$breakpoint}` can not be found. Available breakpoints are: `#{map-keys($breakpoints)}`.";
+  }
+}

@@ -1,0 +1,12 @@
+<label class="checkbox-container">
+  <input class="checkbox-input"
+         type="checkbox"
+         [(ngModel)]="checked"
+         (ngModelChange)="onModelChange($event)">
+  <div class="checkbox">
+    <svg *ngIf="checked" width="17" height="13" viewBox="0 0 17 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 6L6 11L16 1" stroke-width="2"/>
+    </svg>
+  </div>
+  <ng-content></ng-content>
+</label>

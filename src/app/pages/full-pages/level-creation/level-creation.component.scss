@@ -1,0 +1,54 @@
+@import "../../../shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.container {
+  width: 1160px;
+
+  margin: 0 auto;
+  padding: 66px 0;
+
+  .level-name {
+    margin-bottom: 42px;
+
+    font-size: 18px;
+    font-weight: 800;
+
+    span {
+      font-weight: 400;
+      cursor: pointer;
+    }
+  }
+
+  .menu-box {
+    margin-bottom: 46px;
+
+    button {
+      margin-right: 35px;
+
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+
+  @include screen('tablet-portrait') {
+    .menu-box {
+      button {
+        width: 100%;
+        margin: 0 0 10px 0;
+        text-align: left;
+      }
+    }
+  }
+
+  @include screen('phone') {
+    padding-top: 0;
+
+    .menu-box {
+      button {
+        width: 100%;
+        margin: 0 0 10px 0;
+        text-align: left;
+      }
+    }
+  }
+}

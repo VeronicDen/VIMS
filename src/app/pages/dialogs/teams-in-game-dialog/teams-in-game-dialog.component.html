@@ -1,0 +1,22 @@
+<app-dialog (close)="close.emit()" [dialogWidth]="510">
+  <div class="box">
+    <div class="command-list-box unaccepted">
+      <p class="header">Непринятые команды</p>
+      <div class="command">
+        <div class="button-box">
+          <img src="./assets/icons/add-icon.svg">
+        </div>
+        <p>команда 1</p>
+      </div>
+    </div>
+    <div class="command-list-box accepted">
+      <p class="header">Принятые команды</p>
+      <div class="command">
+        <div class="button-box">
+          <img src="./assets/icons/put-away-icon.svg">
+        </div>
+        <p>команда 2</p>
+      </div>
+    </div>
+  </div>
+</app-dialog>

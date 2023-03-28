@@ -1,0 +1,56 @@
+<app-dialog (close)="close.emit()">
+  <div class="header">
+    <button [class.active]="!isRegistration"
+            (click)="changeForm(true)">Вход</button>
+    <button [class.active]="isRegistration"
+            (click)="changeForm(false)">Регистрация</button>
+  </div>
+  <div class="form-container" *ngIf="!isRegistration, else registrationFormContainer">
+    <form [formGroup]="formGroupLogin">
+      <div class="errorMessageBox">
+        {{errorMessageText}}
+      </div>
+      <div class="dialogFormItem">
+        <div class="img-box">
+          <img src="{{isThemeDark() ? 'assets/icons/login-icon-dark.svg' : 'assets/icons/login-icon-light.svg'}}">
+        </div>
+        <input type="text" placeholder="Логин" formControlName="login">
+      </div>
+      <div class="dialogFormItem">
+        <div class="img-box">
+          <img src="{{isThemeDark() ? 'assets/icons/password-icon-dark.svg' : 'assets/icons/password-icon-light.svg'}}">
+        </div>
+        <input type="password" placeholder="Пароль" formControlName="password">
+      </div>
+      <button class="filled" (click)="loginUser()">ВОЙТИ</button>
+    </form>
+  </div>
+  <ng-template #registrationFormContainer>
+    <div class="form-container">
+      <form [formGroup]="formGroupRegistration">
+        <div class="errorMessageBox">
+          {{errorMessageText}}
+        </div>
+        <div class="dialogFormItem">
+          <div class="img-box">
+            <img src="{{isThemeDark() ? 'assets/icons/login-icon-dark.svg' : 'assets/icons/login-icon-light.svg'}}">
+          </div>
+          <input type="text" placeholder="Логин" formControlName="login">
+        </div>
+        <div class="dialogFormItem">
+          <div class="img-box">
+            <img src="{{isThemeDark() ? 'assets/icons/phone-icon-dark.svg' : 'assets/icons/phone-icon-light.svg'}}">
+          </div>
+          <input type="text" placeholder="Почта" formControlName="mail">
+        </div>
+        <div class="dialogFormItem">
+          <div class="img-box">
+            <img src="{{isThemeDark() ? 'assets/icons/password-icon-dark.svg' : 'assets/icons/password-icon-light.svg'}}">
+          </div>
+          <input type="password" placeholder="Пароль" formControlName="password">
+        </div>
+        <button class="filled accent" (click)="registerUser()">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+      </form>
+    </div>
+  </ng-template>
+</app-dialog>

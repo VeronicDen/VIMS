@@ -1,0 +1,16 @@
+<div class="slider">
+  <svg width="9" height="16" viewBox="0 0 9 16" fill="none"
+       (click)="flipSlider(false)"
+       [class.active] = isButtonActive(false)>
+    <path d="M-3.93402e-07 8L8.25 0.205772L8.25 15.7942L-3.93402e-07 8Z"/>
+  </svg>
+
+  <button *ngFor="let num of arrayOfSlideNumbers"
+    [class.active]="num == activeSlideNumber">{{num}}</button>
+
+  <svg width="9" height="16" viewBox="0 0 9 16" fill="none"
+       (click)="flipSlider(true)"
+       [class.active] = isButtonActive(true)>
+    <path d="M9 8L0.750001 0.205772L0.75 15.7942L9 8Z"/>
+  </svg>
+</div>

@@ -1,0 +1,82 @@
+@import "src/app/shared/theme-colors/theme";
+@import "src/app/shared/responsive.mixin";
+
+.container {
+  margin: 0 auto;
+  padding: 40px 0;
+
+  display: flex;
+
+  .main {
+    width: calc(100% - 204px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .logo {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .theme {
+      margin-right: 42px;
+
+      font-size: 16px;
+      font-weight: 300;
+
+      img {
+        width: 15px;
+        height: 15px;
+
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .buttons {
+    width: 204px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    .button {
+      font-size: 16px;
+      font-weight: 400;
+
+      color: $accent-color;
+    }
+  }
+
+  @include screen('tablet-portrait') {
+    .main {
+      width: calc(100% - 185px);
+
+      .theme {
+        margin-right: 30px;
+      }
+    }
+
+    .buttons {
+      width: 185px;
+    }
+  }
+
+  @include screen('phone') {
+    flex-direction: column;
+
+    .main {
+      width: 100%;
+      margin-bottom: 10px;
+
+      .theme {
+        margin-right: 0;
+      }
+    }
+
+    .buttons {
+      align-self: flex-end;
+    }
+  }
+}

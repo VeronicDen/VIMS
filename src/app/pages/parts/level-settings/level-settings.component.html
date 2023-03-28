@@ -1,0 +1,101 @@
+<div class="container">
+  <div class="level-info">
+    <h2>ИНФОРМАЦИЯ ОБ УРОВНЕ</h2>
+
+    <form [formGroup]="formGroupInfo">
+      <div class="form-item">
+        <label for="id">ID уровня</label>
+        <input type="text" id="id" maxlength="20" innerIdText formControlName="id">
+      </div>
+      <div class="form-item">
+        <label for="levelName">Название</label>
+        <input type="text" id="levelName" formControlName="caption">
+      </div>
+
+      <app-checkbox>
+        <p class="checkbox-text">Уровень-ссылка</p>
+      </app-checkbox>
+
+      <button class="filled accent" (click)="saveChanges()">СОХРАНИТЬ</button>
+    </form>
+
+  </div>
+  <div class="condition" [class.theme-light]="isThemeLight()">
+      <div class="condition-box">
+        <div class="pass">
+          <h2>УСЛОВИЯ ПРОХОЖДЕНИЯ</h2>
+          <div class="form-item">
+            <label for="pass-script">Скрипт</label>
+            <textarea id="pass-script" [(ngModel)]="passScript"></textarea>
+          </div>
+
+          <div class="add-new-item" (click)="addPassResult()">
+            <h2>РЕЗУЛЬТАТ ПРОХОЖДЕНИЯ</h2>
+            <p>+</p>
+          </div>
+
+          <div class="table">
+            <div class="row header">
+              <div class="code">Код</div>
+              <div class="type">Вид</div>
+              <div class="value">Значение</div>
+              <div class="buttons"></div>
+            </div>
+            <div class="row" *ngFor="let result of passResults">
+              <div class="code">
+                <input type="number" placeholder="Значение" [value]="result.code">
+              </div>
+              <div class="type">
+                <p-dropdown [options]="resultTypes" [(ngModel)]="result.typeCode"
+                            optionLabel="name" optionValue="code"></p-dropdown>
+              </div>
+              <div class="value">
+                <input type="number" placeholder="Значение" [value]="result.value">
+              </div>
+              <div class="buttons">
+                <button class="delete">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="drain">
+          <h2>УСЛОВИЯ СЛИВА</h2>
+          <div class="form-item">
+            <label for="drain-script">Скрипт</label>
+            <textarea id="drain-script" [(ngModel)]="drainScript"></textarea>
+          </div>
+
+          <div class="add-new-item" (click)="addDrainResult()">
+            <h2>РЕЗУЛЬТАТ СЛИВА</h2>
+            <p>+</p>
+          </div>
+
+          <div class="table">
+            <div class="row header">
+              <div class="code">Код</div>
+              <div class="type">Вид</div>
+              <div class="value">Значение</div>
+              <div class="buttons"></div>
+            </div>
+            <div class="row" *ngFor="let result of drainResults">
+              <div class="code">
+                <input type="number" placeholder="Значение" [value]="result.code">
+              </div>
+              <div class="type">
+                <p-dropdown [options]="resultTypes" [(ngModel)]="result.typeCode"
+                            optionLabel="name" optionValue="code"></p-dropdown>
+              </div>
+              <div class="value">
+                <input type="number" placeholder="Значение" [value]="result.value">
+              </div>
+              <div class="buttons">
+                <button class="delete">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="filled accent" (click)="saveResultsChanges()">СОХРАНИТЬ</button>
+  </div>
+</div>

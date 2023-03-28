@@ -1,0 +1,64 @@
+<ng-template appRef></ng-template>
+
+<div class="container">
+  <div class="users-box">
+    <p class="user-name"><span>ИГРОК</span> {{user ? user.login : '???'}}</p>
+
+    <div class="before-auth-box" *ngIf="!user, else afterAuthBox">
+      <h1>СОЗДАЙ ПРОФИЛЬ И ВЫБЕРИ ИГРУ</h1>
+      <div class="auth-button-box">
+        <button class="accent" (click)="showAuthDialog(true)">РЕГИСТРАЦИЯ</button>
+        <button (click)="showAuthDialog(false)">ВХОД</button>
+      </div>
+    </div>
+
+    <ng-template #afterAuthBox>
+      <div class="add-new-item" (click)="showNewTeamDialog()">
+        <h2>МОИ КОМАНДЫ</h2>
+        <p>+</p>
+      </div>
+
+      <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedCommand" optionLabel="name"
+                  optionValue="code" placeholder="Выбор команды">
+      </p-dropdown>
+
+    </ng-template>
+  </div>
+
+  <div class="games-box">
+    <h2>ТЕКУЩИЕ ИГРЫ</h2>
+
+    <div class="current-game" *ngFor="let game of games" [class.unlocked]="game.isUnlocked && user">
+      <div class="game-name-box">
+        <h2 class="name">
+          <span>#{{game.id}}</span> {{game.game_name}}
+        </h2>
+        <button (click)="isGameOpen.set(game.id, !isGameOpen.get(game.id))">Описание</button>
+      </div>
+      <div class="game-info-box">
+        <div class="info-item">
+          <h3>Автор: </h3>
+          <p>{{game.author}}</p>
+        </div>
+        <div class="info-item">
+          <h3>Начало игры: </h3>
+          <p>{{game.beginningOfGame}}</p>
+        </div>
+        <div class="info-item">
+          <h3>Конец игры: </h3>
+          <p>{{game.endOfGame}}</p>
+        </div>
+        <div class="additional-info" [class.open]="isGameOpen.get(game.id)">
+          <div class="info-item">
+            <h3>Описание: </h3>
+            <p>{{game.description}}</p>
+          </div>
+        </div>
+      </div>
+      <button class="accent"
+              (click)="user ? registerOrGoToTheGame(game.id) : showAuthDialog(false); ">
+        {{game.isUnlocked && user ? 'ПЕРЕЙТИ' : 'ЗАРЕГИСТРИРОВАТЬСЯ'}}
+      </button>
+    </div>
+  </div>
+</div>

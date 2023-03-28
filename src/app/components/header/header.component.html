@@ -1,0 +1,13 @@
+<div class="container">
+  <div class="main">
+    <a class="logo" routerLink="">VIMS</a>
+    <button class="theme" (click)="changeTheme()">
+      <img src="{{isThemeDark ? 'assets/icons/theme-icon-dark.svg' : 'assets/icons/theme-icon-light.svg'}}">
+      {{isThemeDark ? 'Темная' : 'Светлая'}} </button>
+  </div>
+  <div class="buttons">
+    <a class="button" (click)="followTheLink(false)">МОИ ИГРЫ</a>
+    <a class="button" (click)="followTheLink(true)">ПРОФИЛЬ</a>
+  </div>
+</div>
+
