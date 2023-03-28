@@ -37,7 +37,8 @@ export class NewTeamDialogComponent implements OnInit {
       return;
     }
 
-    this.teamApiService.setTeam(this.teamName).subscribe();
-    this.close.emit();
+    this.teamApiService.setTeam(this.teamName).subscribe(() => {
+      this.close.emit();
+    });
   }
 }

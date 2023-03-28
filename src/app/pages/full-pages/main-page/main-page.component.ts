@@ -102,6 +102,8 @@ export class MainPageComponent implements OnInit {
     if (this.currentStateService.isUserLoggedIn) {
       this.user = this.currentStateService.currentUser;
 
+      this.teams = [];
+
       this.teamApiService.getTeams().subscribe(response => {
         for (const team of response.res) {
           this.teams.push({name: team.caption, code: String(team.id)});

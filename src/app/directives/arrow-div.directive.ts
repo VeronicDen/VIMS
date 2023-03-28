@@ -18,16 +18,20 @@ export class ArrowDivDirective {
     e.preventDefault();
     switch (e.keyCode) {
       case 38:
-        this.keyboardService.sendMessage({ element: this.element, action: 'UP'})
+        this.keyboardService.sendMessage({ element: this.element, action: 'UP'});
+        e.preventDefault();
         break;
       case 37:
-        this.keyboardService.sendMessage({ element: this.element, action: 'LEFT'})
+        this.keyboardService.sendMessage({ element: this.element, action: 'LEFT'});
+        e.preventDefault();
         break;
       case 40:
-        this.keyboardService.sendMessage({ element: this.element, action: 'DOWN'})
+        this.keyboardService.sendMessage({ element: this.element, action: 'DOWN'});
+        e.preventDefault();
         break;
       case 39:
-        this.keyboardService.sendMessage({ element: this.element, action: 'RIGHT'})
+        this.keyboardService.sendMessage({ element: this.element, action: 'RIGHT'});
+        e.preventDefault();
         break;
     }
   }
