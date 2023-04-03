@@ -21,81 +21,93 @@
 
   </div>
   <div class="condition" [class.theme-light]="isThemeLight()">
-      <div class="condition-box">
-        <div class="pass">
-          <h2>УСЛОВИЯ ПРОХОЖДЕНИЯ</h2>
-          <div class="form-item">
-            <label for="pass-script">Скрипт</label>
-            <textarea id="pass-script" [(ngModel)]="passScript"></textarea>
-          </div>
-
-          <div class="add-new-item" (click)="addPassResult()">
-            <h2>РЕЗУЛЬТАТ ПРОХОЖДЕНИЯ</h2>
-            <p>+</p>
-          </div>
-
-          <div class="table">
-            <div class="row header">
-              <div class="code">Код</div>
-              <div class="type">Вид</div>
-              <div class="value">Значение</div>
-              <div class="buttons"></div>
-            </div>
-            <div class="row" *ngFor="let result of passResults">
-              <div class="code">
-                <input type="number" placeholder="Значение" [value]="result.code">
-              </div>
-              <div class="type">
-                <p-dropdown [options]="resultTypes" [(ngModel)]="result.typeCode"
-                            optionLabel="name" optionValue="code"></p-dropdown>
-              </div>
-              <div class="value">
-                <input type="number" placeholder="Значение" [value]="result.value">
-              </div>
-              <div class="buttons">
-                <button class="delete">+</button>
-              </div>
-            </div>
-          </div>
+    <div class="scripts-box">
+      <div class="pass">
+        <h2>УСЛОВИЯ ПРОХОЖДЕНИЯ</h2>
+        <div class="form-item">
+          <label for="pass-script">Скрипт</label>
+          <textarea id="pass-script" [ngModel]="currentLevel ? currentLevel.condition_script : null"
+                    (ngModelChange)="currentLevel ? currentLevel.condition_script = $event : null"></textarea>
         </div>
-        <div class="drain">
-          <h2>УСЛОВИЯ СЛИВА</h2>
-          <div class="form-item">
-            <label for="drain-script">Скрипт</label>
-            <textarea id="drain-script" [(ngModel)]="drainScript"></textarea>
-          </div>
+      </div>
 
-          <div class="add-new-item" (click)="addDrainResult()">
-            <h2>РЕЗУЛЬТАТ СЛИВА</h2>
-            <p>+</p>
-          </div>
+      <div class="failed">
+        <h2>УСЛОВИЯ СЛИВА</h2>
+        <div class="form-item">
+          <label for="failed-script">Скрипт</label>
+          <textarea id="failed-script" [ngModel]="currentLevel ? currentLevel.failed_condition_script : null"
+                    (ngModelChange)="currentLevel ? currentLevel.failed_condition_script = $event : null"></textarea>
+        </div>
+      </div>
+    </div>
 
-          <div class="table">
-            <div class="row header">
-              <div class="code">Код</div>
-              <div class="type">Вид</div>
-              <div class="value">Значение</div>
-              <div class="buttons"></div>
+    <div class="error-message" *ngIf="errorMessage.length > 0">
+      <p>{{errorMessage}}</p>
+    </div>
+
+    <div class="result-box">
+      <div class="pass">
+        <div class="add-new-item" (click)="addSuccessResult()">
+          <h2>РЕЗУЛЬТАТ ПРОХОЖДЕНИЯ</h2>
+          <p>+</p>
+        </div>
+
+        <div class="table" *ngIf="currentLevel?.success_result_values.length > 0">
+          <div class="row header">
+            <div class="code">Код</div>
+            <div class="type">Вид</div>
+            <div class="value">Значение</div>
+            <div class="buttons"></div>
+          </div>
+          <div class="row" *ngFor="let result of currentLevel.success_result_values">
+            <div class="code">
+              <input type="number" placeholder="Значение" [(ngModel)]="result.result_code">
             </div>
-            <div class="row" *ngFor="let result of drainResults">
-              <div class="code">
-                <input type="number" placeholder="Значение" [value]="result.code">
-              </div>
-              <div class="type">
-                <p-dropdown [options]="resultTypes" [(ngModel)]="result.typeCode"
-                            optionLabel="name" optionValue="code"></p-dropdown>
-              </div>
-              <div class="value">
-                <input type="number" placeholder="Значение" [value]="result.value">
-              </div>
-              <div class="buttons">
-                <button class="delete">+</button>
-              </div>
+            <div class="type">
+              <p-dropdown [options]="resultTypes" [(ngModel)]="result.result_type"
+                          optionLabel="name" optionValue="code"></p-dropdown>
+            </div>
+            <div class="value">
+              <input type="number" placeholder="Значение" [(ngModel)]="result.result_value">
+            </div>
+            <div class="buttons">
+              <button class="delete" (click)="deleteResult(true, result)">+</button>
             </div>
           </div>
         </div>
       </div>
+      <div class="failed">
+        <div class="add-new-item" (click)="addFailedResult()">
+          <h2>РЕЗУЛЬТАТ СЛИВА</h2>
+          <p>+</p>
+        </div>
 
-      <button class="filled accent" (click)="saveResultsChanges()">СОХРАНИТЬ</button>
+        <div class="table" *ngIf="currentLevel?.failed_result_values.length > 0">
+          <div class="row header">
+            <div class="code">Код</div>
+            <div class="type">Вид</div>
+            <div class="value">Значение</div>
+            <div class="buttons"></div>
+          </div>
+          <div class="row" *ngFor="let result of currentLevel.failed_result_values">
+            <div class="code">
+              <input type="number" placeholder="Значение" [(ngModel)]="result.result_code">
+            </div>
+            <div class="type">
+              <p-dropdown [options]="resultTypes" [(ngModel)]="result.result_type"
+                          optionLabel="name" optionValue="code"></p-dropdown>
+            </div>
+            <div class="value">
+              <input type="number" placeholder="Значение" [(ngModel)]="result.result_value">
+            </div>
+            <div class="buttons">
+              <button class="delete" (click)="deleteResult(false, result)">+</button>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+
+    <button class="filled accent" (click)="saveChanges()">СОХРАНИТЬ</button>
   </div>
 </div>

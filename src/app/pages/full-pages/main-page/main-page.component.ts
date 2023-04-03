@@ -7,16 +7,8 @@ import {NewTeamDialogComponent} from "../../dialogs/new-team-dialog/new-team-dia
 import {Option} from "../../../models/option";
 import {TeamApiService} from "../../../modules/api/team-api.service";
 import {UserApiService} from "../../../modules/api/user-api.service";
-
-interface PlayerGame {
-  isUnlocked: boolean;
-  game_name: string;
-  author: string;
-  beginningOfGame: string;
-  endOfGame: string;
-  description: string;
-  id: number;
-}
+import {PlayerGame} from "../../../models/user/player-game";
+import * as moment from "moment";
 
 /**
  * Стартовая страница
@@ -35,13 +27,16 @@ export class MainPageComponent implements OnInit {
   games: PlayerGame[] = [];
 
   /** Ассоциативный массив флагов открытия игр */
-  isGameOpen = new Map<number, boolean>();
+  isGameOpenMap = new Map<number, boolean>();
+
+  /** Ассоциативный массив флагов открытия игр */
+  isGameUnlockedMap = new Map<number, boolean>();
 
   /** Список команд для выпадающего меню */
   teams: Option<string>[] = [];
 
   /** Команда, выбранная из списка */
-  selectedCommand: Option<string>;
+  selectedTeam: string;
 
   @ViewChild(RefDirective)
   refDir: RefDirective
@@ -51,7 +46,8 @@ export class MainPageComponent implements OnInit {
     private currentStateService: CurrentStateService,
     private teamApiService: TeamApiService,
     private userApiService: UserApiService,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.getActualInfo()
@@ -101,47 +97,26 @@ export class MainPageComponent implements OnInit {
   getActualInfo(): void {
     if (this.currentStateService.isUserLoggedIn) {
       this.user = this.currentStateService.currentUser;
-
       this.teams = [];
 
       this.teamApiService.getTeams().subscribe(response => {
         for (const team of response.res) {
           this.teams.push({name: team.caption, code: String(team.id)});
         }
+        if (this.teams.length != 0)
+          this.selectedTeam = this.teams[0].code;
       });
     }
 
-    this.games = [{
-      id: 30, author: 'trulyalya', game_name: 'Нумерология опустошения II: Декаданс', isUnlocked: false,
-      beginningOfGame: '02.08.2022', endOfGame: '03.08.2022', description: '- 20 кодов по меткам\n' +
-        '- играет небоян\n' +
-        '- в команде до 3 человек\n' +
-        '- формат кода: словочисло\n' +
-        '- продолжительность ровно 2 часа от старта, опоздавших не ждем'
-    },{
-      id: 31, author: 'trulyalya', game_name: 'Нумерология опустошения II: Декаданс', isUnlocked: true,
-      beginningOfGame: '02.08.2022', endOfGame: '03.08.2022', description: '- 20 кодов по меткам\n' +
-        '- играет небоян\n' +
-        '- в команде до 3 человек\n' +
-        '- формат кода: словочисло\n' +
-        '- продолжительность ровно 2 часа от старта, опоздавших не ждем'
-    },{
-      id: 32, author: 'trulyalya', game_name: 'Нумерология опустошения II: Декаданс', isUnlocked: false,
-      beginningOfGame: '02.08.2022', endOfGame: '03.08.2022', description: '- 20 кодов по меткам\n' +
-        '- играет небоян\n' +
-        '- в команде до 3 человек\n' +
-        '- формат кода: словочисло\n' +
-        '- продолжительность ровно 2 часа от старта, опоздавших не ждем'
-    },]
-
-    for (const game of this.games) {
-      this.isGameOpen.set(game.id, false);
-    }
-
     this.userApiService.getActualGames().subscribe(response => {
-      //TODO: текущие игры
-      //this.games = response.res;
-      //console.log(response.res);
+      this.games = response.res.sort(
+        (a, b) => moment(a.creation_date) < moment(b.creation_date) ? -1 : 1);
+
+      for (const game of this.games) {
+        this.isGameOpenMap.set(game.id, false);
+      }
+
+      this.setGameUnlocked();
     })
   }
 
@@ -149,7 +124,41 @@ export class MainPageComponent implements OnInit {
    * Регистрирует пользователя на игру
    * @param gameId идентификатор игры
    */
-  registerOrGoToTheGame(gameId: number): void {
+  applyOrGoToTheGame(gameId: number): void {
+    if (this.user) {
+      if (this.isGameUnlockedMap.get(gameId)) {
+        if (this.games.find(a => a.id == gameId).game_state == 'started')
+          console.log('переход к игре')
+        //TODO: переход к игре
+      } else {
+        this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(response => {
+          this.getActualInfo();
+        })
+      }
+    } else
+      this.showAuthDialog(false);
+  }
 
+  setGameUnlocked(): void {
+    for (const game of this.games) {
+      this.isGameUnlockedMap.set(game.id, false);
+      if (this.selectedTeam) {
+        this.isGameUnlockedMap.set(game.id, !!game.teams.find(a => a.id == this.selectedTeam));
+      }
+    }
+  }
+
+  setGameButtonState(gameId: number): string {
+    if (this.user && this.isGameUnlockedMap.get(gameId)) {
+      if (this.games.find(a => a.id == gameId).game_state == 'started')
+        return 'ПЕРЕЙТИ';
+      else {
+        if (this.games.find(a => a.id == gameId).teams.find(a => a.id == this.selectedTeam).accepted == 1)
+          return 'ВЫ ЗАРЕГИСТРИРОВАНЫ';
+        else
+          return 'ВЫ ПОДАЛИ ЗАЯВКУ';
+      }
+    } else
+      return 'ЗАРЕГИСТРИРОВАТЬСЯ';
   }
 }

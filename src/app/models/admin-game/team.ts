@@ -1,14 +1,14 @@
 /**
- * Модель данных команды
+ * Модель данных команды в игре
  */
 export interface Team {
 
   /** Идентификатор команды */
-  id?: number,
+  id: number,
 
   /** Имя команды */
   caption: string,
 
-  /** Дата создания команды */
-  creation_date: Date,
+  /** Статус в игре */
+  accepted: number;
 }

@@ -1,6 +1,10 @@
 /**
  * Модель данных уровня
  */
+import {CodeResult} from "./code-result";
+import {Infos} from "./infos";
+import {Code} from "./code";
+
 export interface Level {
 
   /** Идентификатор уровня */
@@ -18,6 +22,20 @@ export interface Level {
   /** Скрипт прохождения */
   condition_script: string,
 
-  /** Скрипт слива */
+  /** Результаты прохождения */
+  success_result_values: CodeResult[],
+
+  /** Скрипт провала */
   failed_condition_script: string,
+
+  /** Результаты провала */
+  failed_result_values: CodeResult[],
+
+  deleted?: any,
+
+  /** Блоки информации */
+  infos?: Infos[],
+
+  /** Коды */
+  codes?: Code[],
 }

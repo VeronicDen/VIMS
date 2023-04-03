@@ -3,7 +3,7 @@ import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {SimpleResponse} from "../../models/simple-response";
-import {Team} from "../../models/team";
+import {PlayerTeam} from "../../models/user/player-team";
 
 /**
  * Сервис для отправки запросов команд
@@ -21,8 +21,8 @@ export class TeamApiService {
   /**
    * Отправляет запрос для получения списка команд
    */
-  getTeams(): Observable<SimpleResponse<Team[]>> {
-    return this.httpClient.get<SimpleResponse<Team[]>>(this.urlPrime);
+  getTeams(): Observable<SimpleResponse<PlayerTeam[]>> {
+    return this.httpClient.get<SimpleResponse<PlayerTeam[]>>(this.urlPrime);
   }
 
   /**
@@ -32,4 +32,15 @@ export class TeamApiService {
   setTeam(caption: string): Observable<SimpleResponse<any>> {
     return this.httpClient.post<SimpleResponse<any>>(this.urlPrime, {caption});
   }
+
+  /**
+   * Отправляет запрос на участие команды в игре
+   * @param game_id идентификатор игры
+   * @param teamId идентификатор команды
+   */
+  applyToGame(game_id: number, teamId: number): Observable<SimpleResponse<any>> {
+    return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${teamId}/apply-to-game`, {game_id});
+  }
+
+
 }

@@ -18,8 +18,8 @@
         <p>+</p>
       </div>
 
-      <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedCommand" optionLabel="name"
-                  optionValue="code" placeholder="Выбор команды">
+      <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam" (onChange)="setGameUnlocked()"
+                  optionLabel="name" optionValue="code" placeholder="Выбор команды">
       </p-dropdown>
 
     </ng-template>
@@ -28,37 +28,37 @@
   <div class="games-box">
     <h2>ТЕКУЩИЕ ИГРЫ</h2>
 
-    <div class="current-game" *ngFor="let game of games" [class.unlocked]="game.isUnlocked && user">
+    <div class="current-game" *ngFor="let game of games"
+         [class.unlocked]="user && game.game_state == 'started' && isGameUnlockedMap.get(game.id)">
       <div class="game-name-box">
         <h2 class="name">
-          <span>#{{game.id}}</span> {{game.game_name}}
+          <span>#{{game.id}}</span> {{game.caption}}
         </h2>
-        <button (click)="isGameOpen.set(game.id, !isGameOpen.get(game.id))">Описание</button>
+        <button (click)="isGameOpenMap.set(game.id, !isGameOpenMap.get(game.id))"
+                *ngIf="game.description">Описание</button>
       </div>
       <div class="game-info-box">
-        <div class="info-item">
+        <div class="info-item" *ngIf="game.author">
           <h3>Автор: </h3>
           <p>{{game.author}}</p>
         </div>
-        <div class="info-item">
+        <div class="info-item" *ngIf="game.beginningOfGame">
           <h3>Начало игры: </h3>
           <p>{{game.beginningOfGame}}</p>
         </div>
-        <div class="info-item">
+        <div class="info-item" *ngIf="game.endOfGame">
           <h3>Конец игры: </h3>
           <p>{{game.endOfGame}}</p>
         </div>
-        <div class="additional-info" [class.open]="isGameOpen.get(game.id)">
+        <div class="additional-info" [class.open]="isGameOpenMap.get(game.id)">
           <div class="info-item">
             <h3>Описание: </h3>
             <p>{{game.description}}</p>
           </div>
         </div>
       </div>
-      <button class="accent"
-              (click)="user ? registerOrGoToTheGame(game.id) : showAuthDialog(false); ">
-        {{game.isUnlocked && user ? 'ПЕРЕЙТИ' : 'ЗАРЕГИСТРИРОВАТЬСЯ'}}
-      </button>
+      <button (click)="user ? applyOrGoToTheGame(game.id) : showAuthDialog(false); "
+              class="accent">{{setGameButtonState(game.id)}}</button>
     </div>
   </div>
 </div>

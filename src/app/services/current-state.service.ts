@@ -29,8 +29,6 @@ export class CurrentStateService {
   /** Идентификатор открытой игры */
   currentGameId: number;
 
-  currentGame: Game;
-
   /** Идентификатор открытого уровня */
   currentLevelId: number;
 

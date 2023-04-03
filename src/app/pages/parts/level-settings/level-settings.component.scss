@@ -26,8 +26,10 @@
   .condition {
     width: 760px;
 
-    .condition-box {
+    .scripts-box,
+    .result-box {
       display: flex;
+      justify-content: space-between;
 
       h2 {
         margin-bottom: 20px;
@@ -38,7 +40,7 @@
       }
 
       .pass,
-      .drain {
+      .failed {
         width: 360px;
 
         textarea {
@@ -63,6 +65,16 @@
             margin-right: 15px;
           }
         }
+      }
+    }
+
+    .error-message {
+      width: 100%;
+      padding: 0 0 25px 0;
+
+      p {
+        text-align: center;
+        color: $accent-color;
       }
     }
   }
@@ -101,11 +113,12 @@
       width: 100%;
       margin-top: 30px;
 
-      .condition-box {
+      .scripts-box,
+      .result-box {
         width: 100%;
         justify-content: space-between;
 
-        .pass, .drain {
+        .pass, .failed {
           width: calc(50% - 40px);
         }
       }
@@ -123,8 +136,9 @@
       }
     }
 
-    .condition .condition-box {
-      .pass, .drain {
+    .condition .scripts-box,
+    .condition .result-box {
+      .pass, .failed {
         width: calc(50% - 20px);
 
         .add-new-item h2 {
@@ -145,10 +159,11 @@
       }
     }
 
-    .condition .condition-box {
+    .condition .scripts-box,
+    .condition .result-box {
       flex-direction: column;
 
-      .pass, .drain {
+      .pass, .failed {
         width: 100%;
         margin-bottom: 30px;
       }
@@ -177,8 +192,9 @@
       }
     }
 
-    .condition .condition-box {
-      .pass, .drain {
+    .condition .scripts-box,
+    .condition .result-box {
+      .pass, .failed {
         margin-right: 0;
 
         .table .row {

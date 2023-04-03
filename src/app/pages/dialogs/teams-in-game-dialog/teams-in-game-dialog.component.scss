@@ -89,3 +89,12 @@
     }
   }
 }
+
+.message {
+  padding: 0 40px 28px 40px;
+
+  p {
+    color: $accent-color;
+    text-align: center;
+  }
+}

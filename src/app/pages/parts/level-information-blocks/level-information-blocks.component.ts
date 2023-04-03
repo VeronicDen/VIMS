@@ -47,12 +47,12 @@ export class LevelInformationBlocksComponent implements OnInit {
 
     this.gameApiService.getLevels(this.gameId).subscribe(response => {
       for (const level of response.res) {
-        if (this.levelId != +level.inner_id)
+        if (this.levelId != +level.id)
           this.levelsForLinks.push({name: level.caption, code: level.inner_id})
       }
-      this.getActualInfo();
     });
 
+    this.getActualInfo();
   }
 
   /**
@@ -74,7 +74,7 @@ export class LevelInformationBlocksComponent implements OnInit {
       info_text: "",
       info_type: "SIMPLE",
       condition_script: "",
-      level_link: ""
+      linked_level_id: ""
     }
 
     this.gameApiService.setInfoBlock(this.gameId, this.levelId, infoBlock).subscribe(response => {
@@ -94,7 +94,7 @@ export class LevelInformationBlocksComponent implements OnInit {
       info_text: block.info_text,
       info_type: block.info_type,
       condition_script: block.condition_script,
-      level_link: block.level_link,
+      linked_level_id: block.linked_level_id,
     }
 
     this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(response => {

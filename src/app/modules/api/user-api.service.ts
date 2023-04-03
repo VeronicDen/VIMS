@@ -3,6 +3,9 @@ import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {SimpleResponse} from "../../models/simple-response";
+import {Response} from "../../models/response";
+import {Game} from "../../models/admin-game/game";
+import {PlayerGame} from "../../models/user/player-game";
 
 /**
  * Сервис для отправки запросов пользователя
@@ -22,7 +25,7 @@ export class UserApiService {
   /**
    * Отправляет запрос для получения текущих игр
    */
-  getActualGames(): Observable<SimpleResponse<any>> {
-    return this.httpClient.get<SimpleResponse<any>>(this.urlPrime + 'games')
+  getActualGames(): Observable<Response<PlayerGame[]>> {
+    return this.httpClient.get<Response<PlayerGame[]>>(this.urlPrime + 'games')
   }
 }

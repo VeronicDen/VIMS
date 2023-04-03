@@ -73,27 +73,6 @@ a {
   }
 }
 
-/*
-  @import "src/app/shared/responsive.mixin";
-
-  @include screen('desktop') {
-
-  }
-
-  @include screen('tablet-landscape') {
-
-  }
-
-  @include screen('tablet-portrait') {
-
-  }
-
-  @include screen('phone') {
-
-  }
-
- */
-
 //ШРИФТЫ
 
 h1 {
@@ -150,7 +129,6 @@ button {
 }
 
 .buttons {
-
   button {
     width: 21px;
     height: 21px;
@@ -497,13 +475,15 @@ textarea:read-only {
     border-color: #FFFFFF;
     box-shadow: none;
   }
+
+  .p-inputtext {
+    padding: 3px 20px 8px 10px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-color);
+  }
 }
 
-.p-inputtext {
-  padding: 3px 20px 8px 10px;
-  font-size: 16px;
-  font-weight: 400;
-}
 
 .p-dropdown-items-wrapper {
   max-height: 188px !important;
@@ -522,7 +502,10 @@ textarea:read-only {
   background-color: #FFFFFF;
   background-image: url("assets/icons/dropdown-icon-up.svg");
   border: 1px solid #FFFFFF;
-  color: #000000;
+
+  .p-inputtext {
+    color: #000000 !important;
+  }
 }
 
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item {

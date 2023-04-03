@@ -16,7 +16,6 @@ export class Utils {
 
     while (!isNew) {
       result = this.setNumberWithZeroAsString(arr.length + count + extraLength, digitsNumbers);
-
       arr.find(el => el[fieldName] == result) ? count++ : isNew = true;
     }
 

@@ -25,15 +25,7 @@ export class GamePlayComponent implements OnInit {
 
   ngOnInit(): void {
     this.gameName = 'Игра 1';
-    this.levels = [{
-      id: 0, inner_id: '001', caption: 'Уровень 1', level_type: '123', condition_script: '98765432', failed_condition_script: '98765432'
-    },{
-      id: 1, inner_id: '002', caption: 'Уровень 2', level_type: '123', condition_script: '9876543', failed_condition_script: '9876543'
-    },{
-      id: 2, inner_id: '003', caption: 'Уровень 3', level_type: '123', condition_script: '987654', failed_condition_script: '987654'
-    },{
-      id: 3, inner_id: '004', caption: 'Уровень 4', level_type: '123', condition_script: '98765', failed_condition_script: '98765'
-    }];
+    this.levels = [];
 
     this.actualLevel = this.levels[0];
 

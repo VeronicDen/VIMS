@@ -2,21 +2,24 @@
   <div class="box">
     <div class="command-list-box unaccepted">
       <p class="header">Непринятые команды</p>
-      <div class="command">
+      <div class="command" *ngFor="let team of rejectedTeams" (click)="moveTeam(team.id, false)">
         <div class="button-box">
           <img src="./assets/icons/add-icon.svg">
         </div>
-        <p>команда 1</p>
+        <p>{{team.caption}}</p>
       </div>
     </div>
     <div class="command-list-box accepted">
       <p class="header">Принятые команды</p>
-      <div class="command">
+      <div class="command" *ngFor="let team of acceptedTeams" (click)="moveTeam(team.id, true)">
         <div class="button-box">
           <img src="./assets/icons/put-away-icon.svg">
         </div>
-        <p>команда 2</p>
+        <p>{{team.caption}}</p>
       </div>
     </div>
+  </div>
+  <div class="message" *ngIf="isGameStarted">
+    <p>Вы не можете изменять списки, пока игра запущена</p>
   </div>
 </app-dialog>

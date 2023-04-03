@@ -40,8 +40,6 @@ export class GameCreationComponent implements OnInit {
   /** Флаг открытия контейнера с основной информацией об игре */
   isMainInfoBoxOpened: boolean = false;
 
-  isButtonNamesShort: boolean = false;
-
   /** Флаг начала игры */
   isGameStarted: boolean = false;
 
@@ -99,8 +97,9 @@ export class GameCreationComponent implements OnInit {
     })
 
     this.gameApiService.getLevels(this.gameId).subscribe(response => {
-      this.levels = response.res.sort((a, b) => a.id > b.id ? -1 : 1);
+      this.levels = response.res.sort((a, b) => a.inner_id < b.inner_id ? -1 : 1);
     });
+
   }
 
   /**
@@ -114,6 +113,9 @@ export class GameCreationComponent implements OnInit {
 
     const component = this.refDir.viewContainerRef.createComponent(modalFactory);
 
+    component.instance.teams = this.currentGame.teams;
+    component.instance.gameId = this.currentGame.id;
+    component.instance.isGameStarted = this.isGameStarted;
     component.instance.close.subscribe(() => {
       this.refDir.viewContainerRef.clear();
       this.currentStateService.isDialogOpened = false;
@@ -139,6 +141,8 @@ export class GameCreationComponent implements OnInit {
       level_type: 'SIMPLE',
       condition_script: '',
       failed_condition_script: '',
+      success_result_values: [],
+      failed_result_values: [],
     }
 
     for (let i = 0; i < this.numberOfNewLevels; i++) {
@@ -148,7 +152,10 @@ export class GameCreationComponent implements OnInit {
     }
 
     this.numberOfNewLevels = null;
-    this.getActualInfo();
+
+    setTimeout(() => {
+      this.getActualInfo();
+    }, 1000)
   }
 
   /**
@@ -177,6 +184,7 @@ export class GameCreationComponent implements OnInit {
    * Сохраняет основную информацию об игре
    */
   saveInfo(): void {
-    console.log(this.formGroupInfo.controls.script.value)
+    this.gameApiService.putGame(this.currentGame.id, this.formGroupInfo.controls.caption.value,
+      this.formGroupInfo.controls.script.value).subscribe();
   }
 }

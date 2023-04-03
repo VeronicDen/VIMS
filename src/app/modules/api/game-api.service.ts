@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
@@ -7,6 +7,7 @@ import {Game} from "../../models/admin-game/game";
 import {Level} from "../../models/admin-game/level";
 import {Infos} from "../../models/admin-game/infos";
 import {Code} from "../../models/admin-game/code";
+import {Response} from "../../models/response";
 
 /**
  * Сервис для отправки запросов игр
@@ -19,7 +20,8 @@ export class GameApiService {
 
   constructor(
     private httpClient: HttpClient,
-  ) { }
+  ) {
+  }
 
   /**
    * Отправляет запрос для получения списка игр
@@ -42,6 +44,16 @@ export class GameApiService {
    */
   setGame(caption: string): Observable<SimpleResponse<any>> {
     return this.httpClient.post<SimpleResponse<any>>(this.urlPrime, {caption});
+  }
+
+  /**
+   * Отправляет запрос на изменение основной информации об игре
+   * @param gameId идентификатор игры
+   * @param caption название игры
+   * @param game_yaml основной скрипт
+   */
+  putGame(gameId: number, caption: string, game_yaml: string): Observable<SimpleResponse<any>> {
+    return this.httpClient.put<SimpleResponse<any>>(`${this.urlPrime}/${gameId}`, {caption, game_yaml});
   }
 
   /**
@@ -76,8 +88,8 @@ export class GameApiService {
    * @param gameId идентификатор игры
    * @param levelId идентификатор уровня
    */
-  putLevel(level: Level, gameId: number, levelId: number): Observable<SimpleResponse<any>> {
-    return this.httpClient.put<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/levels/${levelId}`, level);
+  putLevel(level: Level, gameId: number, levelId: number): Observable<Response<any>> {
+    return this.httpClient.put<Response<any>>(`${this.urlPrime}/${gameId}/levels/${levelId}`, level);
   }
 
   /**
@@ -146,5 +158,13 @@ export class GameApiService {
    */
   setCode(gameId: number, levelId: number, code: Code[]): Observable<SimpleResponse<Code[]>> {
     return this.httpClient.post<SimpleResponse<Code[]>>(`${this.urlPrime}/${gameId}/levels/${levelId}/codes`, {codes: code});
+  }
+
+  acceptTeam(gameId: number, gameTeamId: number): Observable<SimpleResponse<any>> {
+    return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/teams/${gameTeamId}/accept`, {});
+  }
+
+  rejectTeam(gameId: number, gameTeamId: number): Observable<SimpleResponse<any>> {
+    return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/teams/${gameTeamId}/reject`, {});
   }
 }

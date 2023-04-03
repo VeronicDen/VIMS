@@ -19,5 +19,5 @@ export interface Infos {
   condition_script?: string;
 
   /** Ссылка на уровень */
-  level_link?: string;
+  linked_level_id?: string;
 }

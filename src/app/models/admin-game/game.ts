@@ -1,6 +1,8 @@
 /**
  * Модель данных игры
  */
+import {Team} from "./team";
+
 export interface Game {
 
   /** Идентификатор игры */
@@ -20,4 +22,7 @@ export interface Game {
 
   /** Основной скрипт игры */
   game_yaml: string;
+
+  /** Комманды зарегистрированные в игре */
+  teams: Team[];
 }
