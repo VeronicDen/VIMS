@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
-import {environment} from "../../../environments/environment";
+import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {SimpleResponse} from "../../models/simple-response";
-import {Game} from "../../models/admin-game/game";
-import {Level} from "../../models/admin-game/level";
-import {Infos} from "../../models/admin-game/infos";
-import {Code} from "../../models/admin-game/code";
-import {Response} from "../../models/response";
+import {SimpleResponse} from "../models/simple-response";
+import {Game} from "../models/admin-game/game";
+import {Level} from "../models/admin-game/level";
+import {Infos} from "../models/admin-game/infos";
+import {Code} from "../models/admin-game/code";
+import {Response} from "../models/response";
 
 /**
  * Сервис для отправки запросов игр
@@ -160,10 +160,20 @@ export class GameApiService {
     return this.httpClient.post<SimpleResponse<Code[]>>(`${this.urlPrime}/${gameId}/levels/${levelId}/codes`, {codes: code});
   }
 
+  /**
+   * Подтверждает участие команды в игре
+   * @param gameId идентификатор игры
+   * @param gameTeamId идентификатор уровня
+   */
   acceptTeam(gameId: number, gameTeamId: number): Observable<SimpleResponse<any>> {
     return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/teams/${gameTeamId}/accept`, {});
   }
 
+  /**
+   * Отказывает команде в участии в игре
+   * @param gameId идентификатор игры
+   * @param gameTeamId идентификатор уровня
+   */
   rejectTeam(gameId: number, gameTeamId: number): Observable<SimpleResponse<any>> {
     return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/teams/${gameTeamId}/reject`, {});
   }

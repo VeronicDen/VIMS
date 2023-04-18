@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {LocalStorageService} from "../../../services/local-storage.service";
 import {Option} from "../../../models/option";
 import {CurrentStateService} from "../../../services/current-state.service";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Level} from 'src/app/models/admin-game/level';
 import {CodeResult} from "../../../models/admin-game/code-result";
@@ -109,6 +109,11 @@ export class LevelSettingsComponent implements OnInit {
     this.currentLevel.failed_result_values.push({result_code: '', result_type: 'fine', result_value: ''});
   }
 
+  /**
+   * Удаляет результат
+   * @param isSuccess флаг результата прохождения
+   * @param result результат
+   */
   deleteResult(isSuccess: boolean, result: CodeResult): void {
     if (isSuccess) {
       this.currentLevel.success_result_values.splice(this.currentLevel.success_result_values.findIndex(

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {LocalStorageService} from "../../../services/local-storage.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {AuthApiService} from "../../../modules/api/auth-api.service";
+import {AuthApiService} from "../../../api/auth-api.service";
 import {RegistrationBody} from "../../../models/auth/registration-body";
 import {CurrentStateService} from "../../../services/current-state.service";
 import {LoginBody} from "../../../models/auth/login-body";
@@ -125,7 +125,10 @@ export class AuthDialogComponent implements OnInit {
     })
   }
 
-  /** Переключает форму */
+  /**
+   * Переключает форму
+   * @param isToRegistration флаг открытия окна регистрации
+   */
   changeForm(isToRegistration: boolean): void {
     this.isRegistration = !isToRegistration;
     this.errorMessageText = '';

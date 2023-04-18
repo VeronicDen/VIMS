@@ -5,10 +5,13 @@ import {CurrentStateService} from "../../../services/current-state.service";
 import {User} from "../../../models/auth/user";
 import {NewTeamDialogComponent} from "../../dialogs/new-team-dialog/new-team-dialog.component";
 import {Option} from "../../../models/option";
-import {TeamApiService} from "../../../modules/api/team-api.service";
-import {UserApiService} from "../../../modules/api/user-api.service";
+import {TeamApiService} from "../../../api/team-api.service";
+import {UserApiService} from "../../../api/user-api.service";
 import {PlayerGame} from "../../../models/user/player-game";
 import * as moment from "moment";
+import {ActionApiService} from "../../../api/action-api.service";
+import {Router} from "@angular/router";
+import {LocalStorageService} from "../../../services/local-storage.service";
 
 /**
  * Стартовая страница
@@ -43,9 +46,12 @@ export class MainPageComponent implements OnInit {
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
+    private router: Router,
     private currentStateService: CurrentStateService,
     private teamApiService: TeamApiService,
     private userApiService: UserApiService,
+    private actionApiService: ActionApiService,
+    private localStorageService: LocalStorageService,
   ) {
   }
 
@@ -95,18 +101,6 @@ export class MainPageComponent implements OnInit {
    * Получает актуальную информацию
    */
   getActualInfo(): void {
-    if (this.currentStateService.isUserLoggedIn) {
-      this.user = this.currentStateService.currentUser;
-      this.teams = [];
-
-      this.teamApiService.getTeams().subscribe(response => {
-        for (const team of response.res) {
-          this.teams.push({name: team.caption, code: String(team.id)});
-        }
-        if (this.teams.length != 0)
-          this.selectedTeam = this.teams[0].code;
-      });
-    }
 
     this.userApiService.getActualGames().subscribe(response => {
       this.games = response.res.sort(
@@ -116,7 +110,20 @@ export class MainPageComponent implements OnInit {
         this.isGameOpenMap.set(game.id, false);
       }
 
-      this.setGameUnlocked();
+      if (this.currentStateService.isUserLoggedIn) {
+        this.user = this.currentStateService.currentUser;
+        this.teams = [];
+
+        this.teamApiService.getTeams().subscribe(response => {
+          for (const team of response.res) {
+            this.teams.push({name: team.caption, code: String(team.id)});
+          }
+          if (this.teams.length != 0)
+            this.selectedTeam = this.teams[0].code;
+
+          this.setGameUnlockedMap();
+        });
+      }
     })
   }
 
@@ -127,9 +134,12 @@ export class MainPageComponent implements OnInit {
   applyOrGoToTheGame(gameId: number): void {
     if (this.user) {
       if (this.isGameUnlockedMap.get(gameId)) {
-        if (this.games.find(a => a.id == gameId).game_state == 'started')
-          console.log('переход к игре')
-        //TODO: переход к игре
+        if (this.games.find(a => a.id == gameId).game_state == 'started') {
+          this.actionApiService.submitRequestToGame(gameId).subscribe(response => {
+            this.localStorageService.game_token = response.res.res;
+            this.router.navigate(['game']);
+          })
+        }
       } else {
         this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(response => {
           this.getActualInfo();
@@ -139,7 +149,10 @@ export class MainPageComponent implements OnInit {
       this.showAuthDialog(false);
   }
 
-  setGameUnlocked(): void {
+  /**
+   * Заполняет ассоциативный массив разблокированных игр
+   */
+  setGameUnlockedMap(): void {
     for (const game of this.games) {
       this.isGameUnlockedMap.set(game.id, false);
       if (this.selectedTeam) {
@@ -148,6 +161,10 @@ export class MainPageComponent implements OnInit {
     }
   }
 
+  /**
+   * Назначает текст кнопки игры
+   * @param gameId идентификатор игры
+   */
   setGameButtonState(gameId: number): string {
     if (this.user && this.isGameUnlockedMap.get(gameId)) {
       if (this.games.find(a => a.id == gameId).game_state == 'started')

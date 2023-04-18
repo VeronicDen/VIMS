@@ -2,8 +2,8 @@ import {Injectable} from "@angular/core";
 import {BehaviorSubject, catchError, filter, Observable, switchMap, take, throwError} from "rxjs";
 import {AuthApiService} from "./auth-api.service";
 import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from "@angular/common/http";
-import {CurrentStateService} from "../../services/current-state.service";
-import {LocalStorageService} from "../../services/local-storage.service";
+import {CurrentStateService} from "../services/current-state.service";
+import {LocalStorageService} from "../services/local-storage.service";
 import jwt_decode from "jwt-decode";
 
 /**
@@ -52,8 +52,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
       const token = this.localStorageService.refresh_token;
 
-      console.log(token)
-
       if (token) {
         return this.authApiService.getRefreshToken(token).pipe(
           switchMap((token: any) => {
@@ -85,45 +83,4 @@ export class AuthInterceptor implements HttpInterceptor {
       switchMap((token) => next.handle(this.addTokenHeader(request, token)))
     );
   }
-
-  /** constructor(
-   private currentStateService: CurrentStateService,
-   private localStorageService: LocalStorageService,
-   private authApiService: AuthApiService
-   ) {}
-
-   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.currentStateService.token;
-
-    if (token) {
-      request = request.clone({
-        setHeaders: {Authorization: `Bearer ${token}`}
-      });
-    }
-
-    return next.handle(request).pipe(
-      catchError((err) => {
-        if (err instanceof HttpErrorResponse && !request.url.includes(`refresh-access`)
-          && !request.url.includes(`sign-in`) && !request.url.includes('sign-up') && err.status === 401) {
-
-          const ref_token = this.localStorageService.refresh_token;
-
-          if (ref_token) {
-            this.authApiService.getRefreshToken(this.localStorageService.refresh_token).subscribe((res) => {
-
-              this.currentStateService.token = res.token_access;
-              this.localStorageService.refresh_token = res.token_refresh;
-
-              return next.handle(request.clone({
-                setHeaders: {Authorization: `Bearer ${res.token_access}`}
-              }))
-            });
-          } else {
-            this.currentStateService.clearCurrentState();
-          }
-        }
-        return throwError(err);
-      })
-    )
-  }*/
 }

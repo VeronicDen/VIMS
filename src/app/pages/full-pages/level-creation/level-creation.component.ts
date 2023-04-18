@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {CurrentStateService} from "../../../services/current-state.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {Game} from "../../../models/admin-game/game";
 import {Level} from "../../../models/admin-game/level";
 

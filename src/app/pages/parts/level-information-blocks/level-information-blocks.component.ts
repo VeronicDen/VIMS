@@ -1,9 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 import {Option} from "../../../models/option";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {CurrentStateService} from "../../../services/current-state.service";
 import {Infos} from "../../../models/admin-game/infos";
 import {ConfirmationService} from "primeng/api";
+import {RefDirective} from "../../../directives/ref.directive";
+import {ToastComponent} from "../../../components/toast/toast.component";
 
 /**
  * Компонент информации об уровне
@@ -32,12 +34,19 @@ export class LevelInformationBlocksComponent implements OnInit {
   levelsForLinks: Option<string>[] = [];
 
   /** Массив блоков информации */
-  blocks: Infos[] = [];
+  blocks: {info: Infos, isHTML: boolean}[] = [];
+
+  /** Флаг ошибки при сохранении нескольких блоков */
+  isSaveErrorInFor: boolean = false;
+
+  @ViewChild(RefDirective)
+  refDir: RefDirective
 
   constructor(
     private currentStateService: CurrentStateService,
     private gameApiService: GameApiService,
     private confirmationService: ConfirmationService,
+    private componentFactoryResolver: ComponentFactoryResolver,
   ) {
   }
 
@@ -60,7 +69,13 @@ export class LevelInformationBlocksComponent implements OnInit {
    */
   getActualInfo(): void {
     this.gameApiService.getInfoBlocks(this.gameId, this.levelId).subscribe(response => {
-      this.blocks = response.res;
+      this.blocks = [];
+      for (const info of response.res) {
+        this.blocks.push({
+          info: info,
+          isHTML: false
+        })
+      }
     });
   }
 
@@ -99,7 +114,12 @@ export class LevelInformationBlocksComponent implements OnInit {
 
     this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(response => {
       if (!isInFor)
-        this.getActualInfo();
+        this.showToast(false);
+    }, error => {
+      if (isInFor)
+        this.isSaveErrorInFor = false;
+      else
+        this.showToast(true);
     });
   }
 
@@ -108,11 +128,16 @@ export class LevelInformationBlocksComponent implements OnInit {
    */
   saveAllChanges(): void {
     for (const block of this.blocks) {
-      this.saveChangedBlock(block, true);
+      this.saveChangedBlock(block.info, true);
     }
 
     setTimeout(() => {
-      this.getActualInfo();
+      if (this.isSaveErrorInFor)
+        this.showToast(true);
+      else {
+        this.showToast(false);
+        this.getActualInfo();
+      }
     }, 1000)
   }
 
@@ -136,5 +161,20 @@ export class LevelInformationBlocksComponent implements OnInit {
         })
       },
     });
+  }
+
+  /**
+   * Показывает оповещение о результате сохранения
+   * @param isError флаг ошибки сохранения
+   */
+  showToast(isError: boolean): void {
+    const modalFactory = this.componentFactoryResolver.resolveComponentFactory(ToastComponent);
+    this.refDir.viewContainerRef.clear();
+
+    const component = this.refDir.viewContainerRef.createComponent(modalFactory);
+    component.instance.isError = isError;
+    component.instance.close.subscribe(() => {
+      this.refDir.viewContainerRef.clear();
+    })
   }
 }

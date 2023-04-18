@@ -32,6 +32,9 @@ export class CurrentStateService {
   /** Идентификатор открытого уровня */
   currentLevelId: number;
 
+  /** Токен для запуска игры */
+  actionGameToken: string = '';
+
   /**
    * Очищает текущие состояния
    */

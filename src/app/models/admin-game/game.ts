@@ -17,7 +17,7 @@ export interface Game {
   /** Состояние игры */
   game_state: string;
 
-  /**  */
+  /** Тип игры */
   game_type: string;
 
   /** Основной скрипт игры */

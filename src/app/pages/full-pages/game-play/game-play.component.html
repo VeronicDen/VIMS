@@ -1,18 +1,16 @@
 <div class="container">
   <div class="game-name-box">
-    <p class="game-name"><span>ИГРА</span> {{gameName}}</p>
+    <p class="game-name"><span>ИГРА</span></p>
   </div>
 
   <div class="game-box">
-    <div class="game-info-box">
+    <div class="game-info-box general">
       <div class="level-name">
-        <h2>{{actualLevel.caption}}</h2>
-        <p-dropdown [options]="levelsOption" (onChange)="setActualLevel($event)"
+        <p-dropdown [options]="levelsOption" [(ngModel)]="actualLevel" (onChange)="setActualLevel()"
                     optionLabel="name" optionValue="code"></p-dropdown>
-      </div>
-      <div class="game-info-element">
-        <p class="label">Время на прохождение:</p>
-        <h2>01:29:54</h2>
+        <p-dropdown [disabled]="childLevelsOption.length < 2" [options]="childLevelsOption"
+                    [(ngModel)]="actualChildLevel" (onChange)="setActualTask($event.value)"
+                    optionLabel="name" optionValue="code"></p-dropdown>
       </div>
       <div class="game-info-element" id="firstCode">
         <p class="label">Код уровня:</p>
@@ -23,19 +21,36 @@
       </div>
       <div class="game-info-element">
         <p class="label">Условия прохождения:</p>
-        <p>{{actualLevel.condition_script}}</p>
+        <p>{{passCondition}}</p>
+      </div>
+      <div class="game-info-element">
+        <p class="label">Условия слива:</p>
+        <p>{{failedConditionScript}}</p>
       </div>
     </div>
-    <div class="game-info-box">
+    <div class="game-info-box task">
       <h2 class="task">ЗАДАНИЕ</h2>
-      <div class="game-info-element">
-        <p>{{actualLevel.condition_script}}</p>
+      <div class="game-info-element" [innerHtml]="task">
       </div>
       <div class="game-info-element" id="secondCode">
         <p class="label">Код уровня:</p>
         <div class="code-container">
           <input type="text" [(ngModel)]="code" placeholder="Код">
           <button class="filled accent">ОТВЕТИТЬ</button>
+        </div>
+      </div>
+      <div class="custom-scroll">
+        <div class="table" *ngIf="codes">
+          <div class="column header">
+            <div class="row">Код</div>
+            <div class="row">Тип</div>
+            <div class="row">Результат</div>
+          </div>
+          <div class="column" *ngFor="let code of codes">
+            <div class="row">{{code.result_code}}</div>
+            <div class="row">{{code.result_type}}</div>
+            <div class="row">{{code.result_value}}</div>
+          </div>
         </div>
       </div>
     </div>

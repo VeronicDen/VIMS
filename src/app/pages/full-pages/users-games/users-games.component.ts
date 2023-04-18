@@ -2,7 +2,7 @@ import {Component, ComponentFactoryResolver, HostListener, OnInit, ViewChild} fr
 import {CurrentStateService} from "../../../services/current-state.service";
 import {Router} from "@angular/router";
 import {User} from "../../../models/auth/user";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {Game} from "../../../models/admin-game/game";
 import {RefDirective} from "../../../directives/ref.directive";
 import {SliderComponent} from "../../../components/slider/slider.component";
@@ -47,7 +47,6 @@ export class UsersGamesComponent implements OnInit {
       this.router.navigate(['']);
 
     this.setSlidersTableWidth();
-
     this.getActualInfo();
   }
 

@@ -21,12 +21,26 @@
     }
   }
 
+  .level-name {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .game-box {
     display: flex;
     justify-content: space-between;
 
     .game-info-box {
-      width: calc((100% - 110px) / 2);
+      display: flex;
+      flex-direction: column;
+
+      &.general {
+        width: calc(45% - 40px);
+      }
+
+      &.task {
+        width: calc(55% - 40px);
+      }
 
       .level-name {
         display: flex;
@@ -59,6 +73,28 @@
 
           button {
             width: 150px;
+          }
+        }
+      }
+
+      .custom-scroll {
+        width: 100%;
+
+        margin-top: auto;
+        padding-top: 20px;
+
+        display: flex;
+        flex-wrap: nowrap;
+
+        overflow-x: scroll;
+
+        .table {
+          display: flex;
+          margin-bottom: 15px;
+
+          .column {
+            min-width: 95px;
+            width: auto;
           }
         }
       }

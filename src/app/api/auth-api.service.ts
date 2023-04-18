@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {environment} from "../../../environments/environment";
-import {LoginBody} from "../../models/auth/login-body";
+import {environment} from "../../environments/environment";
+import {LoginBody} from "../models/auth/login-body";
 import {Observable} from "rxjs";
-import {RegistrationBody} from "../../models/auth/registration-body";
-import {LoginResponseBody} from "../../models/auth/login-response-body";
-import {Response} from "../../models/response";
+import {RegistrationBody} from "../models/auth/registration-body";
+import {LoginResponseBody} from "../models/auth/login-response-body";
+import {Response} from "../models/response";
 
 /**
  * Сервис для отправки запросов авторизации

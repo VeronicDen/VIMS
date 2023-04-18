@@ -6,4 +6,5 @@ export enum LocalStorageKeys {
   REFRESH_TOKEN = 'refresh_token',
   TOKEN = 'token',
   THEME = 'theme',
+  GAME_TOKEN = 'game_token',
 }

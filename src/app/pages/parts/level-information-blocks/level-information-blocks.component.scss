@@ -61,12 +61,17 @@
   }
 
   .form-item {
-    label {
-      display: block;
-    }
 
     input {
       height: 36px;
+    }
+
+    .label-box {
+      display: flex;
+
+      button {
+        margin: 0 0 11px 15px;
+      }
     }
   }
 
@@ -88,8 +93,7 @@
       }
 
       textarea {
-        min-height: 185px;
-        max-height: 265px;
+        height: 227px;
       }
     }
   }

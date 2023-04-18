@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Team} from "../../../models/admin-game/team";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {adjustElementAccessExports} from "@angular/compiler-cli/ngcc/src/packages/adjust_cjs_umd_exports";
 
 /**
@@ -13,12 +13,15 @@ import {adjustElementAccessExports} from "@angular/compiler-cli/ngcc/src/package
 })
 export class CommandInGameDialogComponent implements OnInit {
 
+  /** Массив команд */
   @Input()
   teams: Team[];
 
+  /** Идентификатор игры */
   @Input()
   gameId: number;
 
+  /** Флаг начала игры */
   @Input()
   isGameStarted: boolean;
 
@@ -26,8 +29,10 @@ export class CommandInGameDialogComponent implements OnInit {
   @Output()
   close = new EventEmitter<void>();
 
+  /** Массив принятых команд */
   acceptedTeams: Team[];
 
+  /** Массив непринятых команд */
   rejectedTeams: Team[];
 
   constructor(
@@ -38,6 +43,9 @@ export class CommandInGameDialogComponent implements OnInit {
     this.divideTeams();
   }
 
+  /**
+   * Разделение команд на принятые и нет
+   */
   divideTeams():void {
     this.acceptedTeams = [];
     this.rejectedTeams = [];
@@ -50,7 +58,11 @@ export class CommandInGameDialogComponent implements OnInit {
     }
   }
 
-  /** Изменение состояния команды */
+  /**
+   * Изменение состояния команды
+   * @param teamId идентификатор команды
+   * @param isAccepted флаг принятия команды
+   */
   moveTeam(teamId: number, isAccepted: boolean): void {
     if (!this.isGameStarted) {
       if (isAccepted) {

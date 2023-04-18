@@ -367,6 +367,29 @@ textarea:read-only {
     }
   }
 
+  .column {
+    min-width: 145px;
+    width: auto;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+
+    .code-name {
+      margin-right: 5px;
+    }
+
+    div {
+      white-space: nowrap;
+      width: auto;
+    }
+
+    button {
+      margin-right: 10px;
+      margin-left: auto;
+    }
+  }
+
   .header div,
   .header {
     color: $accent-color;
@@ -491,7 +514,7 @@ textarea:read-only {
 
 .p-dropdown-panel {
   width: 360px;
-  left: -1px !important;
+  //left: -1px !important;
   background: #EBEBEB;
   border-radius: 0;
   border-top: #B6B6B6;
@@ -682,6 +705,51 @@ p-dropdownitem {
   }
 }
 
+.teams {
+  .p-dropdown {
+    width: 360px;
+    background-position: 328px center;
+  }
+
+  .p-dropdown-panel {
+    width: 360px;
+  }
+
+  @include screen('desktop') {
+    .p-dropdown {
+      width: 100% !important;
+      background-position: calc(100% - 12px) center !important;
+    }
+
+    .p-dropdown-panel {
+      width: 100% !important;
+    }
+  }
+
+  @include screen('tablet-landscape') {
+    .p-dropdown {
+      width: 360px !important;
+      background-position: 328px center !important;
+    }
+
+    .p-dropdown-panel {
+      width: 360px !important;
+    }
+
+  }
+
+  @include screen('tablet-portrait') {
+    .p-dropdown {
+      width: 100% !important;
+      background-position: calc(100% - 12px) center !important;
+    }
+
+    .p-dropdown-panel {
+      width: 100% !important;
+    }
+  }
+}
+
 .add-new-item-in-table {
   .p-dropdown {
     width: 103px;
@@ -716,8 +784,8 @@ p-dropdownitem {
 
 .level-name {
   .p-dropdown {
-    width: 90px !important;
-    background-position: calc(90px - 22px) center !important;
+    width: 230px !important;
+    background-position: calc(230px - 22px) center !important;
 
     border: 0;
   }
@@ -733,7 +801,7 @@ p-dropdownitem {
   }
 
   .p-dropdown-panel {
-    width: 90px;
+    width: 230px;
   }
 }
 

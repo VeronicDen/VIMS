@@ -1,6 +1,6 @@
 <div class="container">
-  <p class="level-name">СТРАНИЦА УРОВНЯ {{level ? level.inner_id : null}} / {{level ? level.caption : null}} /
-    <span (click)="backToLevel()"> {{game ? game.caption : null}}</span></p>
+  <p class="level-name" (click)="backToLevel()">{{game ? game.caption : null}} / СТРАНИЦА УРОВНЯ {{level ? level.inner_id : null}} /
+    <span> {{level ? level.caption : null}}</span></p>
 
   <div class="menu-box">
     <button [class.accent]="isInactiveLink('settings')" (click)="menuClick('settings')">
@@ -15,5 +15,4 @@
   </div>
 
   <router-outlet></router-outlet>
-
 </div>

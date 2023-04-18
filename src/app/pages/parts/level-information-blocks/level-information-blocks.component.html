@@ -1,4 +1,5 @@
 <p-confirmDialog></p-confirmDialog>
+<ng-template appRef></ng-template>
 
 <div class="add-new-item" (click)="addNewBlock()">
   <h2>БЛОКИ</h2>
@@ -8,32 +9,37 @@
   <div class="main-block-info">
     <div class="form-item">
       <label>ID блока</label>
-      <input type="text" placeholder="0001" [(ngModel)]="block.inner_id" maxlength="20" innerIdText>
+      <input type="text" placeholder="0001" [(ngModel)]="block.info.inner_id" maxlength="20" innerIdText>
     </div>
     <div class="form-item">
       <label>Название</label>
-      <input type="text" placeholder="Название" [(ngModel)]="block.info_caption">
+      <input type="text" placeholder="Название" [(ngModel)]="block.info.info_caption">
     </div>
     <div class="form-item">
       <label>Тип</label>
-      <p-dropdown [options]="blockTypes" [(ngModel)]="block.info_type"
+      <p-dropdown [options]="blockTypes" [(ngModel)]="block.info.info_type"
                   optionLabel="name" optionValue="code">
       </p-dropdown>
     </div>
     <div class="button-box">
-      <button class="filled accent" (click)="saveChangedBlock(block, false)">СОХРАНИТЬ БЛОК</button>
-      <button class="outline" (click)="deleteBlock(block.id)"><p> + </p></button>
+      <button class="filled accent" (click)="saveChangedBlock(block.info, false)">СОХРАНИТЬ БЛОК</button>
+      <button class="outline" (click)="deleteBlock(block.info.id)"><p> + </p></button>
     </div>
   </div>
   <div class="additional-block-info">
-    <div class="ordinary-block" *ngIf="block.info_type == 'SIMPLE'; else linkBlock">
+    <div class="ordinary-block" *ngIf="block.info.info_type == 'SIMPLE'; else linkBlock">
       <div class="form-item">
         <label>Условия показа</label>
-        <input type="text" [(ngModel)]="block.condition_script">
+        <input type="text" [(ngModel)]="block.info.condition_script">
       </div>
       <div class="form-item" style="margin-bottom: 0">
-        <label>Текст блока</label>
-        <p-editor [(ngModel)]="block.info_text" [style]="{'min-height': '185px'}">
+        <div class="label-box">
+          <label>Текст блока</label>
+          <button (click)="block.isHTML = !block.isHTML">
+            {{block.isHTML ? 'Отобразить как текст' : 'Отобразить как HTML'}}
+          </button>
+        </div>
+        <p-editor *ngIf="!block.isHTML" [(ngModel)]="block.info.info_text" [style]="{'min-height': '185px'}">
           <ng-template pTemplate="header">
             <select class="ql-header">
               <option value="1">Заголовок</option>
@@ -46,22 +52,25 @@
             <button class="ql-image"></button>
           </ng-template>
         </p-editor>
+        <textarea *ngIf="block.isHTML" [(ngModel)]="block.info.info_text"></textarea>
       </div>
     </div>
     <ng-template #linkBlock>
       <div class="form-item">
         <label>Ссылка на уровень</label>
-        <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.linked_level_id"
+        <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.info.linked_level_id"
                     optionLabel="name" optionValue="code" class="big-block-dropdown">
         </p-dropdown>
       </div>
     </ng-template>
   </div>
   <div class="button-box addit">
-    <button class="filled accent" (click)="saveChangedBlock(block, false)">СОХРАНИТЬ БЛОК</button>
-    <button class="outline cutted" (click)="deleteBlock(block.id)"><p> + </p></button>
-    <button class="outline full" (click)="deleteBlock(block.id)"><p> УДАЛИТЬ БЛОК </p></button>
+    <button class="filled accent" (click)="saveChangedBlock(block.info, false)">СОХРАНИТЬ БЛОК</button>
+    <button class="outline cutted" (click)="deleteBlock(block.info.id)"><p> + </p></button>
+    <button class="outline full" (click)="deleteBlock(block.info.id)"><p> УДАЛИТЬ БЛОК </p></button>
   </div>
 </div>
 
 <button class="filled accent save-all" (click)="saveAllChanges()">СОХРАНИТЬ</button>
+
+

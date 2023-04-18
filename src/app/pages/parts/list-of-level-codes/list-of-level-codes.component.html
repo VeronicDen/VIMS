@@ -66,8 +66,8 @@
 
     <div class="table">
       <div class="column" *ngFor="let entry of resultMap | keyvalue">
-        <div class="row header buttons">
-          <div>{{entry.key}}</div>
+        <div class="row header buttons" style="{width: auto !important}">
+          <div class="code-name">{{entry.key}}</div>
           <button class="delete" (click)="deleteResult(entry.key)">+</button>
         </div>
         <div class="row" *ngFor="let resultItem of entry.value">

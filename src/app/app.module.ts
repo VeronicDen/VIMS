@@ -32,9 +32,9 @@ import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {CheckboxModule} from "./components/checkbox/checkbox.module";
-import {ApiModule} from "./modules/api/api.module";
+import {ApiModule} from "./api/api.module";
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
-import {AuthInterceptor} from "./modules/api/auth.interceptor";
+import {AuthInterceptor} from "./api/auth.interceptor";
 import {StartupService} from "./services/startup.service";
 import { IdDirective } from './directives/id.directive';
 import { ArrowDivDirective } from './directives/arrow-div.directive';
@@ -48,11 +48,14 @@ const routes: Routes = [
   {
     path: '',
     component: MainPageComponent,
-    //component: GamePlayComponent,
   },
   {
     path: 'profile',
     component: ProfileComponent,
+  },
+  {
+    path: 'game',
+    component: GamePlayComponent,
   },
   {
     path: 'games',

@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {TeamApiService} from "../../../modules/api/team-api.service";
+import {TeamApiService} from "../../../api/team-api.service";
 
 /**
  * Диалог создания новой команды

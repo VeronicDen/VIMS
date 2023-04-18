@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {LocalStorageService} from "./local-storage.service";
 import {Router} from "@angular/router";
-import {AuthApiService} from "../modules/api/auth-api.service";
+import {AuthApiService} from "../api/auth-api.service";
 import {CurrentStateService} from "./current-state.service";
 import {Observable, of} from "rxjs";
 import jwt_decode from "jwt-decode";

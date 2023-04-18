@@ -31,6 +31,7 @@ export interface Level {
   /** Результаты провала */
   failed_result_values: CodeResult[],
 
+  /** */
   deleted?: any,
 
   /** Блоки информации */

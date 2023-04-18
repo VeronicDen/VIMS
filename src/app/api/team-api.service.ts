@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../environments/environment";
+import {environment} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {SimpleResponse} from "../../models/simple-response";
-import {PlayerTeam} from "../../models/user/player-team";
+import {SimpleResponse} from "../models/simple-response";
+import {PlayerTeam} from "../models/user/player-team";
 
 /**
  * Сервис для отправки запросов команд
@@ -41,6 +41,4 @@ export class TeamApiService {
   applyToGame(game_id: number, teamId: number): Observable<SimpleResponse<any>> {
     return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${teamId}/apply-to-game`, {game_id});
   }
-
-
 }

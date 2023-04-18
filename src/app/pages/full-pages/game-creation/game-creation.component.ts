@@ -4,12 +4,15 @@ import {CurrentStateService} from "../../../services/current-state.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {RefDirective} from "../../../directives/ref.directive";
 import {CommandInGameDialogComponent} from "../../dialogs/teams-in-game-dialog/teams-in-game-dialog.component";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {Level} from "../../../models/admin-game/level";
 import {Utils} from "../../../shared/utils";
 import {Game} from "../../../models/admin-game/game";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ConfirmationService} from "primeng/api";
+import {
+  logExperimentalWarnings
+} from "@angular-devkit/build-angular/src/builders/browser-esbuild/experimental-warnings";
 
 /**
  * Компонент редактирования игры
@@ -99,7 +102,6 @@ export class GameCreationComponent implements OnInit {
     this.gameApiService.getLevels(this.gameId).subscribe(response => {
       this.levels = response.res.sort((a, b) => a.inner_id < b.inner_id ? -1 : 1);
     });
-
   }
 
   /**

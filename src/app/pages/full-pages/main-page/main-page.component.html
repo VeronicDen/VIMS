@@ -18,9 +18,11 @@
         <p>+</p>
       </div>
 
-      <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam" (onChange)="setGameUnlocked()"
-                  optionLabel="name" optionValue="code" placeholder="Выбор команды">
-      </p-dropdown>
+      <div class="teams">
+        <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam" (onChange)="setGameUnlockedMap()"
+                    class="teams" optionLabel="name" optionValue="code" placeholder="Выбор команды">
+        </p-dropdown>
+      </div>
 
     </ng-template>
   </div>

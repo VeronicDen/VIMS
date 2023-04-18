@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
 import {Option} from "../../../models/option";
-import {GameApiService} from "../../../modules/api/game-api.service";
+import {GameApiService} from "../../../api/game-api.service";
 import {CurrentStateService} from "../../../services/current-state.service";
 import {CodeType} from "../../../models/enums/code-type";
 import {ResultType} from "../../../models/enums/result-type";
@@ -20,7 +20,7 @@ import {KeyboardService} from "../../../services/keyboard.service";
   styleUrls: ['./list-of-level-codes.component.scss']
 })
 
-export class ListOfLevelCodesComponent implements OnInit, OnDestroy {
+export class ListOfLevelCodesComponent implements OnInit {
 
   /** Идентификатор уровня */
   levelId: number;
@@ -113,21 +113,6 @@ export class ListOfLevelCodesComponent implements OnInit, OnDestroy {
     })
   }
 
-  ngOnDestroy(): void {
-    this.confirmationService.confirm({
-      message: 'Вы уверены, что хотите удалить код?',
-      header: 'Удаление кода',
-      acceptLabel: 'ДА',
-      rejectLabel: 'НЕТ',
-      acceptIcon: 'none',
-      rejectIcon: 'none',
-      acceptButtonStyleClass: 'filled accent',
-      rejectButtonStyleClass: 'filled',
-      accept: () => {
-      },
-    });
-  }
-
   /**
    * Получает актуальную информацию
    */
@@ -138,13 +123,6 @@ export class ListOfLevelCodesComponent implements OnInit, OnDestroy {
       this.setResultsMap();
     })
   }
-
-
-
-
-
-
-
 
   /**
    * Устанавливает выбранное значение
