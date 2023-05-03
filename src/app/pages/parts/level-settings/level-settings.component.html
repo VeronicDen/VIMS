@@ -1,3 +1,5 @@
+<ng-template appRef></ng-template>
+
 <div class="container">
   <div class="level-info">
     <h2>ИНФОРМАЦИЯ ОБ УРОВНЕ</h2>
@@ -10,6 +12,12 @@
       <div class="form-item">
         <label for="levelName">Название</label>
         <input type="text" id="levelName" formControlName="caption">
+      </div>
+      <div class="form-item">
+        <label for="code_acceptation">Условия принятия кода</label>
+        <textarea type="text" id="code_acceptation" formControlName="code_acceptation"></textarea>
+        <!--textarea id="code_acceptation" [ngModel]="currentLevel ? currentLevel.failed_condition_script : null"
+                  (ngModelChange)="currentLevel ? currentLevel.failed_condition_script = $event : null"></textarea-->
       </div>
 
       <app-checkbox>

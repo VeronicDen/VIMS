@@ -47,8 +47,8 @@
     flex-wrap: wrap;
 
     .game-info {
-      width: 360px;
-      margin-right: 40px;
+      width: 100%;
+      margin-bottom: 48px;
 
       transition-duration: 0.5s;
 
@@ -84,28 +84,24 @@
       }
 
       textarea {
-        height: 253px;
+        height: 66px;
         margin-bottom: 25px;
+
+        &.open {
+          height: 242px;
+        }
       }
 
       button.filled {
         width: 150px;
       }
-
-      &.opened {
-        width: 100%;
-        margin-bottom: 48px;
-        margin-right: 0;
-        transition-duration: 0.5s;
-      }
     }
 
     .levels {
-      width: 760px;
-      transition-duration: 0.5s;
+      width: 100%;
 
       h2 {
-        margin-bottom: 57px;
+        margin-bottom: 20px;
       }
 
       .add-new-item-in-table {
@@ -123,61 +119,28 @@
         }
 
         .id {
-          width: 69px;
-          margin: 0 21px 0 10px;
+          width: 80px;
+          margin-right: 40px;
         }
 
         .name {
-          width: 210px;
-          margin-right: 25px;
-        }
-
-        .duration {
-          width: 110px;
-          margin-right: 25px;
+          width: 290px;
+          margin-right: 40px;
         }
 
         .terms {
-          width: 180px;
-          margin-right: 17px;
+          width: 240px;
+          margin-right: 40px;
         }
 
         .buttons {
-          width: 75px;
+          width: 120px;
 
           padding: 0 12px;
 
           display: flex;
           justify-content: space-between;
           align-items: center;
-        }
-      }
-
-      &.opened {
-        width: 100%;
-        transition-duration: 0.5s;
-
-        h2 {
-          margin-bottom: 20px;
-        }
-
-        .id {
-          width: 106px !important;
-          margin-right: 39px !important;
-        }
-
-        .name {
-          width: 316px !important;
-          margin-right: 40px !important;
-        }
-
-        .duration {
-          margin-right: 30px !important;
-        }
-
-        .terms {
-          width: 401px !important;
-          margin-right: 40px !important;
         }
       }
     }

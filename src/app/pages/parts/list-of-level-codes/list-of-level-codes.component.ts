@@ -1,4 +1,12 @@
-import {Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {
+  Component,
+  ComponentFactoryResolver,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import {Option} from "../../../models/option";
 import {GameApiService} from "../../../api/game-api.service";
 import {CurrentStateService} from "../../../services/current-state.service";
@@ -10,6 +18,7 @@ import {Utils} from "../../../shared/utils";
 import {ConfirmationService} from "primeng/api";
 import {ArrowDivDirective} from "../../../directives/arrow-div.directive";
 import {KeyboardService} from "../../../services/keyboard.service";
+import {RefDirective} from "../../../directives/ref.directive";
 
 /**
  * Компонент списка кодов
@@ -28,26 +37,29 @@ export class ListOfLevelCodesComponent implements OnInit {
   /** Идентификатор игры */
   gameId: number;
 
-  /** Возможные типы кодов */
-  codeTypes: Option<string>[];
+  /** Массив кодов */
+  codes: Code[] = [];
+
+  /** Возможные коды результатов */
+  resultCodes: Option<string>[];
+
+  /** Код нового результата */
+  newResultCode: string;
 
   /** Возможные типы результатов */
   resultTypes: Option<string>[];
 
-  /** Массив кодов */
-  codes: Code[] = [];
-
-  /** Ассоциативный массив результатов */
-  resultMap = new Map<string, CodeResult[]>();
-
-  /** Количество кодов для создания */
-  numberOfNewCodes: number;
-
   /** Тип нового результата */
   newResultType: string;
 
-  /** Тип нового результата */
-  newResultCode: string;
+  /** Возможные типы кодов */
+  codeTypes: Option<string>[];
+
+  /** Ассоциативный массив результатов */
+  resultMap = new Map<number, {name: string, element: CodeResult[]}>();
+
+  /** Количество кодов для создания */
+  numberOfNewCodes: number;
 
   /** Выбранный элемент массива */
   chosenItem: Code | CodeResult;
@@ -57,6 +69,12 @@ export class ListOfLevelCodesComponent implements OnInit {
 
   /** Текст ошибки */
   errorText: string;
+
+  /** Вызывает оповещение */
+  showToast = Utils.showToast;
+
+  @ViewChild(RefDirective)
+  refDir: RefDirective
 
   /** Возвращает слово в правильной форме */
   pluralCase = Utils.pluralCase;
@@ -83,6 +101,7 @@ export class ListOfLevelCodesComponent implements OnInit {
     private gameApiService: GameApiService,
     private confirmationService: ConfirmationService,
     private keyboardService: KeyboardService,
+    private componentFactoryResolver: ComponentFactoryResolver,
   ) {
   }
 
@@ -97,11 +116,13 @@ export class ListOfLevelCodesComponent implements OnInit {
       {name: 'LOCATION', code: CodeType.LOCATION},
     ]
 
-    this.resultTypes = [
-      {name: 'SIMPLE', code: ResultType.SIMPLE},
-      {name: 'BONUS', code: ResultType.BONUS},
-      {name: '@', code: ResultType.EMPTY},
+    this.resultCodes = [
+      {name: 'NUMBER', code: 'POINTS'},
+      {name: 'TIME', code: 'TIME'},
+      {name: 'LINK', code: 'INFOS'}
     ]
+    this.newResultCode = this.resultCodes[0].code;
+    this.setResultTypes();
 
     if (this.codes) {
       this.chosenItem = this.codes[0];
@@ -139,7 +160,7 @@ export class ListOfLevelCodesComponent implements OnInit {
    */
   addCodes(): void {
     for (let i = 0; i < this.numberOfNewCodes; i++) {
-      let names = this.resultMap.keys();
+      let names = this.resultMap.values();
 
       let code = {
         id: null,
@@ -153,7 +174,7 @@ export class ListOfLevelCodesComponent implements OnInit {
       }
 
       for (const name of names) {
-        let arr = name.split('(');
+        let arr = name.name.split('(');
         code.code_result_values.push({
           result_code: arr[0],
           result_type: arr[1].substring(0, arr[1].length - 1),
@@ -163,12 +184,10 @@ export class ListOfLevelCodesComponent implements OnInit {
 
       this.codes.push(code);
 
+      let index = 0;
       for (const result of code.code_result_values) {
-        const formattedName = `${result.result_code}(${result.result_type})`;
-        if (!this.resultMap.has(formattedName)) {
-          this.resultMap.set(formattedName, []);
-        }
-        this.resultMap.get(formattedName).push(result);
+        this.resultMap.get(index).element.push(result);
+        index++;
       }
     }
     this.rowsResult += this.numberOfNewCodes;
@@ -201,46 +220,39 @@ export class ListOfLevelCodesComponent implements OnInit {
    * Добавляет результат
    */
   addResult(): void {
-    this.errorText = '';
-    if (this.newResultCode) {
+    const formattedName = `${this.newResultCode}(${this.newResultType})`;
+    let index = this.codes[0].code_result_values ? this.codes[0].code_result_values.length : 0;
+    for (let code of this.codes) {
+      code.code_result_values.push({
+        result_code: this.newResultCode,
+        result_type: this.newResultType,
+        result_value: null
+      })
 
-      if (this.resultMap.has(`${this.newResultCode}(${this.newResultType})`)) {
-        this.errorText = 'Результат с таким названием и типом уже существует';
-        setTimeout(() => {
-          this.errorText = '';
-        }, 3000)
-        return;
+      if (!this.resultMap.has(index)) {
+        this.resultMap.set(index, {name: formattedName, element: []});
       }
-
-      const formattedName = `${this.newResultCode}(${this.newResultType})`;
-      for (let code of this.codes) {
-        code.code_result_values.push({
-          result_code: this.newResultCode,
-          result_type: this.newResultType,
-          result_value: null
-        })
-
-        if (!this.resultMap.has(formattedName)) {
-          this.resultMap.set(formattedName, []);
-        }
-        this.resultMap.get(formattedName).push(code.code_result_values[code.code_result_values.length - 1]);
-      }
+      this.resultMap.get(index).element.push(code.code_result_values[code.code_result_values.length - 1]);
     }
-    this.newResultCode = null;
   }
 
   /**
    * Обновляет массив результатов
    */
   setResultsMap(): void {
-    this.resultMap = new Map<string, CodeResult[]>();
-    this.codes.map(it => it.code_result_values).flat().forEach(result => {
-      const formattedName = `${result.result_code}(${result.result_type})`;
-      if (!this.resultMap.has(formattedName)) {
-        this.resultMap.set(formattedName, []);
+    this.resultMap = new Map<number, {name: string; element: CodeResult[]}>();
+
+    for (const code of this.codes) {
+      let index = 0;
+      for (const result of code.code_result_values) {
+        const formattedName = `${result.result_code}(${result.result_type})`;
+        if (!this.resultMap.has(index)) {
+          this.resultMap.set(index, {name: formattedName, element: []});
+        }
+        this.resultMap.get(index).element.push(result);
+        index++;
       }
-      this.resultMap.get(formattedName).push(result);
-    })
+    }
   }
 
   /**
@@ -273,10 +285,11 @@ export class ListOfLevelCodesComponent implements OnInit {
   saveChanges(): void {
     this.gameApiService.setCode(this.gameId, this.levelId, this.codes).subscribe(
       response => {
+        this.showToast(false, this.componentFactoryResolver, this.refDir);
         this.codes = response.res;
         this.setResultsMap();
       },
-      error => {
+      () => {
         this.errorText = 'Все поля должны быть заполнены';
         setTimeout(() => {
           this.errorText = '';
@@ -355,5 +368,17 @@ export class ListOfLevelCodesComponent implements OnInit {
   onDoubleClick(e: Event): void {
     e.preventDefault();
     this.mainInput.nativeElement.focus();
+  }
+
+  setResultTypes(): void {
+    if (this.newResultCode == 'INFOS')
+      this.resultTypes = [{name: '@', code: ResultType.LINK}];
+    else {
+      this.resultTypes = [
+        {name: 'SIMPLE', code: ResultType.SIMPLE},
+        {name: 'BONUS', code: ResultType.BONUS},
+      ]
+    }
+    this.newResultType = this.resultTypes[0].code;
   }
 }

@@ -23,31 +23,24 @@
 
   .level-name {
     display: flex;
-    justify-content: space-between;
+    margin-bottom: 20px;
   }
 
   .game-box {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 
     .game-info-box {
       display: flex;
       flex-direction: column;
 
       &.general {
-        width: calc(45% - 40px);
+        width: 350px;
       }
 
       &.task {
-        width: calc(55% - 40px);
-      }
-
-      .level-name {
-        display: flex;
-
-        h2 {
-          margin-right: 10px;
-        }
+        width: calc(100% - 400px);
       }
 
       h2.task {
@@ -67,42 +60,48 @@
           justify-content: space-between;
 
           input {
-            width: 300px;
-            min-height: 37px;
+            width: calc(100% - 55px);
+            height: 40px;
           }
 
           button {
-            width: 150px;
+            width: 40px;
+            height: 40px;
+            padding: 0;
           }
         }
+
+        .error-box {
+          height: 22px;
+          margin-top: 10px;
+        }
       }
+    }
 
-      .custom-scroll {
+    .custom-scroll {
+      width: 100%;
+      max-height: 300px;
+
+      margin-top: 40px;
+
+      display: flex;
+      flex-wrap: nowrap;
+
+      overflow-y: scroll;
+
+      .table {
         width: 100%;
+        margin: 0;
 
-        margin-top: auto;
-        padding-top: 20px;
+        .row {
+          width: 100%;
 
-        display: flex;
-        flex-wrap: nowrap;
-
-        overflow-x: scroll;
-
-        .table {
-          display: flex;
-          margin-bottom: 15px;
-
-          .column {
-            min-width: 95px;
-            width: auto;
+          div {
+            width: 100%;
           }
         }
       }
     }
-  }
-
-  #secondCode {
-    display: none;
   }
 
   @include screen('desktop') {
@@ -159,13 +158,6 @@
           }
         }
       }
-    }
-    #firstCode {
-      display: none;
-    }
-
-    #secondCode {
-      display: block;
     }
   }
 

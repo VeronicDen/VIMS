@@ -39,6 +39,7 @@ import {StartupService} from "./services/startup.service";
 import { IdDirective } from './directives/id.directive';
 import { ArrowDivDirective } from './directives/arrow-div.directive';
 import { GamePlayComponent } from './pages/full-pages/game-play/game-play.component';
+import { HelpPageComponent } from './pages/full-pages/help-page/help-page.component';
 
 export function themeFactory(themeService: UiStyleToggleService) {
   return () => themeService.setThemeOnStart();
@@ -48,6 +49,10 @@ const routes: Routes = [
   {
     path: '',
     component: MainPageComponent,
+  },
+  {
+    path: 'help',
+    component: HelpPageComponent,
   },
   {
     path: 'profile',
@@ -108,6 +113,7 @@ const routes: Routes = [
     IdDirective,
     ArrowDivDirective,
     GamePlayComponent,
+    HelpPageComponent,
   ],
   imports: [
     BrowserModule,

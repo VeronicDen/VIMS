@@ -34,6 +34,9 @@ export interface ActionLevel {
   /** Статус */
   status: string,
 
+  /** Результаты уровня */
+  level_scores: any,
+
   /** Коды команды */
   team_codes: any[],
 

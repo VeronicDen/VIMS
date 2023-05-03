@@ -29,8 +29,10 @@ export class MainPageComponent implements OnInit {
   /** Массив игр */
   games: PlayerGame[] = [];
 
+  isCurrentGamesChose: boolean = true;
+
   /** Ассоциативный массив флагов открытия игр */
-  isGameOpenMap = new Map<number, boolean>();
+  isGameOpenMap = new Map<PlayerGame, boolean>();
 
   /** Ассоциативный массив флагов открытия игр */
   isGameUnlockedMap = new Map<number, boolean>();
@@ -107,7 +109,7 @@ export class MainPageComponent implements OnInit {
         (a, b) => moment(a.creation_date) < moment(b.creation_date) ? -1 : 1);
 
       for (const game of this.games) {
-        this.isGameOpenMap.set(game.id, false);
+        this.isGameOpenMap.set(game, false);
       }
 
       if (this.currentStateService.isUserLoggedIn) {
@@ -154,6 +156,7 @@ export class MainPageComponent implements OnInit {
    */
   setGameUnlockedMap(): void {
     for (const game of this.games) {
+      // TODO: сделать фильтрацию по датам
       this.isGameUnlockedMap.set(game.id, false);
       if (this.selectedTeam) {
         this.isGameUnlockedMap.set(game.id, !!game.teams.find(a => a.id == this.selectedTeam));
@@ -177,5 +180,10 @@ export class MainPageComponent implements OnInit {
       }
     } else
       return 'ЗАРЕГИСТРИРОВАТЬСЯ';
+  }
+
+  choseGames(isCurGames: boolean) {
+    this.isCurrentGamesChose = isCurGames;
+    //TODO: сделать фильтрацию по датам
   }
 }

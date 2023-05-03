@@ -14,7 +14,8 @@ div {
   animation: ani 2s forwards;
 
   &.error {
-    color: $accent-color !important;
+    background: $accent-color !important;
+    color: $text-color-dark;
   }
 }
 

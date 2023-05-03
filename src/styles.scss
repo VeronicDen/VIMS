@@ -360,6 +360,9 @@ textarea:read-only {
 
       background: none;
       border: none;
+
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     &:nth-child(2n) {
@@ -752,16 +755,16 @@ p-dropdownitem {
 
 .add-new-item-in-table {
   .p-dropdown {
-    width: 103px;
+    width: 110px;
     height: 24px;
 
-    margin: 0 30px 0 0;
+    margin: 0 17px 0 0;
 
-    background-position: 75px center;
+    background-position: 82px center;
   }
 
   .p-dropdown-panel {
-    width: 103px;
+    width: 110px;
   }
 
   .p-inputtext {
@@ -784,11 +787,16 @@ p-dropdownitem {
 
 .level-name {
   .p-dropdown {
-    width: 230px !important;
-    background-position: calc(230px - 22px) center !important;
+    width: 250px !important;
+    background-position: calc(250px - 22px) center !important;
 
     border: 0;
   }
+
+  .main-level .p-dropdown {
+    margin-right: 40px;
+  }
+
 
   .p-inputtext {
     color: var(--text-color);
@@ -801,7 +809,7 @@ p-dropdownitem {
   }
 
   .p-dropdown-panel {
-    width: 230px;
+    width: 250px;
   }
 }
 

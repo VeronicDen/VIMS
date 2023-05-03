@@ -39,8 +39,18 @@ button {
   .games-box {
     width: 610px;
 
-    & > h2 {
-      margin-bottom: 24px;
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+
+      h2 {
+        margin-bottom: 24px;
+        cursor: pointer;
+
+        &:not(.chosen) {
+          color: #6a6a6a;
+        }
+      }
     }
 
     .current-game {

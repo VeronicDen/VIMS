@@ -11,9 +11,11 @@ export class ToastComponent implements OnInit {
   @Output()
   close = new EventEmitter<void>();
 
+  /** Флаг ошибки */
   @Input()
   isError: boolean = false;
 
+  /** Текст сообщения */
   text: string;
 
   constructor() { }

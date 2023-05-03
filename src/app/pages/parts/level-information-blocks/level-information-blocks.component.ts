@@ -6,6 +6,7 @@ import {Infos} from "../../../models/admin-game/infos";
 import {ConfirmationService} from "primeng/api";
 import {RefDirective} from "../../../directives/ref.directive";
 import {ToastComponent} from "../../../components/toast/toast.component";
+import {Utils} from "../../../shared/utils";
 
 /**
  * Компонент информации об уровне
@@ -31,13 +32,16 @@ export class LevelInformationBlocksComponent implements OnInit {
   ];
 
   /** Список уровней для выпадающего меню */
-  levelsForLinks: Option<string>[] = [];
+  levelsForLinks: Option<number>[] = [];
 
   /** Массив блоков информации */
   blocks: {info: Infos, isHTML: boolean}[] = [];
 
   /** Флаг ошибки при сохранении нескольких блоков */
   isSaveErrorInFor: boolean = false;
+
+  /** Вызывает оповещение */
+  showToast = Utils.showToast;
 
   @ViewChild(RefDirective)
   refDir: RefDirective
@@ -57,8 +61,9 @@ export class LevelInformationBlocksComponent implements OnInit {
     this.gameApiService.getLevels(this.gameId).subscribe(response => {
       for (const level of response.res) {
         if (this.levelId != +level.id)
-          this.levelsForLinks.push({name: level.caption, code: level.inner_id})
+          this.levelsForLinks.push({name: level.caption, code: level.id})
       }
+      console.log(this.levelsForLinks)
     });
 
     this.getActualInfo();
@@ -70,7 +75,8 @@ export class LevelInformationBlocksComponent implements OnInit {
   getActualInfo(): void {
     this.gameApiService.getInfoBlocks(this.gameId, this.levelId).subscribe(response => {
       this.blocks = [];
-      for (const info of response.res) {
+      for (const info of response.res.sort((a, b) => +a.inner_id > +b.inner_id ? 1 : -1)) {
+        console.log(info)
         this.blocks.push({
           info: info,
           isHTML: false
@@ -92,7 +98,7 @@ export class LevelInformationBlocksComponent implements OnInit {
       linked_level_id: ""
     }
 
-    this.gameApiService.setInfoBlock(this.gameId, this.levelId, infoBlock).subscribe(response => {
+    this.gameApiService.setInfoBlock(this.gameId, this.levelId, infoBlock).subscribe(() => {
       this.getActualInfo();
     });
   }
@@ -112,14 +118,14 @@ export class LevelInformationBlocksComponent implements OnInit {
       linked_level_id: block.linked_level_id,
     }
 
-    this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(response => {
+    this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(() => {
       if (!isInFor)
-        this.showToast(false);
+        this.showToast(false, this.componentFactoryResolver, this.refDir);
     }, error => {
       if (isInFor)
         this.isSaveErrorInFor = false;
       else
-        this.showToast(true);
+        this.showToast(true, this.componentFactoryResolver, this.refDir);
     });
   }
 
@@ -133,9 +139,9 @@ export class LevelInformationBlocksComponent implements OnInit {
 
     setTimeout(() => {
       if (this.isSaveErrorInFor)
-        this.showToast(true);
+        this.showToast(true, this.componentFactoryResolver, this.refDir);
       else {
-        this.showToast(false);
+        this.showToast(false, this.componentFactoryResolver, this.refDir);
         this.getActualInfo();
       }
     }, 1000)
@@ -161,20 +167,5 @@ export class LevelInformationBlocksComponent implements OnInit {
         })
       },
     });
-  }
-
-  /**
-   * Показывает оповещение о результате сохранения
-   * @param isError флаг ошибки сохранения
-   */
-  showToast(isError: boolean): void {
-    const modalFactory = this.componentFactoryResolver.resolveComponentFactory(ToastComponent);
-    this.refDir.viewContainerRef.clear();
-
-    const component = this.refDir.viewContainerRef.createComponent(modalFactory);
-    component.instance.isError = isError;
-    component.instance.close.subscribe(() => {
-      this.refDir.viewContainerRef.clear();
-    })
   }
 }

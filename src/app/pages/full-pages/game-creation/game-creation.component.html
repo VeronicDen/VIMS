@@ -15,7 +15,7 @@
   </div>
 
   <div class="main-game-settings">
-    <div class="game-info" [class.opened]="isMainInfoBoxOpened">
+    <div class="game-info">
       <h2>ИНФОРМАЦИЯ ОБ ИГРЕ</h2>
       <form [formGroup]="formGroupInfo">
         <label for="gameName">Название</label>
@@ -27,13 +27,12 @@
 
         <div class="script-label-box">
           <label for="script">Скрипт</label>
-          <button (click)="isMainInfoBoxOpened=!isMainInfoBoxOpened">
-            {{isMainInfoBoxOpened ? 'Свернуть поле <<' : 'Развернуть поле >>'}}
+          <button (click)="isTextareaOpened=!isTextareaOpened">
+            {{isTextareaOpened ? 'Свернуть поле ↑↑' : 'Развернуть поле ↓↓'}}
           </button>
         </div>
-        <textarea placeholder="Текст"
-                  id="script"
-                  formControlName="script"
+        <textarea [class.open]="isTextareaOpened" placeholder="Текст"
+                  id="script" formControlName="script"
                   [readonly]="isGameStarted"></textarea>
         <button class="filled accent"
                 [disabled]="isGameStarted"
@@ -42,7 +41,7 @@
       </form>
     </div>
 
-    <div class="levels" [class.opened]="isMainInfoBoxOpened">
+    <div class="levels">
       <h2>УРОВНИ</h2>
       <div class="add-new-item-in-table">
         <p>Создать</p>
@@ -55,16 +54,26 @@
         <div class="row header">
           <div class="id">ID</div>
           <div class="name">Название</div>
-          <div class="duration">Длительность</div>
+          <div class="terms">Условие слива</div>
           <div class="terms">Условие прохождения</div>
           <div class="buttons"></div>
         </div>
         <div class="row" *ngFor="let level of levels">
-          <div class="id">{{level.inner_id}}</div>
-          <div class="name">{{level.caption}}</div>
-          <div class="duration"></div>
-          <div class="terms"></div>
+          <div class="id">
+            <input type="text" [(ngModel)]="level.inner_id">
+          </div>
+          <div class="name">
+            <input type="text" [(ngModel)]="level.caption">
+          </div>
+          <div class="terms">
+            <input type="text" [(ngModel)]="level.failed_condition_script">
+          </div>
+          <div class="terms">
+            <input type="text" [(ngModel)]="level.condition_script">
+          </div>
           <div class="buttons">
+            <button class="save mdi mdi-24px mdi-content-save" [disabled]="isGameStarted"
+                    (click)="saveLevelInfo(level)" title="Сохранить"></button>
             <button class="info" [disabled]="isGameStarted"
                     (click)="goToLevel(level.id)" title="Редактировать">i</button>
             <button class="delete" [disabled]="isGameStarted"
@@ -72,7 +81,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>

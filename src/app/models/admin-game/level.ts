@@ -31,6 +31,9 @@ export interface Level {
   /** Результаты провала */
   failed_result_values: CodeResult[],
 
+  /** Условия принятия кода */
+  code_acceptation_script: string,
+
   /** */
   deleted?: any,
 

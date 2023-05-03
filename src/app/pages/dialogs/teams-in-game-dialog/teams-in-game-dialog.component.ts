@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Team} from "../../../models/admin-game/team";
 import {GameApiService} from "../../../api/game-api.service";
-import {adjustElementAccessExports} from "@angular/compiler-cli/ngcc/src/packages/adjust_cjs_umd_exports";
 
 /**
  * Диалог изменения команд в игре

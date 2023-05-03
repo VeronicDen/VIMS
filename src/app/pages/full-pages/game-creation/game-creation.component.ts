@@ -10,9 +10,6 @@ import {Utils} from "../../../shared/utils";
 import {Game} from "../../../models/admin-game/game";
 import {FormControl, FormGroup} from "@angular/forms";
 import {ConfirmationService} from "primeng/api";
-import {
-  logExperimentalWarnings
-} from "@angular-devkit/build-angular/src/builders/browser-esbuild/experimental-warnings";
 
 /**
  * Компонент редактирования игры
@@ -40,20 +37,23 @@ export class GameCreationComponent implements OnInit {
   /** Массив уровней игры */
   levels: Level[] = [];
 
-  /** Флаг открытия контейнера с основной информацией об игре */
-  isMainInfoBoxOpened: boolean = false;
-
   /** Флаг начала игры */
   isGameStarted: boolean = false;
 
   /** Количество уровней для добавления */
   numberOfNewLevels: number;
 
+  /** Флаг открытия поля скрипта */
+  isTextareaOpened: boolean = false;
+
   /** Форма изменения основной информации */
   formGroupInfo: FormGroup;
 
   /** Возвращает слово в правильной форме */
   pluralCase = Utils.pluralCase;
+
+  /** Вызывает оповещение */
+  showToast = Utils.showToast;
 
   @ViewChild(RefDirective)
   refDir: RefDirective;
@@ -79,11 +79,10 @@ export class GameCreationComponent implements OnInit {
       });
       this.getActualInfo();
     });
-    this.isMainInfoBoxOpened = window.innerWidth <= 960;
   }
 
   @HostListener('window:resize', ['$event']) onResize() {
-    this.isMainInfoBoxOpened = window.innerWidth <= 960;
+
   }
 
   /**
@@ -119,6 +118,7 @@ export class GameCreationComponent implements OnInit {
     component.instance.gameId = this.currentGame.id;
     component.instance.isGameStarted = this.isGameStarted;
     component.instance.close.subscribe(() => {
+      this.getActualInfo();
       this.refDir.viewContainerRef.clear();
       this.currentStateService.isDialogOpened = false;
     })
@@ -143,6 +143,7 @@ export class GameCreationComponent implements OnInit {
       level_type: 'SIMPLE',
       condition_script: '',
       failed_condition_script: '',
+      code_acceptation_script: '',
       success_result_values: [],
       failed_result_values: [],
     }
@@ -175,9 +176,7 @@ export class GameCreationComponent implements OnInit {
       acceptButtonStyleClass: 'filled accent',
       rejectButtonStyleClass: 'filled',
       accept: () => {
-        this.gameApiService.deleteLevel(this.gameId, levelId).subscribe(() => {
-          this.getActualInfo();
-        })
+        this.gameApiService.deleteLevel(this.gameId, levelId).subscribe()
       },
     });
   }
@@ -187,6 +186,32 @@ export class GameCreationComponent implements OnInit {
    */
   saveInfo(): void {
     this.gameApiService.putGame(this.currentGame.id, this.formGroupInfo.controls.caption.value,
-      this.formGroupInfo.controls.script.value).subscribe();
+      this.formGroupInfo.controls.script.value).subscribe( () => {
+        this.showToast(false, this.componentFactoryResolver, this.refDir);
+    }, () => {
+      this.showToast(true, this.componentFactoryResolver, this.refDir);
+    });
+  }
+
+  /**
+   * Сохраняет инфомацию об уровне
+   */
+  saveLevelInfo(level: Level) {
+    const currentLevel: Level = {
+      caption: level.caption,
+      code_acceptation_script: level.code_acceptation_script,
+      condition_script: level.condition_script,
+      failed_condition_script: level.failed_condition_script,
+      failed_result_values: level.failed_result_values,
+      inner_id: level.inner_id,
+      level_type: level.level_type,
+      success_result_values: level.success_result_values
+    }
+
+    this.gameApiService.putLevel(currentLevel, this.gameId, level.id).subscribe(() => {
+      this.showToast(false, this.componentFactoryResolver, this.refDir);
+    }, () => {
+      this.showToast(true, this.componentFactoryResolver, this.refDir);
+    })
   }
 }

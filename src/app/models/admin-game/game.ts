@@ -2,6 +2,7 @@
  * Модель данных игры
  */
 import {Team} from "./team";
+import {Variables} from "../user/variables";
 
 export interface Game {
 
@@ -25,4 +26,7 @@ export interface Game {
 
   /** Комманды зарегистрированные в игре */
   teams: Team[];
+
+  /** Переменные игры */
+  variables?: Variables[];
 }

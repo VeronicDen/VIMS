@@ -1,8 +1,10 @@
 <p-confirmDialog></p-confirmDialog>
+<ng-template appRef></ng-template>
 
 <div class="head-box">
   <input type="text" placeholder="Значение" #mainInput [ngModel]="chosenItem ? chosenItem[chosenField]: null"
-         (ngModelChange)="chosenItem ? chosenItem[chosenField] = $event : null" (keydown.enter)="returnFocus()">
+         (ngModelChange)="chosenItem ? chosenItem[chosenField] = $event : null"
+         (keydown.enter)="returnFocus()" (keydown.escape)="returnFocus()">
   <button class="filled accent" (click)="saveChanges()">СОХРАНИТЬ</button>
 </div>
 
@@ -57,7 +59,8 @@
     <h2>РЕЗУЛЬТАТ <span *ngIf="errorText">{{errorText}}</span></h2>
     <div class="add-new-item-in-table">
       <p>Создать</p>
-      <input type="text" placeholder="Код результата" [(ngModel)]="newResultCode">
+      <p-dropdown [options]="resultCodes" [(ngModel)]="newResultCode" (onChange)="setResultTypes()"
+                  optionLabel="name" optionValue="code"></p-dropdown>
       <p>типа</p>
       <p-dropdown [options]="resultTypes" [(ngModel)]="newResultType"
                   optionLabel="name" optionValue="code"></p-dropdown>
@@ -67,10 +70,10 @@
     <div class="table">
       <div class="column" *ngFor="let entry of resultMap | keyvalue">
         <div class="row header buttons" style="{width: auto !important}">
-          <div class="code-name">{{entry.key}}</div>
-          <button class="delete" (click)="deleteResult(entry.key)">+</button>
+          <div class="code-name">{{entry.value.name}}</div>
+          <button class="delete" (click)="deleteResult(entry.value.name)">+</button>
         </div>
-        <div class="row" *ngFor="let resultItem of entry.value">
+        <div class="row" *ngFor="let resultItem of entry.value.element">
           <input type="text" class="transposed"
                  [(ngModel)]="resultItem.result_value" placeholder="Значение"
                  (focusin)="setChosenValue(resultItem, 'result_value')"

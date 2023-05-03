@@ -1,57 +1,61 @@
 <div class="container">
   <div class="game-name-box">
-    <p class="game-name"><span>ИГРА</span></p>
+    <p class="game-name"><span>ИГРА </span>{{gameName}}</p>
+  </div>
+
+  <div class="level-name">
+    <p-dropdown [options]="levelsOption" [(ngModel)]="actualLevel" (onChange)="setActualLevel()"
+                optionLabel="name" optionValue="code" class="main-level"></p-dropdown>
+    <p-dropdown [disabled]="childLevelsOption.length < 2" [options]="childLevelsOption"
+                [(ngModel)]="actualChildLevel" (onChange)="setActualTask($event.value)"
+                optionLabel="name" optionValue="code"></p-dropdown>
   </div>
 
   <div class="game-box">
     <div class="game-info-box general">
-      <div class="level-name">
-        <p-dropdown [options]="levelsOption" [(ngModel)]="actualLevel" (onChange)="setActualLevel()"
-                    optionLabel="name" optionValue="code"></p-dropdown>
-        <p-dropdown [disabled]="childLevelsOption.length < 2" [options]="childLevelsOption"
-                    [(ngModel)]="actualChildLevel" (onChange)="setActualTask($event.value)"
-                    optionLabel="name" optionValue="code"></p-dropdown>
-      </div>
-      <div class="game-info-element" id="firstCode">
-        <p class="label">Код уровня:</p>
+      <div class="game-info-element">
+        <p class="label">Код уровня:  </p>
         <div class="code-container">
-          <input type="text" [(ngModel)]="code" placeholder="Код">
-          <button class="filled accent">ОТВЕТИТЬ</button>
+          <input type="text" placeholder="Код"
+                 [(ngModel)]="code" (keydown.enter)="setCode()">
+          <button class="filled accent mdi mdi-24px mdi-send"
+                  title="Отправить" (click)="setCode()"></button>
+        </div>
+        <div class="error-box">{{codeError}}</div>
+      </div>
+      <div class="condition">
+        <div class="game-info-element">
+          <p class="label">Текущее количество очков:</p>
+          <div class="scores" *ngFor="let score of scores | keyvalue">
+            {{getScore(score)}}
+          </div>
+        </div>
+        <div class="game-info-element">
+          <p class="label">Условия прохождения:</p>
+          <p>{{passCondition}}</p>
+        </div>
+        <div class="game-info-element">
+          <p class="label">Условия слива:</p>
+          <p>{{failedConditionScript}}</p>
         </div>
       </div>
-      <div class="game-info-element">
-        <p class="label">Условия прохождения:</p>
-        <p>{{passCondition}}</p>
-      </div>
-      <div class="game-info-element">
-        <p class="label">Условия слива:</p>
-        <p>{{failedConditionScript}}</p>
+      <div class="custom-scroll">
+        <div class="table" *ngIf="codesInfo">
+          <div class="code" *ngFor="let info of codesInfo">
+            <div class="row">
+              <div>{{info.count}}</div>
+            </div>
+            <div class="row">
+              <div>{{info.info}}</div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
     <div class="game-info-box task">
       <h2 class="task">ЗАДАНИЕ</h2>
       <div class="game-info-element" [innerHtml]="task">
-      </div>
-      <div class="game-info-element" id="secondCode">
-        <p class="label">Код уровня:</p>
-        <div class="code-container">
-          <input type="text" [(ngModel)]="code" placeholder="Код">
-          <button class="filled accent">ОТВЕТИТЬ</button>
-        </div>
-      </div>
-      <div class="custom-scroll">
-        <div class="table" *ngIf="codes">
-          <div class="column header">
-            <div class="row">Код</div>
-            <div class="row">Тип</div>
-            <div class="row">Результат</div>
-          </div>
-          <div class="column" *ngFor="let code of codes">
-            <div class="row">{{code.result_code}}</div>
-            <div class="row">{{code.result_type}}</div>
-            <div class="row">{{code.result_value}}</div>
-          </div>
-        </div>
       </div>
     </div>
   </div>

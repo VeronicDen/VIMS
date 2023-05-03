@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 import {LocalStorageService} from "../../../services/local-storage.service";
 import {Option} from "../../../models/option";
 import {CurrentStateService} from "../../../services/current-state.service";
@@ -6,6 +6,8 @@ import {GameApiService} from "../../../api/game-api.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {Level} from 'src/app/models/admin-game/level';
 import {CodeResult} from "../../../models/admin-game/code-result";
+import {Utils} from "../../../shared/utils";
+import {RefDirective} from "../../../directives/ref.directive";
 
 /**
  * Компонент настроек уровня
@@ -52,10 +54,17 @@ export class LevelSettingsComponent implements OnInit {
   /** Сообщение об ошибке при сохранении скриптов */
   errorMessage: string = '';
 
+  /** Вызывает оповещение */
+  showToast = Utils.showToast;
+
+  @ViewChild(RefDirective)
+  refDir: RefDirective
+
   constructor(
     private currentStateService: CurrentStateService,
     private localStorageService: LocalStorageService,
     private gameApiService: GameApiService,
+    private componentFactoryResolver: ComponentFactoryResolver,
   ) {
   }
 
@@ -66,7 +75,8 @@ export class LevelSettingsComponent implements OnInit {
     this.formGroupInfo = new FormGroup({
       id: new FormControl('', []),
       caption: new FormControl('', []),
-      isInner: new FormControl(true, [])
+      isInner: new FormControl(true, []),
+      code_acceptation: new FormControl('', [])
     });
 
     this.getActualInfo();
@@ -81,6 +91,7 @@ export class LevelSettingsComponent implements OnInit {
       this.formGroupInfo.controls.caption.setValue(this.currentLevel.caption);
       this.formGroupInfo.controls.id.setValue(this.currentLevel.inner_id);
       this.formGroupInfo.controls.isInner.setValue(this.currentLevel.level_type != `INNER`);
+      this.formGroupInfo.controls.code_acceptation.setValue(this.currentLevel.code_acceptation_script);
     })
   }
 
@@ -136,11 +147,13 @@ export class LevelSettingsComponent implements OnInit {
       level_type: this.formGroupInfo.controls.isInner.value ? 'INNER' : 'SIMPLE',
       condition_script: this.currentLevel.condition_script,
       failed_condition_script: this.currentLevel.failed_condition_script,
+      code_acceptation_script: this.formGroupInfo.controls.code_acceptation.value,
       success_result_values: this.currentLevel.success_result_values,
       failed_result_values: this.currentLevel.failed_result_values
     }
 
-    this.gameApiService.putLevel(level, this.gameId, this.levelId).subscribe(response => {
+    this.gameApiService.putLevel(level, this.gameId, this.levelId).subscribe(() => {
+      this.showToast(false, this.componentFactoryResolver, this.refDir);
       this.getActualInfo();
     }, error => {
       this.errorMessage = error.error.comments;

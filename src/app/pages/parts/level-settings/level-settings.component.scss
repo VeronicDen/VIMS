@@ -20,6 +20,10 @@
       .checkbox-text {
         color: $accent-color;
       }
+
+      textarea {
+        height: 132px;
+      }
     }
   }
 
@@ -44,7 +48,7 @@
         width: 360px;
 
         textarea {
-          height: 214px;
+          height: 198px;
         }
 
         .table {

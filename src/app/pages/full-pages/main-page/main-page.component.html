@@ -28,39 +28,43 @@
   </div>
 
   <div class="games-box">
-    <h2>ТЕКУЩИЕ ИГРЫ</h2>
 
-    <div class="current-game" *ngFor="let game of games"
-         [class.unlocked]="user && game.game_state == 'started' && isGameUnlockedMap.get(game.id)">
+    <div class="buttons">
+      <h2 [class.chosen]="isCurrentGamesChose" (click)="choseGames(true)">ТЕКУЩИЕ ИГРЫ</h2>
+      <h2 [class.chosen]="!isCurrentGamesChose" (click)="choseGames(false)">ПРОШЕДШИЕ ИГРЫ</h2>
+    </div>
+
+    <div class="current-game" *ngFor="let game of isGameOpenMap | keyvalue"
+         [class.unlocked]="user && game.key.game_state == 'started' && isGameUnlockedMap.get(game.key.id)">
       <div class="game-name-box">
         <h2 class="name">
-          <span>#{{game.id}}</span> {{game.caption}}
+          <span>#{{game.key.id}}</span> {{game.key.caption}}
         </h2>
-        <button (click)="isGameOpenMap.set(game.id, !isGameOpenMap.get(game.id))"
-                *ngIf="game.description">Описание</button>
+        <button (click)="isGameOpenMap.set(game.key, !game.value)"
+                *ngIf="game.key.description">Описание</button>
       </div>
       <div class="game-info-box">
-        <div class="info-item" *ngIf="game.author">
+        <div class="info-item" *ngIf="game.key.author">
           <h3>Автор: </h3>
-          <p>{{game.author}}</p>
+          <p>{{game.key.author}}</p>
         </div>
-        <div class="info-item" *ngIf="game.beginningOfGame">
+        <div class="info-item" *ngIf="game.key.beginningOfGame">
           <h3>Начало игры: </h3>
-          <p>{{game.beginningOfGame}}</p>
+          <p>{{game.key.beginningOfGame}}</p>
         </div>
-        <div class="info-item" *ngIf="game.endOfGame">
+        <div class="info-item" *ngIf="game.key.endOfGame">
           <h3>Конец игры: </h3>
-          <p>{{game.endOfGame}}</p>
+          <p>{{game.key.endOfGame}}</p>
         </div>
-        <div class="additional-info" [class.open]="isGameOpenMap.get(game.id)">
+        <div class="additional-info" [class.open]="game.value">
           <div class="info-item">
             <h3>Описание: </h3>
-            <p>{{game.description}}</p>
+            <p>{{game.key.description}}</p>
           </div>
         </div>
       </div>
-      <button (click)="user ? applyOrGoToTheGame(game.id) : showAuthDialog(false); "
-              class="accent">{{setGameButtonState(game.id)}}</button>
+      <button (click)="user ? applyOrGoToTheGame(game.key.id) : showAuthDialog(false); "
+              class="accent">{{setGameButtonState(game.key.id)}}</button>
     </div>
   </div>
 </div>

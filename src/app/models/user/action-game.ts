@@ -2,6 +2,7 @@
  * Модель данных запущенной игры
  */
 import {TeamLevel} from "./team-level";
+import {Game} from "../admin-game/game";
 
 export interface ActionGame {
 
@@ -16,9 +17,9 @@ export interface ActionGame {
 
   team_id: number,
 
-  team_levels: TeamLevel,
+  game: Game,
 
-  total_scores: {
-    TIME: number,
-  }
+  team_levels: TeamLevel[],
+
+  total_scores: any,
 }

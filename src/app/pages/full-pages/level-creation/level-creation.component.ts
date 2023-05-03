@@ -1,9 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {CurrentStateService} from "../../../services/current-state.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GameApiService} from "../../../api/game-api.service";
 import {Game} from "../../../models/admin-game/game";
 import {Level} from "../../../models/admin-game/level";
+import {ConfirmationService} from "primeng/api";
 
 /**
  * Компонент редактирования уровня
@@ -13,7 +14,7 @@ import {Level} from "../../../models/admin-game/level";
   templateUrl: './level-creation.component.html',
   styleUrls: ['./level-creation.component.scss']
 })
-export class LevelCreationComponent implements OnInit, OnDestroy {
+export class LevelCreationComponent implements OnInit {
 
   /** Текущий уровень */
   level: Level;
@@ -25,6 +26,7 @@ export class LevelCreationComponent implements OnInit, OnDestroy {
     private currentStateService: CurrentStateService,
     private activatedRoute: ActivatedRoute,
     private gameApiService: GameApiService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     ) { }
 
@@ -44,11 +46,6 @@ export class LevelCreationComponent implements OnInit, OnDestroy {
         this.level = response.res;
       })
     })
-  }
-
-  ngOnDestroy(): void {
-    this.currentStateService.currentLevelId = null;
-    this.currentStateService.currentGameId = null;
   }
 
   /**

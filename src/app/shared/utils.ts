@@ -1,5 +1,14 @@
+import {ToastComponent} from "../components/toast/toast.component";
+import {ComponentFactoryResolver} from "@angular/core";
+import {RefDirective} from "../directives/ref.directive";
+
 export class Utils {
 
+  /**
+   * Возвращает число строкой с незначащими нулями
+   * @param number число
+   * @param digitsNumbers количество незначащих нулей
+   */
   static setNumberWithZeroAsString(number: number, digitsNumbers: number): string {
     let result = '';
     for (let i = 0; i < digitsNumbers - String(number).length; i++) {
@@ -9,6 +18,13 @@ export class Utils {
     return result;
   }
 
+  /**
+   * Возвращает идентификатор элемента массива
+   * @param arr массив
+   * @param fieldName имя поля
+   * @param digitsNumbers количество незначащих нулей
+   * @param extraLength дополнительное число
+   */
   static setInnerId(arr: any[], fieldName: string, digitsNumbers: number, extraLength: number): string {
     let result = '';
     let isNew = false;
@@ -34,5 +50,23 @@ export class Utils {
       stringCases.few,
       stringCases.other
     ][(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
+  }
+
+
+  /**
+   * Показывает оповещение о результате сохранения
+   * @param isError флаг ошибки сохранения
+   * @param componentFactoryResolver
+   * @param refDir
+   */
+  static showToast(isError: boolean, componentFactoryResolver: ComponentFactoryResolver, refDir: RefDirective): void {
+    const modalFactory = componentFactoryResolver.resolveComponentFactory(ToastComponent);
+    refDir.viewContainerRef.clear();
+
+    const component = refDir.viewContainerRef.createComponent(modalFactory);
+    component.instance.isError = isError;
+    component.instance.close.subscribe(() => {
+      refDir.viewContainerRef.clear();
+    })
   }
 }
