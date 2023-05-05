@@ -146,13 +146,6 @@
     }
   }
 
-  .main-game-settings,
-  .levels {
-    &.disabled {
-
-    }
-  }
-
   @include screen('desktop') {
     .main-game-settings {
 
