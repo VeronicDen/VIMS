@@ -28,10 +28,10 @@ export class ActionApiService {
   }
 
   enterTheGame(token: string): Observable<Response<ActionGame>> {
-    return this.httpClient.get<Response<ActionGame>>(this.urlPrime + '/info', {headers: {'game_token': token}});
+    return this.httpClient.get<Response<ActionGame>>(this.urlPrime + '/info', {headers: {'game-token': token}});
   }
 
   sendCode(token: string, code: CodeForSend): Observable<SimpleResponse<ActionGame>> {
-    return this.httpClient.post<SimpleResponse<ActionGame>>(this.urlPrime + '/codes/send', code, {headers: {'game_token': token}})
+    return this.httpClient.post<SimpleResponse<ActionGame>>(this.urlPrime + '/codes/send', code, {headers: {'game-token': token}})
   }
 }

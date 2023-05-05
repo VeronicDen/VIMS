@@ -103,6 +103,7 @@ export class MainPageComponent implements OnInit {
    * Получает актуальную информацию
    */
   getActualInfo(): void {
+    this.isGameOpenMap = new Map<PlayerGame, boolean>();
 
     this.userApiService.getActualGames().subscribe(response => {
       this.games = response.res.sort(

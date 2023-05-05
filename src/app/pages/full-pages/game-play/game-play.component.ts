@@ -75,8 +75,7 @@ export class GamePlayComponent implements OnInit {
     if (this.localStorageService.game_token) {
 
       navigator.geolocation.getCurrentPosition(position => {
-        console.log(position)
-        console.log(position.coords.accuracy)
+
       }, error => {
         const { code } = error
 
