@@ -40,6 +40,7 @@ import { IdDirective } from './directives/id.directive';
 import { ArrowDivDirective } from './directives/arrow-div.directive';
 import { GamePlayComponent } from './pages/full-pages/game-play/game-play.component';
 import { HelpPageComponent } from './pages/full-pages/help-page/help-page.component';
+import {CurrentStateService} from "./services/current-state.service";
 
 export function themeFactory(themeService: UiStyleToggleService) {
   return () => themeService.setThemeOnStart();
@@ -136,6 +137,7 @@ const routes: Routes = [
     UiStyleToggleService,
     StartupService,
     ConfirmationService,
+    CurrentStateService,
     {
       provide: APP_INITIALIZER,
       useFactory: themeFactory,

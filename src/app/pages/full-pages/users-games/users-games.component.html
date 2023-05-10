@@ -14,13 +14,13 @@
       <div class="list-container" [ngStyle]="{'left.px': (activeSlide - 1) * -slidersTableWidth}"
            *ngIf="games.length > 0, else beforeCreateBox">
 
-        <div class="table" *ngFor="let arr of gamesArrsArr">
+        <div class="table" *ngFor="let arr of gamesPages">
           <div class="row header" [ngStyle]="{'width.px': slidersTableWidth}">
             <div class="number">Номер</div>
             <div class="game">Игра</div>
           </div>
 
-          <div class="row" *ngFor="let game of gamesArrsArr[activeSlide - 1]"
+          <div class="row" *ngFor="let game of gamesPages[activeSlide - 1]"
                (click)="goToGame(game.id)" [ngStyle]="{'width.px': slidersTableWidth}">
             <div class="number">#{{game.id}}</div>
             <div class="game">{{game.caption}}</div>

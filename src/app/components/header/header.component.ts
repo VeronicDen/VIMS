@@ -46,7 +46,7 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(isToProfile ? ['/profile'] : ['/games']);
   }
 
-  goToHelp() {
+  /*goToHelp() {
     this.router.navigate(['/help']);
-  }
+  }*/
 }

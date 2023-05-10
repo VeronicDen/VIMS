@@ -1,15 +1,12 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {User} from "../models/auth/user";
 import {LocalStorageService} from "./local-storage.service";
 import {Router} from "@angular/router";
-import {Game} from "../models/admin-game/game";
 
 /**
  * Сервис для работы с текущими состояниями
  */
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CurrentStateService {
 
   constructor(

@@ -23,17 +23,28 @@ export class ProfileComponent implements OnInit {
   /** Информация о пользователе */
   user: User;
 
-  listOfCommandArr: string[][] = [];
-  quantityOfCommandSlides: number[] = [];
+  /** Массив страниц команд */
+  teamsPages: string[][] = [];
 
-  listOfGamesArr: string[][] = [];
-  quantityOfGamesSlides: number[] = [];
+  /** Номера страниц команд */
+  teamPagesNumbers: number[] = [];
 
-  listOfResultsArr: GameResult[][] = [];
-  quantityOfResultsSlides: number[] = [];
+  /** Массив страниц игр */
+  gamesPages: string[][] = [];
 
-  activeSlides = new Map <string, number>();
+  /** Номера страниц игр */
+  gamePagesNumbers: number[] = [];
 
+  /** Массив страниц результатов */
+  resultsPages: GameResult[][] = [];
+
+  /** Номера страниц результатов */
+  resultPagesNumbers: number[] = [];
+
+  /** Номера выбранных страниц в слайдере */
+  activePages = new Map <string, number>();
+
+  /** Ширина страниц слайдера */
   slidersWidths = new Map <string, number>();
 
   @ViewChild(RefDirective)
@@ -80,19 +91,19 @@ export class ProfileComponent implements OnInit {
       {date: '01.01.22', name: 'Игра 20', team: 'Команда 20', place: '10/10'},
     ]
 
-    this.listOfCommandArr = this.setListArr(listOfCommand, 10);
-    this.quantityOfCommandSlides = this.setQuantityOfSlides(this.listOfCommandArr.length);
-    this.listOfGamesArr = this.setListArr(listOfGames, 10);
-    this.quantityOfGamesSlides = this.setQuantityOfSlides(this.listOfGamesArr.length);
-    this.listOfResultsArr = this.setListArr(listOfResults, 7);
-    this.quantityOfResultsSlides = this.setQuantityOfSlides(this.listOfResultsArr.length);
+    this.teamsPages = this.setListArr(listOfCommand, 10);
+    this.teamPagesNumbers = this.setQuantityOfSlides(this.teamsPages.length);
+    this.gamesPages = this.setListArr(listOfGames, 10);
+    this.gamePagesNumbers = this.setQuantityOfSlides(this.gamesPages.length);
+    this.resultsPages = this.setListArr(listOfResults, 7);
+    this.resultPagesNumbers = this.setQuantityOfSlides(this.resultsPages.length);
 
-    this.activeSlides.set('teams', 1);
-    this.activeSlides.set('games', 1);
-    this.activeSlides.set('results', 1);
+    this.activePages.set('teams', 1);
+    this.activePages.set('games', 1);
+    this.activePages.set('results', 1);
   }
 
-  @HostListener('window:resize', ['$event']) onResize(e) {
+  @HostListener('window:resize', ['$event']) onResize() {
     this.setSlidersWidth();
   }
 
@@ -129,6 +140,11 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  /**
+   * Разделяет массив на подмассивы
+   * @param array изначальный массив
+   * @param quantity количество элементов в одном подмассиве
+   */
   setListArr(array: string[] | GameResult[], quantity: number): any[] {
     let resultArray = [];
     for (let i = 0; i < Math.ceil(array.length/quantity); i++){
@@ -137,6 +153,10 @@ export class ProfileComponent implements OnInit {
     return resultArray;
   }
 
+  /**
+   * Передает массив номеров страниц слайдера
+   * @param quantity количество
+   */
   setQuantityOfSlides(quantity: number): number[] {
     let resultArray = [];
     for (let i = 1; i <= quantity; i++){

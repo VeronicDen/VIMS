@@ -27,18 +27,19 @@
     </div>
   </div>
   <div class="additional-block-info">
-    <div class="ordinary-block" *ngIf="block.info.info_type == 'SIMPLE'; else linkBlock">
+    <div class="ordinary-block" >
       <div class="form-item">
         <label>Условия показа</label>
         <input type="text" [(ngModel)]="block.info.condition_script">
       </div>
-      <div class="form-item" style="margin-bottom: 0">
+      <div class="form-item" *ngIf="block.info.info_type == 'SIMPLE'; else linkBlock" style="margin-bottom: 0">
         <div class="label-box">
           <label>Текст блока</label>
           <button (click)="block.isHTML = !block.isHTML">
             {{block.isHTML ? 'Отобразить как текст' : 'Отобразить как HTML'}}
           </button>
         </div>
+
         <p-editor *ngIf="!block.isHTML" [(ngModel)]="block.info.info_text" [style]="{'min-height': '185px'}">
           <ng-template pTemplate="header">
             <select class="ql-header">
@@ -52,17 +53,19 @@
             <button class="ql-image"></button>
           </ng-template>
         </p-editor>
+
         <textarea *ngIf="block.isHTML" [(ngModel)]="block.info.info_text"></textarea>
       </div>
+
+      <ng-template #linkBlock>
+        <div class="form-item">
+          <label>Ссылка на уровень</label>
+          <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.info.linked_level_id"
+                      optionLabel="name" optionValue="code" class="big-block-dropdown" placeholder="Выберите уровень">
+          </p-dropdown>
+        </div>
+      </ng-template>
     </div>
-    <ng-template #linkBlock>
-      <div class="form-item">
-        <label>Ссылка на уровень</label>
-        <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.info.linked_level_id"
-                    optionLabel="name" optionValue="code" class="big-block-dropdown" placeholder="Выберите уровень">
-        </p-dropdown>
-      </div>
-    </ng-template>
   </div>
   <div class="button-box addit">
     <button class="filled accent" (click)="saveChangedBlock(block.info, false)">СОХРАНИТЬ БЛОК</button>

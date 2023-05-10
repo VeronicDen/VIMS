@@ -10,6 +10,7 @@ import {GameApiService} from "../../../api/game-api.service";
 import {KeyValue} from "@angular/common";
 import {Variables} from "../../../models/user/variables";
 import {Utils} from "../../../shared/utils";
+import {ActionGame} from "../../../models/user/action-game";
 
 @Component({
   selector: 'app-game-play',
@@ -18,121 +19,134 @@ import {Utils} from "../../../shared/utils";
 })
 export class GamePlayComponent implements OnInit {
 
+  /** Название игры */
   gameName: string = '';
 
   /** Массив уровней игры */
   levels: TeamLevel[] = [];
 
+  /** Список уровней для выпадающего меню */
   levelsOption: Option<TeamLevel>[] = [];
 
+  /** Список дочерних уровней для выпадающего меню */
   childLevelsOption: Option<TeamLevel>[] = [];
 
+  /** Выбранный уровень */
   actualLevel: TeamLevel;
 
+  /** Выбранный дочерний уровень*/
   actualChildLevel: TeamLevel;
 
+  /** Код */
   code: string = '';
 
+  /** Идентификатор выбранного уровня */
   codeLevelId: number;
 
-  codeError: string = '';
+  /** Сообщение при ошибке в отправке кода */
+  errorMessage: string = '';
 
-  time: string = '';
-
+  /** Результаты уровня */
   scores: Map<string, any> = new Map<string, any>();
 
+  /** Разница времени для результата ВРЕМЯ */
   timeDifInScores: number = 0;
 
+  /** Услоия прохождения */
   passCondition: string = '';
 
-  failedConditionScript: string = '';
+  /** Условия слива */
+  failedCondition: string = '';
 
+  /** Условия принятия кода */
   codeAcceptationScript: string = '';
 
+  /** Текст задания */
   task: SafeHtml = '';
 
+  /** Массив значений для таблицы кодов */
   codesInfo: { count: string; info: string }[] = [];
 
+  /** Флаг необходимости геолокации при отправки ответа */
+  isGeoRequired: boolean = false;
+
+  /** Переменные */
   variables: Variables[] = [];
 
-  options = {
-    enableHighAccuracy: true,
-    timeout: 3600
-  }
-
+  /** Возвращает число строкой с незначащими нулями */
   setNumberWithZeroAsString = Utils.setNumberWithZeroAsString;
 
   constructor(
-    private localStorageService: LocalStorageService,
     private actionApiService: ActionApiService,
     private gameApiService: GameApiService,
+    private localStorageService: LocalStorageService,
     private router: Router,
     private sanitized: DomSanitizer,
   ) {
   }
 
   ngOnInit(): void {
-    if (this.localStorageService.game_token) {
-
-      navigator.geolocation.getCurrentPosition(position => {
-
-      }, error => {
-        const { code } = error
-
-        switch (code) {
-          case GeolocationPositionError.TIMEOUT:
-            // время получения геолокации истекло
-            console.log('время получения геолокации истекло')
-            break
-          case GeolocationPositionError.PERMISSION_DENIED:
-            // пользователь запретил трекинг своей геопозиции
-            console.log('пользователь запретил трекинг своей геопозиции')
-            break
-          case GeolocationPositionError.POSITION_UNAVAILABLE:
-            // получить местоположение не удалось
-            console.log('получить местоположение не удалось')
-            break
-        }
-      },{
-        enableHighAccuracy: true
-      })
-      //navigator.geolocation.watchPosition(this.getCurrentPosition, this.errorInGetCurrentPosition, this.options)
-
-      this.actionApiService.enterTheGame(this.localStorageService.game_token).subscribe(response => {
-        this.gameName = response.res.game.caption;
+    if (!this.localStorageService.game_token) {
+      this.router.navigate(['']);
+      return;
+    }
+    this.actionApiService.enterTheGame(this.localStorageService.game_token).subscribe(response => {
+      this.gameName = response.res.game.caption;
+      if (response.res.game.variables)
         this.variables = response.res.game.variables;
 
-        setInterval(() => {
-          this.timeDifInScores++;
-        }, 1000)
+      setInterval(() => {
+        this.timeDifInScores++;
+      }, 1000)
 
-        this.levels = response.res.team_levels;
-        for (const level of this.levels) {
-          this.levelsOption.push({name: level.level.level_info.caption, code: level})
-        }
-        this.actualLevel = this.levels[0];
-        this.setActualLevel();
-      })
-    } else {
-      this.router.navigate(['']);
-    }
+      this.getActualInfo(response.res);
+    })
   }
 
+  /**
+   * Получает актуальную информацию
+   * @param game Вся информация об игре
+   */
+  getActualInfo(game: ActionGame): void {
+    this.levels = game.team_levels;
+    this.levelsOption = [];
+    for (const level of this.levels) {
+      this.levelsOption.push({name: level.level.level_info.caption, code: level})
+    }
+
+    //Если уровень не выбран или выбран, но такого больше нет
+    if (!this.actualLevel && !game.team_levels.find(a => a.level.id == this.actualLevel?.level.id))
+      this.actualLevel = this.levels[0];
+
+    this.setActualLevel();
+  }
+
+  /**
+   * Устанавливает текущий уровень
+   */
   setActualLevel() {
     this.childLevelsOption = [];
 
-    if (this.actualLevel.child_levels.length > 0) {
-      for (const level of this.actualLevel.child_levels) {
-        this.childLevelsOption.push({name: level.level.level_info.caption, code: level})
-      }
-      this.actualChildLevel = this.actualLevel.child_levels[0];
-      this.setActualTask(this.actualChildLevel);
-    } else {
-      this.setActualTask(this.actualLevel);
+    if (this.actualLevel.child_levels.length == 0) {
+      this.setActualData(this.actualLevel);
+      return;
     }
+
+    for (const level of this.actualLevel.child_levels) {
+      this.childLevelsOption.push({name: level.level.level_info.caption, code: level})
+    }
+
+    if (!this.actualChildLevel && !this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id))
+      this.actualChildLevel = this.actualLevel.child_levels[0];
+
+    this.setActualData(this.actualChildLevel);
   }
 
-  setActualTask(level: TeamLevel) {
+  /**
+   * Устанавливает данные для вывода
+   * @param level уровень
+   */
+  setActualData(level: TeamLevel) {
     let string = '';
     for (const info of level.level.team_infos) {
       string += info.status == 'showed' ? info.info.info_caption + info.info.info_text : '';
@@ -152,8 +166,9 @@ export class GamePlayComponent implements OnInit {
     this.task = this.sanitized.bypassSecurityTrustHtml(string);
 
     this.passCondition = level.level.level_info.condition_script;
-    this.failedConditionScript = level.level.level_info.failed_condition_script;
+    this.failedCondition = level.level.level_info.failed_condition_script;
     this.codeAcceptationScript = level.level.level_info.code_acceptation_script;
+    this.isGeoRequired = !!this.codeAcceptationScript?.includes('DISTANCE');
     this.codeLevelId = level.level.id;
 
     this.codesInfo = [];
@@ -163,17 +178,21 @@ export class GamePlayComponent implements OnInit {
         let first = count + ': ' + (codes.code_values_info ? codes.code_values_info : '');
         count++;
 
-        let second = this.variables.find(a => a.code == code.result_code).caption + ': ' + '_' + ', ';
-        switch (code.result_type) {
-          case 'SIMPLE':
-            second += 'время: ';
-            break;
-          case ('BONUS'):
-            second += 'бонус: ';
-            break;
-          case ('@'):
-            second += 'откроет: ';
-            break;
+        let second = 'бонус: ';
+
+        if (this.variables.length > 0) {
+          second = this.variables.find(a => a.code == code.result_code).caption + ': ' + '_' + ', ';
+          switch (code.result_type) {
+            case 'SIMPLE':
+              second += 'время: ';
+              break;
+            case ('BONUS'):
+              second += 'бонус: ';
+              break;
+            case ('@'):
+              second += 'откроет: ';
+              break;
+          }
         }
         second += '_';
 
@@ -182,29 +201,71 @@ export class GamePlayComponent implements OnInit {
     }
   }
 
-  setCode() {
-    if (this.code != '') {
-      let code: CodeForSend = {
-        code_value: this.code,
-        team_level_id: this.codeLevelId,
-      }
+  /**
+   * Отпрапвляет код
+   */
+  sendCode() {
+    if (this.code != '')
+      return;
 
+    let code: CodeForSend = {
+      code_value: this.code,
+      team_level_id: this.codeLevelId,
+    }
+
+    let isError: boolean = false;
+    if (this.isGeoRequired) {
+      navigator.geolocation.getCurrentPosition(position => {
+        /*if (position.coords.accuracy >= 30) {
+          this.codeError = 'слишком большая погрешность';
+        }
+        else {*/
+        code.current_location = {
+          lon: position.coords.longitude, lat: position.coords.latitude
+        };
+        /*}*/
+      }, () => {
+        isError = true;
+        if (GeolocationPositionError.PERMISSION_DENIED) {
+          this.errorMessage = 'вы запретили трекинг своей геопозиции';
+        } else {
+          this.errorMessage = 'получить местоположение не удалось';
+        }
+      })
+      setTimeout(() => {
+        this.errorMessage = '';
+      }, 4000)
+    }
+
+    if (isError)
+      return;
+
+    setTimeout(() => {
       this.actionApiService.sendCode(this.localStorageService.game_token, code).subscribe(response => {
-
+        this.getActualInfo(response.res.team_info);
       }, error => {
         this.code = '';
         if (error.error.error == "wrong-code") {
-          this.codeError = error.error.comments;
-          setTimeout(() => {
-            this.codeError = '';
-          }, 3000)
+          this.errorMessage = error.error.comments;
+        } else if (error.error.error == "can-not-accept") {
+          this.errorMessage = 'вы находитесь далеко от места'
+        } else {
+          this.errorMessage = 'неопределенная ошибка'
         }
+        setTimeout(() => {
+          this.errorMessage = '';
+        }, 4000)
       })
+    }, 1500)
 
-    }
+    this.code = '';
   }
 
-  getScore(element: KeyValue<string, any>): string {
+  /**
+   * Обрабатывает результаты
+   * @param element необработанные результаты
+   */
+  setScore(element: KeyValue<string, any>): string {
     if (element.key == 'TIME') {
       return 'Время: ' + Math.floor((+element.value + this.timeDifInScores) / 3600) + ':' +
         this.setNumberWithZeroAsString(Math.floor((+element.value + this.timeDifInScores) / 60) -

@@ -84,8 +84,10 @@
       }
 
       textarea {
-        height: 66px;
+        height: 88px;
         margin-bottom: 25px;
+
+        font-family: monospace;
 
         &.open {
           height: 242px;

@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, HostListener, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
 import {User} from "../../../models/auth/user";
 import {CurrentStateService} from "../../../services/current-state.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -59,12 +59,12 @@ export class GameCreationComponent implements OnInit {
   refDir: RefDirective;
 
   constructor(
-    private currentStateService: CurrentStateService,
-    private componentFactoryResolver: ComponentFactoryResolver,
     private activatedRoute: ActivatedRoute,
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private confirmationService: ConfirmationService,
+    private currentStateService: CurrentStateService,
     private gameApiService: GameApiService,
     private router: Router,
-    private confirmationService: ConfirmationService,
   ) { }
 
   ngOnInit(): void {
@@ -79,10 +79,6 @@ export class GameCreationComponent implements OnInit {
       });
       this.getActualInfo();
     });
-  }
-
-  @HostListener('window:resize', ['$event']) onResize() {
-
   }
 
   /**

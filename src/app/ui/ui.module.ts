@@ -16,7 +16,7 @@ export function themeFactory(themeService: UiStyleToggleService) {
     CommonModule
   ],
   providers: [
-    LocalStorageService,
+    // LocalStorageService,
     UiStyleToggleService,
     {
       provide: APP_INITIALIZER,

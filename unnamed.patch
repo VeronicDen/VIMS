@@ -1,0 +1,2045 @@
+Index: src/app/models/user/team-info.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/models/user/team-info.ts b/src/app/models/user/team-info.ts
+--- a/src/app/models/user/team-info.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/models/user/team-info.ts	(date 1683749734542)
+@@ -1,11 +1,25 @@
+ import {Infos} from "../admin-game/infos";
+ 
++/**
++ * Модель данных блока информации в игре
++ */
+ export interface TeamInfo {
+ 
++  /** Идентификатор */
+   id: number,
++
++  /** Основная информация блока информации */
+   info: Infos,
++
++  /** Идентификатор блока информации */
+   info_id: number,
++
++  /** Дата */
+   insert_date: string,
++
++  /** Статус */
+   status: string,
++
++  /** Идентификатор коамнды в игре */
+   team_level_id: number
+ }
+Index: src/app/pages/dialogs/auth-dialog/auth-dialog.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/dialogs/auth-dialog/auth-dialog.component.ts b/src/app/pages/dialogs/auth-dialog/auth-dialog.component.ts
+--- a/src/app/pages/dialogs/auth-dialog/auth-dialog.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/dialogs/auth-dialog/auth-dialog.component.ts	(date 1683749846302)
+@@ -87,8 +87,7 @@
+       this.currentStateService.currentUser = jwt_decode(this.localStorageService.token);
+ 
+       this.close.emit();
+-
+-    },error => {
++    },() => {
+       this.formGroupLogin.markAsUntouched();
+       this.errorMessageText = 'ошибка';
+     })
+@@ -121,7 +120,7 @@
+       this.changeForm(true);
+     },error => {
+       this.formGroupRegistration.markAsUntouched();
+-      this.errorMessageText = 'ошибка';
++      this.errorMessageText = 'Ошибка';
+     })
+   }
+ 
+Index: src/app/pages/full-pages/game-play/game-play.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/game-play/game-play.component.html b/src/app/pages/full-pages/game-play/game-play.component.html
+--- a/src/app/pages/full-pages/game-play/game-play.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/game-play/game-play.component.html	(date 1683746147791)
+@@ -7,7 +7,7 @@
+     <p-dropdown [options]="levelsOption" [(ngModel)]="actualLevel" (onChange)="setActualLevel()"
+                 optionLabel="name" optionValue="code" class="main-level"></p-dropdown>
+     <p-dropdown [disabled]="childLevelsOption.length < 2" [options]="childLevelsOption"
+-                [(ngModel)]="actualChildLevel" (onChange)="setActualTask($event.value)"
++                [(ngModel)]="actualChildLevel" (onChange)="setActualData($event.value)"
+                 optionLabel="name" optionValue="code"></p-dropdown>
+   </div>
+ 
+@@ -17,29 +17,33 @@
+         <p class="label">Код уровня:  </p>
+         <div class="code-container">
+           <input type="text" placeholder="Код"
+-                 [(ngModel)]="code" (keydown.enter)="setCode()">
++                 [(ngModel)]="code" (keydown.enter)="se()">
+           <button class="filled accent mdi mdi-24px mdi-send"
+-                  title="Отправить" (click)="setCode()"></button>
++                  title="Отправить" (click)="se()"></button>
+         </div>
+-        <div class="error-box">{{codeError}}</div>
++        <div class="error-box">{{errorMessage}}</div>
+       </div>
+       <div class="condition">
+         <div class="game-info-element">
+           <p class="label">Текущее количество очков:</p>
+           <div class="scores" *ngFor="let score of scores | keyvalue">
+-            {{getScore(score)}}
++            {{setScore(score)}}
+           </div>
+         </div>
+         <div class="game-info-element">
+           <p class="label">Условия прохождения:</p>
+-          <p>{{passCondition}}</p>
++          <p>{{passCondition ? passCondition : 'Условия не определены'}}</p>
+         </div>
+         <div class="game-info-element">
+           <p class="label">Условия слива:</p>
+-          <p>{{failedConditionScript}}</p>
++          <p>{{failedCondition ? failedCondition : 'Условия не определены'}}</p>
++        </div>
++        <div class="game-info-element">
++          <p class="label">Условия принятия кода:</p>
++          <p>{{codeAcceptationScript ? codeAcceptationScript : 'Условия не определены'}}</p>
+         </div>
+       </div>
+-      <div class="custom-scroll">
++      <div class="custom-scroll" id="first-table">
+         <div class="table" *ngIf="codesInfo">
+           <div class="code" *ngFor="let info of codesInfo">
+             <div class="row">
+@@ -48,7 +52,6 @@
+             <div class="row">
+               <div>{{info.info}}</div>
+             </div>
+-
+           </div>
+         </div>
+       </div>
+@@ -56,6 +59,18 @@
+     <div class="game-info-box task">
+       <h2 class="task">ЗАДАНИЕ</h2>
+       <div class="game-info-element" [innerHtml]="task">
++      </div>
++    </div>
++    <div class="custom-scroll" id="second-table">
++      <div class="table" *ngIf="codesInfo">
++        <div class="code" *ngFor="let info of codesInfo">
++          <div class="row">
++            <div>{{info.count}}</div>
++          </div>
++          <div class="row">
++            <div>{{info.info}}</div>
++          </div>
++        </div>
+       </div>
+     </div>
+   </div>
+Index: src/app/components/header/header.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/components/header/header.component.ts b/src/app/components/header/header.component.ts
+--- a/src/app/components/header/header.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/components/header/header.component.ts	(date 1683739809253)
+@@ -46,7 +46,7 @@
+     this.router.navigate(isToProfile ? ['/profile'] : ['/games']);
+   }
+ 
+-  goToHelp() {
++  /*goToHelp() {
+     this.router.navigate(['/help']);
+-  }
++  }*/
+ }
+Index: src/app/api/user-api.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/api/user-api.service.ts b/src/app/api/user-api.service.ts
+--- a/src/app/api/user-api.service.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/api/user-api.service.ts	(date 1683749734560)
+@@ -1,10 +1,8 @@
+-import { Injectable } from '@angular/core';
++import {Injectable} from '@angular/core';
+ import {environment} from "../../environments/environment";
+ import {HttpClient} from "@angular/common/http";
+ import {Observable} from "rxjs";
+-import {SimpleResponse} from "../models/simple-response";
+ import {Response} from "../models/response";
+-import {Game} from "../models/admin-game/game";
+ import {PlayerGame} from "../models/user/player-game";
+ 
+ /**
+Index: src/app/pages/full-pages/game-play/game-play.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/game-play/game-play.component.ts b/src/app/pages/full-pages/game-play/game-play.component.ts
+--- a/src/app/pages/full-pages/game-play/game-play.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/game-play/game-play.component.ts	(date 1683750477797)
+@@ -10,6 +10,7 @@
+ import {KeyValue} from "@angular/common";
+ import {Variables} from "../../../models/user/variables";
+ import {Utils} from "../../../shared/utils";
++import {ActionGame} from "../../../models/user/action-game";
+ 
+ @Component({
+   selector: 'app-game-play',
+@@ -18,121 +19,134 @@
+ })
+ export class GamePlayComponent implements OnInit {
+ 
++  /** Название игры */
+   gameName: string = '';
+ 
+   /** Массив уровней игры */
+   levels: TeamLevel[] = [];
+ 
++  /** Список уровней для выпадающего меню */
+   levelsOption: Option<TeamLevel>[] = [];
+ 
++  /** Список дочерних уровней для выпадающего меню */
+   childLevelsOption: Option<TeamLevel>[] = [];
+ 
++  /** Выбранный уровень */
+   actualLevel: TeamLevel;
+ 
++  /** Выбранный дочерний уровень*/
+   actualChildLevel: TeamLevel;
+ 
++  /** Код */
+   code: string = '';
+ 
++  /** Идентификатор выбранного уровня */
+   codeLevelId: number;
+ 
+-  codeError: string = '';
++  /** Сообщение при ошибке в отправке кода */
++  errorMessage: string = '';
+ 
+-  time: string = '';
+-
++  /** Результаты уровня */
+   scores: Map<string, any> = new Map<string, any>();
+ 
++  /** Разница времени для результата ВРЕМЯ */
+   timeDifInScores: number = 0;
+ 
++  /** Услоия прохождения */
+   passCondition: string = '';
+ 
+-  failedConditionScript: string = '';
++  /** Условия слива */
++  failedCondition: string = '';
+ 
++  /** Условия принятия кода */
+   codeAcceptationScript: string = '';
+ 
++  /** Текст задания */
+   task: SafeHtml = '';
+ 
++  /** Массив значений для таблицы кодов */
+   codesInfo: { count: string; info: string }[] = [];
+ 
++  /** Флаг необходимости геолокации при отправки ответа */
++  isGeoRequired: boolean = false;
++
++  /** Переменные */
+   variables: Variables[] = [];
+ 
+-  options = {
+-    enableHighAccuracy: true,
+-    timeout: 3600
+-  }
+-
++  /** Возвращает число строкой с незначащими нулями */
+   setNumberWithZeroAsString = Utils.setNumberWithZeroAsString;
+ 
+   constructor(
+-    private localStorageService: LocalStorageService,
+     private actionApiService: ActionApiService,
+     private gameApiService: GameApiService,
++    private localStorageService: LocalStorageService,
+     private router: Router,
+     private sanitized: DomSanitizer,
+   ) {
+   }
+ 
+   ngOnInit(): void {
+-    if (this.localStorageService.game_token) {
+-
+-      navigator.geolocation.getCurrentPosition(position => {
+-
+-      }, error => {
+-        const { code } = error
+-
+-        switch (code) {
+-          case GeolocationPositionError.TIMEOUT:
+-            // время получения геолокации истекло
+-            console.log('время получения геолокации истекло')
+-            break
+-          case GeolocationPositionError.PERMISSION_DENIED:
+-            // пользователь запретил трекинг своей геопозиции
+-            console.log('пользователь запретил трекинг своей геопозиции')
+-            break
+-          case GeolocationPositionError.POSITION_UNAVAILABLE:
+-            // получить местоположение не удалось
+-            console.log('получить местоположение не удалось')
+-            break
+-        }
+-      },{
+-        enableHighAccuracy: true
+-      })
+-      //navigator.geolocation.watchPosition(this.getCurrentPosition, this.errorInGetCurrentPosition, this.options)
+-
+-      this.actionApiService.enterTheGame(this.localStorageService.game_token).subscribe(response => {
+-        this.gameName = response.res.game.caption;
++    if (!this.localStorageService.game_token) {
++      this.router.navigate(['']);
++      return;
++    }
++    this.actionApiService.enterTheGame(this.localStorageService.game_token).subscribe(response => {
++      this.gameName = response.res.game.caption;
++      if (response.res.game.variables)
+         this.variables = response.res.game.variables;
+ 
+-        setInterval(() => {
+-          this.timeDifInScores++;
+-        }, 1000)
++      setInterval(() => {
++        this.timeDifInScores++;
++      }, 1000)
+ 
+-        this.levels = response.res.team_levels;
+-        for (const level of this.levels) {
+-          this.levelsOption.push({name: level.level.level_info.caption, code: level})
+-        }
+-        this.actualLevel = this.levels[0];
+-        this.setActualLevel();
+-      })
+-    } else {
+-      this.router.navigate(['']);
+-    }
++      this.getActualInfo(response.res);
++    })
++  }
++
++  /**
++   * Получает актуальную информацию
++   * @param game Вся информация об игре
++   */
++  getActualInfo(game: ActionGame): void {
++    this.levels = game.team_levels;
++    this.levelsOption = [];
++    for (const level of this.levels) {
++      this.levelsOption.push({name: level.level.level_info.caption, code: level})
++    }
++
++    //Если уровень не выбран или выбран, но такого больше нет
++    if (!this.actualLevel && !game.team_levels.find(a => a.level.id == this.actualLevel?.level.id))
++      this.actualLevel = this.levels[0];
++
++    this.setActualLevel();
+   }
+ 
++  /**
++   * Устанавливает текущий уровень
++   */
+   setActualLevel() {
+     this.childLevelsOption = [];
+ 
+-    if (this.actualLevel.child_levels.length > 0) {
+-      for (const level of this.actualLevel.child_levels) {
+-        this.childLevelsOption.push({name: level.level.level_info.caption, code: level})
+-      }
++    if (this.actualLevel.child_levels.length == 0) {
++      this.setActualData(this.actualLevel);
++      return;
++    }
++
++    for (const level of this.actualLevel.child_levels) {
++      this.childLevelsOption.push({name: level.level.level_info.caption, code: level})
++    }
++
++    if (!this.actualChildLevel && !this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id))
+       this.actualChildLevel = this.actualLevel.child_levels[0];
+-      this.setActualTask(this.actualChildLevel);
+-    } else {
+-      this.setActualTask(this.actualLevel);
+-    }
++
++    this.setActualData(this.actualChildLevel);
+   }
+ 
+-  setActualTask(level: TeamLevel) {
++  /**
++   * Устанавливает данные для вывода
++   * @param level уровень
++   */
++  setActualData(level: TeamLevel) {
+     let string = '';
+     for (const info of level.level.team_infos) {
+       string += info.status == 'showed' ? info.info.info_caption + info.info.info_text : '';
+@@ -152,8 +166,9 @@
+     this.task = this.sanitized.bypassSecurityTrustHtml(string);
+ 
+     this.passCondition = level.level.level_info.condition_script;
+-    this.failedConditionScript = level.level.level_info.failed_condition_script;
++    this.failedCondition = level.level.level_info.failed_condition_script;
+     this.codeAcceptationScript = level.level.level_info.code_acceptation_script;
++    this.isGeoRequired = !!this.codeAcceptationScript?.includes('DISTANCE');
+     this.codeLevelId = level.level.id;
+ 
+     this.codesInfo = [];
+@@ -163,17 +178,21 @@
+         let first = count + ': ' + (codes.code_values_info ? codes.code_values_info : '');
+         count++;
+ 
+-        let second = this.variables.find(a => a.code == code.result_code).caption + ': ' + '_' + ', ';
+-        switch (code.result_type) {
+-          case 'SIMPLE':
+-            second += 'время: ';
+-            break;
+-          case ('BONUS'):
+-            second += 'бонус: ';
+-            break;
+-          case ('@'):
+-            second += 'откроет: ';
+-            break;
++        let second = 'бонус: ';
++
++        if (this.variables.length > 0) {
++          second = this.variables.find(a => a.code == code.result_code).caption + ': ' + '_' + ', ';
++          switch (code.result_type) {
++            case 'SIMPLE':
++              second += 'время: ';
++              break;
++            case ('BONUS'):
++              second += 'бонус: ';
++              break;
++            case ('@'):
++              second += 'откроет: ';
++              break;
++          }
+         }
+         second += '_';
+ 
+@@ -182,29 +201,71 @@
+     }
+   }
+ 
+-  setCode() {
+-    if (this.code != '') {
+-      let code: CodeForSend = {
+-        code_value: this.code,
+-        team_level_id: this.codeLevelId,
+-      }
++  /**
++   * Отпрапвляет код
++   */
++  sendCode() {
++    if (this.code != '')
++      return;
++
++    let code: CodeForSend = {
++      code_value: this.code,
++      team_level_id: this.codeLevelId,
++    }
+ 
++    let isError: boolean = false;
++    if (this.isGeoRequired) {
++      navigator.geolocation.getCurrentPosition(position => {
++        /*if (position.coords.accuracy >= 30) {
++          this.codeError = 'слишком большая погрешность';
++        }
++        else {*/
++        code.current_location = {
++          lon: position.coords.longitude, lat: position.coords.latitude
++        };
++        /*}*/
++      }, () => {
++        isError = true;
++        if (GeolocationPositionError.PERMISSION_DENIED) {
++          this.errorMessage = 'вы запретили трекинг своей геопозиции';
++        } else {
++          this.errorMessage = 'получить местоположение не удалось';
++        }
++      })
++      setTimeout(() => {
++        this.errorMessage = '';
++      }, 4000)
++    }
++
++    if (isError)
++      return;
++
++    setTimeout(() => {
+       this.actionApiService.sendCode(this.localStorageService.game_token, code).subscribe(response => {
+-
++        this.getActualInfo(response.res.team_info);
+       }, error => {
+         this.code = '';
+         if (error.error.error == "wrong-code") {
+-          this.codeError = error.error.comments;
+-          setTimeout(() => {
+-            this.codeError = '';
+-          }, 3000)
+-        }
++          this.errorMessage = error.error.comments;
++        } else if (error.error.error == "can-not-accept") {
++          this.errorMessage = 'вы находитесь далеко от места'
++        } else {
++          this.errorMessage = 'неопределенная ошибка'
++        }
++        setTimeout(() => {
++          this.errorMessage = '';
++        }, 4000)
+       })
++    }, 1500)
+ 
+-    }
++    this.code = '';
+   }
+ 
+-  getScore(element: KeyValue<string, any>): string {
++  /**
++   * Обрабатывает результаты
++   * @param element необработанные результаты
++   */
++  setScore(element: KeyValue<string, any>): string {
+     if (element.key == 'TIME') {
+       return 'Время: ' + Math.floor((+element.value + this.timeDifInScores) / 3600) + ':' +
+         this.setNumberWithZeroAsString(Math.floor((+element.value + this.timeDifInScores) / 60) -
+Index: src/app/pages/full-pages/game-play/game-play.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/game-play/game-play.component.scss b/src/app/pages/full-pages/game-play/game-play.component.scss
+--- a/src/app/pages/full-pages/game-play/game-play.component.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/game-play/game-play.component.scss	(date 1683735294777)
+@@ -5,6 +5,10 @@
+   margin: 0 auto;
+   padding: 66px 0;
+ 
++  #second-table {
++    display: none;
++  }
++
+   .game-name-box {
+     width: 100%;
+     margin-bottom: 34px;
+@@ -23,6 +27,7 @@
+ 
+   .level-name {
+     display: flex;
++    flex-wrap: wrap;
+     margin-bottom: 20px;
+   }
+ 
+@@ -105,74 +110,66 @@
+   }
+ 
+   @include screen('desktop') {
+-    .game-box .game-info-box .game-info-element .code-container {
+-      input {
++    .game-box .game-info-box {
++      &.general {
+         width: 220px;
+       }
+ 
+-      button {
+-        width: 120px;
++      &.task {
++        width: calc(100% - 250px);
+       }
+     }
+   }
+ 
+   @include screen('tablet-landscape') {
+-    .game-box .game-info-box {
+-      width: calc((100% - 70px) / 2);
+-
+-      .game-info-element .code-container {
+-        flex-direction: column;
+-
+-        input, button {
+-          width: 100%;
+-        }
++    .level-name {
++      justify-content: center;
++    }
+ 
+-        input {
+-          margin-bottom: 10px;
+-        }
+-      }
+-    }
+-  }
+-
+-  @include screen('tablet-portrait') {
+     .game-box {
+       flex-direction: column;
+ 
+       .game-info-box {
+-        width: 100%;
+-
+-        h2.task {
+-          margin-top: 25px;
++        &.general {
++          width: 100%;
++          margin-bottom: 45px;
+         }
+ 
+-        .game-info-element .code-container {
+-          flex-direction: row;
+-
+-          button {
+-            width: 120px;
+-          }
+-
+-          input {
+-            width: 290px;
+-            margin-bottom: 0;
+-          }
+-        }
+-      }
++        &.task {
++          width: 100%;
++        }
++      }
++    }
++  }
++
++  @include screen('tablet-portrait') {
++    .level-name {
++      justify-content: flex-start;
+     }
+   }
+ 
+   @include screen('phone') {
+     padding-top: 0;
+ 
++    #first-table {
++      display: none;
++    }
++
++    #second-table {
++      display: flex;
++    }
++
+     .game-box .game-info-box .game-info-element .code-container {
+-      flex-direction: column;
+-
+-      input, button {
+-        width: 100%;
+-      }
+ 
+       input {
+-        margin-bottom: 10px;
++        border-right: none;
++        width: calc(100% - 40px);
++      }
++
++      button {
++        background: none;
++        border: 1px solid var(--text-color);
++        color: $accent-color;
+       }
+     }
+   }
+Index: src/app/pages/full-pages/profile/profile.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/profile/profile.component.html b/src/app/pages/full-pages/profile/profile.component.html
+--- a/src/app/pages/full-pages/profile/profile.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/profile/profile.component.html	(date 1683747937159)
+@@ -13,39 +13,39 @@
+         <h2>МОИ КОМАНДЫ</h2>
+         <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('teams')}">
+           <div class="list-container"
+-               [ngStyle]="{'left.px': -(activeSlides.get('teams') - 1) * slidersWidths.get('teams')}">
+-            <div class="list" *ngFor="let list of listOfCommandArr"
++               [ngStyle]="{'left.px': -(activePages.get('teams') - 1) * slidersWidths.get('teams')}">
++            <div class="list" *ngFor="let list of teamsPages"
+                  [ngStyle]="{'width.px': slidersWidths.get('teams')}">
+               <p *ngFor="let item of list">{{item}}</p>
+             </div>
+           </div>
+         </div>
+         <app-slider [maxNumberOfSlides]="quantityOfCommandSlides.length"
+-                    [activeSlideNumber]="activeSlides.get('teams')"
+-                    (activeSlideNumberChange)="activeSlides.set('teams', $event)"></app-slider>
++                    [activeSlideNumber]="activePages.get('teams')"
++                    (activeSlideNumberChange)="activePages.set('teams', $event)"></app-slider>
+       </div>
+       <div class="games">
+         <h2>ИГРЫ</h2>
+         <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('games')}">
+           <div class="list-container"
+-               [ngStyle]="{'left.px': -(activeSlides.get('games') - 1) * slidersWidths.get('games')}">
+-            <div class="list" *ngFor="let list of listOfGamesArr"
++               [ngStyle]="{'left.px': -(activePages.get('games') - 1) * slidersWidths.get('games')}">
++            <div class="list" *ngFor="let list of gamesPages"
+                  [ngStyle]="{'width.px': slidersWidths.get('games')}">
+               <p *ngFor="let item of list">{{item}}</p>
+             </div>
+           </div>
+         </div>
+-        <app-slider [maxNumberOfSlides]="quantityOfGamesSlides.length"
+-                    [activeSlideNumber]="activeSlides.get('games')"
+-                    (activeSlideNumberChange)="activeSlides.set('games', $event)"></app-slider>
++        <app-slider [maxNumberOfSlides]="gamePagesNumbers.length"
++                    [activeSlideNumber]="activePages.get('games')"
++                    (activeSlideNumberChange)="activePages.set('games', $event)"></app-slider>
+       </div>
+     </div>
+     <div class="results">
+       <h2>РЕЗУЛЬТАТЫ ИГР</h2>
+       <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('results')}">
+         <div class="list-container"
+-             [ngStyle]="{'left.px': -(activeSlides.get('results') - 1) * slidersWidths.get('results')}">
+-          <div class="list" *ngFor="let list of listOfResultsArr"
++             [ngStyle]="{'left.px': -(activePages.get('results') - 1) * slidersWidths.get('results')}">
++          <div class="list" *ngFor="let list of resultsPages"
+                [ngStyle]="{'width.px': slidersWidths.get('results')}">
+             <div class="table">
+               <div class="header row">
+@@ -64,9 +64,9 @@
+           </div>
+         </div>
+       </div>
+-      <app-slider [maxNumberOfSlides]="quantityOfResultsSlides.length"
+-                  [activeSlideNumber]="activeSlides.get('results')"
+-                  (activeSlideNumberChange)="activeSlides.set('results', $event)"></app-slider>
++      <app-slider [maxNumberOfSlides]="resultPagesNumbers.length"
++                  [activeSlideNumber]="activePages.get('results')"
++                  (activeSlideNumberChange)="activePages.set('results', $event)"></app-slider>
+     </div>
+   </div>
+ </div>
+Index: src/app/models/user/team-level.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/models/user/team-level.ts b/src/app/models/user/team-level.ts
+--- a/src/app/models/user/team-level.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/models/user/team-level.ts	(date 1683749734500)
+@@ -5,13 +5,15 @@
+ 
+ export interface TeamLevel {
+ 
+-
++  /** Дочерние уровни */
+   child_levels: TeamLevel[],
+ 
++  /** Скрипт для дочерних уровней */
+   child_levels_script: {
+     id: string,
+     order: number,
+   }[],
+ 
++  /** Информация об уровне */
+   level: ActionLevel,
+ }
+Index: src/app/pages/full-pages/users-games/users-games.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/users-games/users-games.component.ts b/src/app/pages/full-pages/users-games/users-games.component.ts
+--- a/src/app/pages/full-pages/users-games/users-games.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/users-games/users-games.component.ts	(date 1683750477817)
+@@ -26,10 +26,10 @@
+   /** Массив всех игр пользователя */
+   games: Game[] = [];
+ 
+-  /** Массив массивов игр для вывода в слайдер */
+-  gamesArrsArr: Game[][] = [];
++  /** Массив страниц игр */
++  gamesPages: Game[][] = [];
+ 
+-  /** Ширина слайдов таблицы игр */
++  /** Ширина страниц слайдера таблицы игр */
+   slidersTableWidth: number;
+ 
+   @ViewChild(RefDirective)
+@@ -50,7 +50,7 @@
+     this.getActualInfo();
+   }
+ 
+-  @HostListener('window:resize', ['$event']) onResize(e) {
++  @HostListener('window:resize', ['$event']) onResize() {
+     this.setSlidersTableWidth();
+   }
+ 
+@@ -68,7 +68,7 @@
+           if (this.games[j])
+             arr.push(this.games[j])
+         }
+-        this.gamesArrsArr.push(arr);
++        this.gamesPages.push(arr);
+       }
+       this.showSlider();
+     })
+@@ -122,7 +122,7 @@
+ 
+     const component = this.refDir.viewContainerRef.createComponent(modalFactory);
+ 
+-    component.instance.maxNumberOfSlides = this.gamesArrsArr.length;
++    component.instance.maxNumberOfSlides = this.gamesPages.length;
+     component.instance.activeSlideNumber = this.activeSlide;
+     component.instance.activeSlideNumberChange.subscribe(() => {
+       this.activeSlide = component.instance.activeSlideNumber;
+Index: src/app/pages/full-pages/game-creation/game-creation.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/game-creation/game-creation.component.scss b/src/app/pages/full-pages/game-creation/game-creation.component.scss
+--- a/src/app/pages/full-pages/game-creation/game-creation.component.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/game-creation/game-creation.component.scss	(date 1683735294776)
+@@ -84,9 +84,11 @@
+       }
+ 
+       textarea {
+-        height: 66px;
++        height: 88px;
+         margin-bottom: 25px;
+ 
++        font-family: monospace;
++
+         &.open {
+           height: 242px;
+         }
+Index: src/app/pages/full-pages/game-creation/game-creation.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/game-creation/game-creation.component.ts b/src/app/pages/full-pages/game-creation/game-creation.component.ts
+--- a/src/app/pages/full-pages/game-creation/game-creation.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/game-creation/game-creation.component.ts	(date 1683750477913)
+@@ -1,4 +1,4 @@
+-import {Component, ComponentFactoryResolver, HostListener, OnInit, ViewChild} from '@angular/core';
++import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+ import {User} from "../../../models/auth/user";
+ import {CurrentStateService} from "../../../services/current-state.service";
+ import {ActivatedRoute, Router} from "@angular/router";
+@@ -59,12 +59,12 @@
+   refDir: RefDirective;
+ 
+   constructor(
+-    private currentStateService: CurrentStateService,
++    private activatedRoute: ActivatedRoute,
+     private componentFactoryResolver: ComponentFactoryResolver,
+-    private activatedRoute: ActivatedRoute,
++    private confirmationService: ConfirmationService,
++    private currentStateService: CurrentStateService,
+     private gameApiService: GameApiService,
+     private router: Router,
+-    private confirmationService: ConfirmationService,
+   ) { }
+ 
+   ngOnInit(): void {
+@@ -81,10 +81,6 @@
+     });
+   }
+ 
+-  @HostListener('window:resize', ['$event']) onResize() {
+-
+-  }
+-
+   /**
+    * Получает актуальную информацию
+    */
+Index: src/app/pages/full-pages/profile/profile.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/profile/profile.component.ts b/src/app/pages/full-pages/profile/profile.component.ts
+--- a/src/app/pages/full-pages/profile/profile.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/profile/profile.component.ts	(date 1683750477889)
+@@ -23,17 +23,28 @@
+   /** Информация о пользователе */
+   user: User;
+ 
+-  listOfCommandArr: string[][] = [];
+-  quantityOfCommandSlides: number[] = [];
++  /** Массив страниц команд */
++  teamsPages: string[][] = [];
++
++  /** Номера страниц команд */
++  teamPagesNumbers: number[] = [];
+ 
+-  listOfGamesArr: string[][] = [];
+-  quantityOfGamesSlides: number[] = [];
++  /** Массив страниц игр */
++  gamesPages: string[][] = [];
+ 
+-  listOfResultsArr: GameResult[][] = [];
+-  quantityOfResultsSlides: number[] = [];
++  /** Номера страниц игр */
++  gamePagesNumbers: number[] = [];
+ 
+-  activeSlides = new Map <string, number>();
++  /** Массив страниц результатов */
++  resultsPages: GameResult[][] = [];
+ 
++  /** Номера страниц результатов */
++  resultPagesNumbers: number[] = [];
++
++  /** Номера выбранных страниц в слайдере */
++  activePages = new Map <string, number>();
++
++  /** Ширина страниц слайдера */
+   slidersWidths = new Map <string, number>();
+ 
+   @ViewChild(RefDirective)
+@@ -80,19 +91,19 @@
+       {date: '01.01.22', name: 'Игра 20', team: 'Команда 20', place: '10/10'},
+     ]
+ 
+-    this.listOfCommandArr = this.setListArr(listOfCommand, 10);
+-    this.quantityOfCommandSlides = this.setQuantityOfSlides(this.listOfCommandArr.length);
+-    this.listOfGamesArr = this.setListArr(listOfGames, 10);
+-    this.quantityOfGamesSlides = this.setQuantityOfSlides(this.listOfGamesArr.length);
+-    this.listOfResultsArr = this.setListArr(listOfResults, 7);
+-    this.quantityOfResultsSlides = this.setQuantityOfSlides(this.listOfResultsArr.length);
++    this.teamsPages = this.setListArr(listOfCommand, 10);
++    this.teamPagesNumbers = this.setQuantityOfSlides(this.teamsPages.length);
++    this.gamesPages = this.setListArr(listOfGames, 10);
++    this.gamePagesNumbers = this.setQuantityOfSlides(this.gamesPages.length);
++    this.resultsPages = this.setListArr(listOfResults, 7);
++    this.resultPagesNumbers = this.setQuantityOfSlides(this.resultsPages.length);
+ 
+-    this.activeSlides.set('teams', 1);
+-    this.activeSlides.set('games', 1);
+-    this.activeSlides.set('results', 1);
++    this.activePages.set('teams', 1);
++    this.activePages.set('games', 1);
++    this.activePages.set('results', 1);
+   }
+ 
+-  @HostListener('window:resize', ['$event']) onResize(e) {
++  @HostListener('window:resize', ['$event']) onResize() {
+     this.setSlidersWidth();
+   }
+ 
+@@ -129,6 +140,11 @@
+     }
+   }
+ 
++  /**
++   * Разделяет массив на подмассивы
++   * @param array изначальный массив
++   * @param quantity количество элементов в одном подмассиве
++   */
+   setListArr(array: string[] | GameResult[], quantity: number): any[] {
+     let resultArray = [];
+     for (let i = 0; i < Math.ceil(array.length/quantity); i++){
+@@ -137,6 +153,10 @@
+     return resultArray;
+   }
+ 
++  /**
++   * Передает массив номеров страниц слайдера
++   * @param quantity количество
++   */
+   setQuantityOfSlides(quantity: number): number[] {
+     let resultArray = [];
+     for (let i = 1; i <= quantity; i++){
+Index: src/app/pages/full-pages/level-creation/level-creation.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/level-creation/level-creation.component.ts b/src/app/pages/full-pages/level-creation/level-creation.component.ts
+--- a/src/app/pages/full-pages/level-creation/level-creation.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/level-creation/level-creation.component.ts	(date 1683746649174)
+@@ -1,10 +1,11 @@
+-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
++import {Component, OnInit} from '@angular/core';
+ import {CurrentStateService} from "../../../services/current-state.service";
+ import {ActivatedRoute, Router} from "@angular/router";
+ import {GameApiService} from "../../../api/game-api.service";
+ import {Game} from "../../../models/admin-game/game";
+ import {Level} from "../../../models/admin-game/level";
+ import {ConfirmationService} from "primeng/api";
++import {forkJoin} from "rxjs";
+ 
+ /**
+  * Компонент редактирования уровня
+@@ -23,10 +24,10 @@
+   game: Game;
+ 
+   constructor(
+-    private currentStateService: CurrentStateService,
+     private activatedRoute: ActivatedRoute,
+-    private gameApiService: GameApiService,
+     private confirmationService: ConfirmationService,
++    private currentStateService: CurrentStateService,
++    private gameApiService: GameApiService,
+     private router: Router,
+     ) { }
+ 
+@@ -38,12 +39,12 @@
+       this.currentStateService.currentLevelId = params['level-id'];
+       this.currentStateService.currentGameId = params['game-id'];
+ 
+-      this.gameApiService.getGame(params['game-id']).subscribe(response => {
+-        this.game = response.res;
+-      })
+-
+-      this.gameApiService.getLevel(params['game-id'], params['level-id']).subscribe(response => {
+-        this.level = response.res;
++      forkJoin({
++        game: this.gameApiService.getGame(params['game-id']),
++        level: this.gameApiService.getLevel(params['game-id'], params['level-id'])
++      }).subscribe(({game, level}) => {
++        this.game = game.res;
++        this.level = level.res;
+       })
+     })
+   }
+Index: src/app/components/header/header.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/components/header/header.component.html b/src/app/components/header/header.component.html
+--- a/src/app/components/header/header.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/components/header/header.component.html	(date 1683735294771)
+@@ -6,7 +6,7 @@
+       {{isThemeDark ? 'Темная' : 'Светлая'}} </button>
+   </div>
+   <div class="buttons">
+-    <a class="button" (click)="goToHelp()">ПОМОЩЬ</a>
++    <!-- a class="button" (click)="goToHelp()">ПОМОЩЬ</a -->
+     <a class="button" (click)="followTheLink(false)">МОИ ИГРЫ</a>
+     <a class="button" (click)="followTheLink(true)">ПРОФИЛЬ</a>
+   </div>
+Index: src/app/pages/parts/level-information-blocks/level-information-blocks.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/parts/level-information-blocks/level-information-blocks.component.ts b/src/app/pages/parts/level-information-blocks/level-information-blocks.component.ts
+--- a/src/app/pages/parts/level-information-blocks/level-information-blocks.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/parts/level-information-blocks/level-information-blocks.component.ts	(date 1683750477777)
+@@ -5,7 +5,6 @@
+ import {Infos} from "../../../models/admin-game/infos";
+ import {ConfirmationService} from "primeng/api";
+ import {RefDirective} from "../../../directives/ref.directive";
+-import {ToastComponent} from "../../../components/toast/toast.component";
+ import {Utils} from "../../../shared/utils";
+ 
+ /**
+@@ -35,7 +34,7 @@
+   levelsForLinks: Option<number>[] = [];
+ 
+   /** Массив блоков информации */
+-  blocks: {info: Infos, isHTML: boolean}[] = [];
++  blocks: { info: Infos, isHTML: boolean }[] = [];
+ 
+   /** Флаг ошибки при сохранении нескольких блоков */
+   isSaveErrorInFor: boolean = false;
+@@ -63,7 +62,6 @@
+         if (this.levelId != +level.id)
+           this.levelsForLinks.push({name: level.caption, code: level.id})
+       }
+-      console.log(this.levelsForLinks)
+     });
+ 
+     this.getActualInfo();
+@@ -76,7 +74,6 @@
+     this.gameApiService.getInfoBlocks(this.gameId, this.levelId).subscribe(response => {
+       this.blocks = [];
+       for (const info of response.res.sort((a, b) => +a.inner_id > +b.inner_id ? 1 : -1)) {
+-        console.log(info)
+         this.blocks.push({
+           info: info,
+           isHTML: false
+@@ -121,9 +118,9 @@
+     this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(() => {
+       if (!isInFor)
+         this.showToast(false, this.componentFactoryResolver, this.refDir);
+-    }, error => {
++    }, () => {
+       if (isInFor)
+-        this.isSaveErrorInFor = false;
++        this.isSaveErrorInFor = true;
+       else
+         this.showToast(true, this.componentFactoryResolver, this.refDir);
+     });
+@@ -138,8 +135,10 @@
+     }
+ 
+     setTimeout(() => {
+-      if (this.isSaveErrorInFor)
++      if (this.isSaveErrorInFor) {
+         this.showToast(true, this.componentFactoryResolver, this.refDir);
++        this.isSaveErrorInFor = false;
++      }
+       else {
+         this.showToast(false, this.componentFactoryResolver, this.refDir);
+         this.getActualInfo();
+@@ -162,7 +161,7 @@
+       acceptButtonStyleClass: 'filled accent',
+       rejectButtonStyleClass: 'filled',
+       accept: () => {
+-        this.gameApiService.deleteInfoBlock(this.gameId, this.levelId, infoId).subscribe(response => {
++        this.gameApiService.deleteInfoBlock(this.gameId, this.levelId, infoId).subscribe(() => {
+           this.getActualInfo();
+         })
+       },
+Index: src/app/pages/parts/level-information-blocks/level-information-blocks.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/parts/level-information-blocks/level-information-blocks.component.html b/src/app/pages/parts/level-information-blocks/level-information-blocks.component.html
+--- a/src/app/pages/parts/level-information-blocks/level-information-blocks.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/parts/level-information-blocks/level-information-blocks.component.html	(date 1683749734456)
+@@ -27,18 +27,19 @@
+     </div>
+   </div>
+   <div class="additional-block-info">
+-    <div class="ordinary-block" *ngIf="block.info.info_type == 'SIMPLE'; else linkBlock">
++    <div class="ordinary-block" >
+       <div class="form-item">
+         <label>Условия показа</label>
+         <input type="text" [(ngModel)]="block.info.condition_script">
+       </div>
+-      <div class="form-item" style="margin-bottom: 0">
++      <div class="form-item" *ngIf="block.info.info_type == 'SIMPLE'; else linkBlock" style="margin-bottom: 0">
+         <div class="label-box">
+           <label>Текст блока</label>
+           <button (click)="block.isHTML = !block.isHTML">
+             {{block.isHTML ? 'Отобразить как текст' : 'Отобразить как HTML'}}
+           </button>
+         </div>
++
+         <p-editor *ngIf="!block.isHTML" [(ngModel)]="block.info.info_text" [style]="{'min-height': '185px'}">
+           <ng-template pTemplate="header">
+             <select class="ql-header">
+@@ -52,17 +53,19 @@
+             <button class="ql-image"></button>
+           </ng-template>
+         </p-editor>
++
+         <textarea *ngIf="block.isHTML" [(ngModel)]="block.info.info_text"></textarea>
+       </div>
+-    </div>
+-    <ng-template #linkBlock>
+-      <div class="form-item">
+-        <label>Ссылка на уровень</label>
+-        <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.info.linked_level_id"
+-                    optionLabel="name" optionValue="code" class="big-block-dropdown" placeholder="Выберите уровень">
+-        </p-dropdown>
+-      </div>
+-    </ng-template>
++
++      <ng-template #linkBlock>
++        <div class="form-item">
++          <label>Ссылка на уровень</label>
++          <p-dropdown [options]="levelsForLinks" [(ngModel)]="block.info.linked_level_id"
++                      optionLabel="name" optionValue="code" class="big-block-dropdown" placeholder="Выберите уровень">
++          </p-dropdown>
++        </div>
++      </ng-template>
++    </div>
+   </div>
+   <div class="button-box addit">
+     <button class="filled accent" (click)="saveChangedBlock(block.info, false)">СОХРАНИТЬ БЛОК</button>
+Index: src/app/pages/full-pages/users-games/users-games.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/users-games/users-games.component.html b/src/app/pages/full-pages/users-games/users-games.component.html
+--- a/src/app/pages/full-pages/users-games/users-games.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/users-games/users-games.component.html	(date 1683747937127)
+@@ -14,13 +14,13 @@
+       <div class="list-container" [ngStyle]="{'left.px': (activeSlide - 1) * -slidersTableWidth}"
+            *ngIf="games.length > 0, else beforeCreateBox">
+ 
+-        <div class="table" *ngFor="let arr of gamesArrsArr">
++        <div class="table" *ngFor="let arr of gamesPages">
+           <div class="row header" [ngStyle]="{'width.px': slidersTableWidth}">
+             <div class="number">Номер</div>
+             <div class="game">Игра</div>
+           </div>
+ 
+-          <div class="row" *ngFor="let game of gamesArrsArr[activeSlide - 1]"
++          <div class="row" *ngFor="let game of gamesPages[activeSlide - 1]"
+                (click)="goToGame(game.id)" [ngStyle]="{'width.px': slidersTableWidth}">
+             <div class="number">#{{game.id}}</div>
+             <div class="game">{{game.caption}}</div>
+Index: src/app/services/local-storage.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/services/local-storage.service.ts b/src/app/services/local-storage.service.ts
+--- a/src/app/services/local-storage.service.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/services/local-storage.service.ts	(date 1683750650068)
+@@ -7,42 +7,76 @@
+ @Injectable()
+ export class LocalStorageService {
+ 
++  /**
++   * Передает тему
++   */
+   get theme(): string {
+     return localStorage.getItem(LocalStorageKeys.THEME);
+   }
+ 
++  /**
++   * Устанавливает тему
++   * @param value тема
++   */
+   set theme(value: string) {
+     localStorage.setItem(LocalStorageKeys.THEME, value);
+   }
+ 
++  /**
++   * Передает токен
++   */
+   get token(): string {
+     return localStorage.getItem(LocalStorageKeys.TOKEN);
+   }
+ 
++  /**
++   * Устанавливает токен
++   * @param value значение
++   */
+   set token(value: string) {
+     localStorage.setItem(LocalStorageKeys.TOKEN, value);
+   }
+ 
++  /**
++   * Передает решреш-токен
++   */
+   get refresh_token(): string {
+     return localStorage.getItem(LocalStorageKeys.REFRESH_TOKEN);
+   }
+ 
++  /**
++   * Устанавливает рефреш токен
++   * @param value
++   */
+   set refresh_token(value: string) {
+     localStorage.setItem(LocalStorageKeys.REFRESH_TOKEN, value);
+   }
+ 
++  /**
++   * Передает игровой токен
++   */
+   get game_token(): string {
+     return localStorage.getItem(LocalStorageKeys.GAME_TOKEN);
+   }
+ 
++  /**
++   * Устанавливает игровой токен
++   * @param value
++   */
+   set game_token(value: string) {
+     localStorage.setItem(LocalStorageKeys.GAME_TOKEN, value);
+   }
+ 
++  /**
++   * Удаляет игровой токен
++   */
+   dropGameToken() {
+     localStorage.removeItem(LocalStorageKeys.GAME_TOKEN);
+   }
+ 
++  /**
++   * Удаляет обычный и рефреш токены
++   */
+   dropTokens(): void {
+     localStorage.removeItem(LocalStorageKeys.REFRESH_TOKEN);
+     localStorage.removeItem(LocalStorageKeys.TOKEN);
+Index: src/app/pages/parts/level-settings/level-settings.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/parts/level-settings/level-settings.component.scss b/src/app/pages/parts/level-settings/level-settings.component.scss
+--- a/src/app/pages/parts/level-settings/level-settings.component.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/parts/level-settings/level-settings.component.scss	(date 1683735294783)
+@@ -23,6 +23,7 @@
+ 
+       textarea {
+         height: 132px;
++        font-family: monospace;
+       }
+     }
+   }
+@@ -49,6 +50,7 @@
+ 
+         textarea {
+           height: 198px;
++          font-family: monospace;
+         }
+ 
+         .table {
+Index: src/app/pages/parts/list-of-level-codes/list-of-level-codes.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/parts/list-of-level-codes/list-of-level-codes.component.ts b/src/app/pages/parts/list-of-level-codes/list-of-level-codes.component.ts
+--- a/src/app/pages/parts/list-of-level-codes/list-of-level-codes.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/parts/list-of-level-codes/list-of-level-codes.component.ts	(date 1683749734404)
+@@ -41,7 +41,11 @@
+   codes: Code[] = [];
+ 
+   /** Возможные коды результатов */
+-  resultCodes: Option<string>[];
++  resultCodes: Option<string>[] = [
++    {name: 'NUMBER', code: 'POINTS'},
++    {name: 'TIME', code: 'TIME'},
++    {name: 'LINK', code: 'INFOS'}
++  ];
+ 
+   /** Код нового результата */
+   newResultCode: string;
+@@ -53,7 +57,10 @@
+   newResultType: string;
+ 
+   /** Возможные типы кодов */
+-  codeTypes: Option<string>[];
++  codeTypes: Option<string>[] = [
++    {name: 'SIMPLE', code: CodeType.SIMPLE},
++    {name: 'LOCATION', code: CodeType.LOCATION},
++  ];
+ 
+   /** Ассоциативный массив результатов */
+   resultMap = new Map<number, {name: string, element: CodeResult[]}>();
+@@ -79,6 +86,15 @@
+   /** Возвращает слово в правильной форме */
+   pluralCase = Utils.pluralCase;
+ 
++  /** Количество колонок в таблиуе кодов */
++  columnsCode: number = 4;
++
++  /** Количество строк в таблице результатов */
++  rowsResult: number = 0;
++
++  /** Последний выбранный элемент таблицы */
++  savedDiv: ArrowDivDirective;
++
+   /** Массив полей 'таблицы' для передвижения стрелками */
+   @ViewChildren(ArrowDivDirective)
+   inputs: QueryList<ArrowDivDirective>
+@@ -87,21 +103,12 @@
+   @ViewChild('mainInput')
+   mainInput: ElementRef
+ 
+-  /** Количество колонок в таблиуе кодов */
+-  columnsCode: number = 4;
+-
+-  /** Количество строк в таблице результатов */
+-  rowsResult: number = 0;
+-
+-  /** Последний выбранный элемент таблицы */
+-  savedDiv: ArrowDivDirective;
+-
+   constructor(
++    private componentFactoryResolver: ComponentFactoryResolver,
++    private confirmationService: ConfirmationService,
+     private currentStateService: CurrentStateService,
+     private gameApiService: GameApiService,
+-    private confirmationService: ConfirmationService,
+     private keyboardService: KeyboardService,
+-    private componentFactoryResolver: ComponentFactoryResolver,
+   ) {
+   }
+ 
+@@ -111,16 +118,6 @@
+ 
+     this.getActualInfo();
+ 
+-    this.codeTypes = [
+-      {name: 'SIMPLE', code: CodeType.SIMPLE},
+-      {name: 'LOCATION', code: CodeType.LOCATION},
+-    ]
+-
+-    this.resultCodes = [
+-      {name: 'NUMBER', code: 'POINTS'},
+-      {name: 'TIME', code: 'TIME'},
+-      {name: 'LINK', code: 'INFOS'}
+-    ]
+     this.newResultCode = this.resultCodes[0].code;
+     this.setResultTypes();
+ 
+@@ -139,7 +136,7 @@
+    */
+   getActualInfo(): void {
+     this.gameApiService.getCodes(this.gameId, this.levelId).subscribe(response => {
+-      this.codes = response.res.sort((a, b) => a.code_order < b.code_order ? -1 : 1);
++      this.codes = response.res;
+       this.rowsResult = this.codes.length;
+       this.setResultsMap();
+     })
+@@ -370,6 +367,9 @@
+     this.mainInput.nativeElement.focus();
+   }
+ 
++  /**
++   * Устанавливает возможные типы результатов
++   */
+   setResultTypes(): void {
+     if (this.newResultCode == 'INFOS')
+       this.resultTypes = [{name: '@', code: ResultType.LINK}];
+Index: src/app/pages/parts/level-settings/level-settings.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/parts/level-settings/level-settings.component.html b/src/app/pages/parts/level-settings/level-settings.component.html
+--- a/src/app/pages/parts/level-settings/level-settings.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/parts/level-settings/level-settings.component.html	(date 1683748384503)
+@@ -16,13 +16,15 @@
+       <div class="form-item">
+         <label for="code_acceptation">Условия принятия кода</label>
+         <textarea type="text" id="code_acceptation" formControlName="code_acceptation"></textarea>
+-        <!--textarea id="code_acceptation" [ngModel]="currentLevel ? currentLevel.failed_condition_script : null"
+-                  (ngModelChange)="currentLevel ? currentLevel.failed_condition_script = $event : null"></textarea-->
+       </div>
+ 
+       <app-checkbox>
+         <p class="checkbox-text">Уровень-ссылка</p>
+       </app-checkbox>
++
++      <app-checkbox>
++        <p class="checkbox-text">Отслеживать геолокацию</p>
++      </app-checkbox>
+ 
+       <button class="filled accent" (click)="saveChanges()">СОХРАНИТЬ</button>
+     </form>
+Index: src/app/services/current-state.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/services/current-state.service.ts b/src/app/services/current-state.service.ts
+--- a/src/app/services/current-state.service.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/services/current-state.service.ts	(date 1683750477761)
+@@ -1,8 +1,7 @@
+-import { Injectable } from '@angular/core';
++import {Injectable} from '@angular/core';
+ import {User} from "../models/auth/user";
+ import {LocalStorageService} from "./local-storage.service";
+ import {Router} from "@angular/router";
+-import {Game} from "../models/admin-game/game";
+ 
+ /**
+  * Сервис для работы с текущими состояниями
+Index: src/app/pages/full-pages/main-page/main-page.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/main-page/main-page.component.ts b/src/app/pages/full-pages/main-page/main-page.component.ts
+--- a/src/app/pages/full-pages/main-page/main-page.component.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/main-page/main-page.component.ts	(date 1683750477929)
+@@ -1,4 +1,4 @@
+-import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
++import {Component, ComponentFactoryResolver, OnInit, ViewChild,} from '@angular/core';
+ import {AuthDialogComponent} from "../../dialogs/auth-dialog/auth-dialog.component";
+ import {RefDirective} from "../../../directives/ref.directive";
+ import {CurrentStateService} from "../../../services/current-state.service";
+@@ -12,6 +12,7 @@
+ import {ActionApiService} from "../../../api/action-api.service";
+ import {Router} from "@angular/router";
+ import {LocalStorageService} from "../../../services/local-storage.service";
++import {finalize, mergeMap, of} from "rxjs";
+ 
+ /**
+  * Стартовая страница
+@@ -29,10 +30,11 @@
+   /** Массив игр */
+   games: PlayerGame[] = [];
+ 
++  /** Флаг выбора текущих игр */
+   isCurrentGamesChose: boolean = true;
+ 
+   /** Ассоциативный массив флагов открытия игр */
+-  isGameOpenMap = new Map<PlayerGame, boolean>();
++  isGameOpenMap = new Map<PlayerGame, boolean>;
+ 
+   /** Ассоциативный массив флагов открытия игр */
+   isGameUnlockedMap = new Map<number, boolean>();
+@@ -47,18 +49,18 @@
+   refDir: RefDirective
+ 
+   constructor(
++    private actionApiService: ActionApiService,
+     private componentFactoryResolver: ComponentFactoryResolver,
++    private currentStateService: CurrentStateService,
++    private localStorageService: LocalStorageService,
+     private router: Router,
+-    private currentStateService: CurrentStateService,
+     private teamApiService: TeamApiService,
+     private userApiService: UserApiService,
+-    private actionApiService: ActionApiService,
+-    private localStorageService: LocalStorageService,
+   ) {
+   }
+ 
+   ngOnInit(): void {
+-    this.getActualInfo()
++    this.getActualInfo();
+   }
+ 
+   /**
+@@ -105,28 +107,33 @@
+   getActualInfo(): void {
+     this.isGameOpenMap = new Map<PlayerGame, boolean>();
+ 
+-    this.userApiService.getActualGames().subscribe(response => {
+-      this.games = response.res.sort(
+-        (a, b) => moment(a.creation_date) < moment(b.creation_date) ? -1 : 1);
++    this.userApiService.getActualGames().pipe(
++      mergeMap(response => {
++        this.games = response.res.sort(
++          (a, b) => moment(a.creation_date) < moment(b.creation_date) ? -1 : 1);
+ 
+-      for (const game of this.games) {
+-        this.isGameOpenMap.set(game, false);
+-      }
++        for (const game of this.games) {
++          this.isGameOpenMap.set(game, false);
++        }
+ 
+-      if (this.currentStateService.isUserLoggedIn) {
++        if (!this.currentStateService.isUserLoggedIn) {
++          return of(null);
++        }
+         this.user = this.currentStateService.currentUser;
+         this.teams = [];
+ 
+-        this.teamApiService.getTeams().subscribe(response => {
+-          for (const team of response.res) {
+-            this.teams.push({name: team.caption, code: String(team.id)});
+-          }
+-          if (this.teams.length != 0)
+-            this.selectedTeam = this.teams[0].code;
+-
+-          this.setGameUnlockedMap();
+-        });
+-      }
++        return this.teamApiService.getTeams();
++      }),
++      finalize(() => this.setGameUnlockedMap())
++    ).subscribe(response => {
++      if (!response) {
++        return;
++      }
++      for (const team of response.res) {
++        this.teams.push({name: team.caption, code: String(team.id)});
++      }
++      if (this.teams.length != 0)
++        this.selectedTeam = this.teams[0].code;
+     })
+   }
+ 
+@@ -135,21 +142,18 @@
+    * @param gameId идентификатор игры
+    */
+   applyOrGoToTheGame(gameId: number): void {
+-    if (this.user) {
+-      if (this.isGameUnlockedMap.get(gameId)) {
+-        if (this.games.find(a => a.id == gameId).game_state == 'started') {
+-          this.actionApiService.submitRequestToGame(gameId).subscribe(response => {
+-            this.localStorageService.game_token = response.res.res;
+-            this.router.navigate(['game']);
+-          })
+-        }
+-      } else {
+-        this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(response => {
+-          this.getActualInfo();
+-        })
+-      }
+-    } else
+-      this.showAuthDialog(false);
++    if (!this.user) {
++      this.showAuthDialog(false);
++      return;
++    }
++    if (!this.isGameUnlockedMap.get(gameId)) {
++      this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(() => this.getActualInfo());
++    } else if (this.games.find(a => a.id == gameId).game_state == 'started') {
++      this.actionApiService.submitRequestToGame(gameId).subscribe(response => {
++        this.localStorageService.game_token = response.res.res;
++        this.router.navigate(['game']);
++      })
++    }
+   }
+ 
+   /**
+@@ -158,6 +162,7 @@
+   setGameUnlockedMap(): void {
+     for (const game of this.games) {
+       // TODO: сделать фильтрацию по датам
++
+       this.isGameUnlockedMap.set(game.id, false);
+       if (this.selectedTeam) {
+         this.isGameUnlockedMap.set(game.id, !!game.teams.find(a => a.id == this.selectedTeam));
+Index: src/app/components/header/header.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/components/header/header.component.scss b/src/app/components/header/header.component.scss
+--- a/src/app/components/header/header.component.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/components/header/header.component.scss	(date 1683735294772)
+@@ -35,8 +35,8 @@
+   }
+ 
+   .buttons {
+-    width: 306px;
+-    //width: 204px;
++    //width: 306px;
++    width: 204px;
+ 
+     display: flex;
+     align-items: flex-end;
+Index: src/app/pages/full-pages/main-page/main-page.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/main-page/main-page.component.scss b/src/app/pages/full-pages/main-page/main-page.component.scss
+--- a/src/app/pages/full-pages/main-page/main-page.component.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/main-page/main-page.component.scss	(date 1683741027805)
+@@ -38,6 +38,13 @@
+ 
+   .games-box {
+     width: 610px;
++    display: flex;
++    flex-direction: column;
++
++    .custom-scroll {
++      height: 550px;
++      overflow-y: scroll;
++    }
+ 
+     .buttons {
+       display: flex;
+@@ -50,10 +57,14 @@
+         &:not(.chosen) {
+           color: #6a6a6a;
+         }
++
++        &:last-child {
++          text-align: right;
++        }
+       }
+     }
+ 
+-    .current-game {
++    .game {
+       margin-bottom: 32px;
+ 
+       .game-name-box {
+Index: src/app/pages/full-pages/main-page/main-page.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/full-pages/main-page/main-page.component.html b/src/app/pages/full-pages/main-page/main-page.component.html
+--- a/src/app/pages/full-pages/main-page/main-page.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/pages/full-pages/main-page/main-page.component.html	(date 1683739809273)
+@@ -17,54 +17,55 @@
+         <h2>МОИ КОМАНДЫ</h2>
+         <p>+</p>
+       </div>
+-
+       <div class="teams">
+-        <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam" (onChange)="setGameUnlockedMap()"
++        <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam"
++                    (onChange)="setGameUnlockedMap()"
+                     class="teams" optionLabel="name" optionValue="code" placeholder="Выбор команды">
+         </p-dropdown>
+       </div>
+-
+     </ng-template>
+   </div>
+ 
+   <div class="games-box">
+-
+     <div class="buttons">
+       <h2 [class.chosen]="isCurrentGamesChose" (click)="choseGames(true)">ТЕКУЩИЕ ИГРЫ</h2>
+       <h2 [class.chosen]="!isCurrentGamesChose" (click)="choseGames(false)">ПРОШЕДШИЕ ИГРЫ</h2>
+     </div>
+ 
+-    <div class="current-game" *ngFor="let game of isGameOpenMap | keyvalue"
+-         [class.unlocked]="user && game.key.game_state == 'started' && isGameUnlockedMap.get(game.key.id)">
+-      <div class="game-name-box">
+-        <h2 class="name">
+-          <span>#{{game.key.id}}</span> {{game.key.caption}}
+-        </h2>
+-        <button (click)="isGameOpenMap.set(game.key, !game.value)"
+-                *ngIf="game.key.description">Описание</button>
+-      </div>
+-      <div class="game-info-box">
+-        <div class="info-item" *ngIf="game.key.author">
+-          <h3>Автор: </h3>
+-          <p>{{game.key.author}}</p>
+-        </div>
+-        <div class="info-item" *ngIf="game.key.beginningOfGame">
+-          <h3>Начало игры: </h3>
+-          <p>{{game.key.beginningOfGame}}</p>
+-        </div>
+-        <div class="info-item" *ngIf="game.key.endOfGame">
+-          <h3>Конец игры: </h3>
+-          <p>{{game.key.endOfGame}}</p>
+-        </div>
+-        <div class="additional-info" [class.open]="game.value">
+-          <div class="info-item">
+-            <h3>Описание: </h3>
+-            <p>{{game.key.description}}</p>
+-          </div>
+-        </div>
+-      </div>
+-      <button (click)="user ? applyOrGoToTheGame(game.key.id) : showAuthDialog(false); "
+-              class="accent">{{setGameButtonState(game.key.id)}}</button>
++    <div class="custom-scroll">
++      <div class="game" *ngFor="let game of isGameOpenMap | keyvalue"
++           [class.unlocked]="user && game.key.game_state == 'started' && isGameUnlockedMap.get(game.key.id)">
++        <div class="game-name-box">
++          <h2 class="name">
++            <span>#{{game.key.id}}</span> {{game.key.caption}}
++          </h2>
++          <button (click)="isGameOpenMap.set(game.key, !game.value)"
++                  *ngIf="game.key.description">Описание
++          </button>
++        </div>
++        <div class="game-info-box">
++          <div class="info-item" *ngIf="game.key.author">
++            <h3>Автор: </h3>
++            <p>{{game.key.author}}</p>
++          </div>
++          <div class="info-item" *ngIf="game.key.beginningOfGame">
++            <h3>Начало игры: </h3>
++            <p>{{game.key.beginningOfGame}}</p>
++          </div>
++          <div class="info-item" *ngIf="game.key.endOfGame">
++            <h3>Конец игры: </h3>
++            <p>{{game.key.endOfGame}}</p>
++          </div>
++          <div class="additional-info" [class.open]="game.value">
++            <div class="info-item">
++              <h3>Описание: </h3>
++              <p>{{game.key.description}}</p>
++            </div>
++          </div>
++        </div>
++        <button (click)="user ? applyOrGoToTheGame(game.key.id) : showAuthDialog(false); "
++                class="accent">{{setGameButtonState(game.key.id)}}</button>
++      </div>
+     </div>
+   </div>
+ </div>
+Index: src/styles.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/styles.scss b/src/styles.scss
+--- a/src/styles.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/styles.scss	(date 1683749734570)
+@@ -459,8 +459,6 @@
+ 
+ .custom-scroll {
+   &::-webkit-scrollbar-track {
+-    //border-radius: 4px;
+-    //background: #252525;
+     background: var(--slider-inactive-icon-color);
+   }
+ 
+@@ -469,14 +467,8 @@
+   }
+ 
+   &::-webkit-scrollbar-thumb {
+-    //border-radius: 4px;
+-    //background: #B6B6B6;
+     background: var(--slider-active-icon-color);
+   }
+-
+-  &:hover::-webkit-scrollbar-thumb {
+-    //background: #6a7d9b;
+-  }
+ }
+ 
+ //ГОТОВЫЕ ЭЛЕМЕНТЫ
+@@ -510,6 +502,9 @@
+   }
+ }
+ 
++.p-disabled.p-dropdown {
++  background-image: none;
++}
+ 
+ .p-dropdown-items-wrapper {
+   max-height: 188px !important;
+@@ -517,7 +512,6 @@
+ 
+ .p-dropdown-panel {
+   width: 360px;
+-  //left: -1px !important;
+   background: #EBEBEB;
+   border-radius: 0;
+   border-top: #B6B6B6;
+@@ -656,11 +650,6 @@
+   background-image: url("assets/icons/dropdown-icon-up.svg");
+ }
+ 
+-.theme-light .add-new-item-in-table .p-dropdown:not(.p-disabled).p-focus {
+-  //border-color: #000000;
+-  //border-bottom: #FFFFFF;
+-}
+-
+ .block,
+ .add-new-item-in-table {
+   .p-dropdown {
+@@ -849,14 +838,15 @@
+   .ql-snow.ql-toolbar button.ql-active, .p-editor-container .ql-snow.ql-toolbar .ql-picker-label.ql-active, .p-editor-container .ql-snow.ql-toolbar .ql-picker-item.ql-selected {
+     color: $accent-color !important;
+   }
++
+   .ql-snow.ql-toolbar button.ql-active .ql-stroke, .p-editor-container .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke, .p-editor-container .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
+     stroke: $accent-color !important;
+   }
++
+   .ql-snow.ql-toolbar button.ql-active .ql-fill {
+     fill: $accent-color !important;
+   }
+ 
+-
+   @include screen('phone') {
+     .ql-bold,
+     .ql-image {
+@@ -865,7 +855,6 @@
+   }
+ }
+ 
+-
+ .ql-container {
+   font-size: 16px;
+ }
+@@ -884,17 +873,14 @@
+     background-color: var(--dialog-background-color);
+   }
+ 
+-  .p-dialog-header {
+-    .p-dialog-header-icon {
++  .p-dialog-header .p-dialog-header-icon {
+ 
+-      &:enabled:hover {
+-        background: none;
+-      }
++    &:enabled:hover {
++      background: none;
++    }
+ 
+-      &:focus {
+-        box-shadow: none;
+-      }
+-
++    &:focus {
++      box-shadow: none;
+     }
+   }
+ 
+Index: src/app/api/action-api.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/api/action-api.service.ts b/src/app/api/action-api.service.ts
+--- a/src/app/api/action-api.service.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/api/action-api.service.ts	(date 1683749734420)
+@@ -8,7 +8,7 @@
+ import {Response} from "../models/response";
+ 
+ /**
+- * Сервис для отправки запросов запуска игр
++ * Сервис для отправки запросов запущенных игр
+  */
+ @Injectable({
+   providedIn: 'root'
+@@ -23,15 +23,28 @@
+   ) {
+   }
+ 
++  /**
++   * Отправляет запрос на подключение к игре и получение токена
++   * @param gameId идентификатор игры
++   */
+   submitRequestToGame(gameId: number): Observable<SimpleResponse<SimpleResponse<string>>> {
+     return this.httpClient.post<SimpleResponse<SimpleResponse<string>>>(`${this.urlPrime}/${gameId}/enter`, {});
+   }
+ 
++  /**
++   * Отправляет запрос на получение информации об игре
++   * @param token токен
++   */
+   enterTheGame(token: string): Observable<Response<ActionGame>> {
+     return this.httpClient.get<Response<ActionGame>>(this.urlPrime + '/info', {headers: {'game-token': token}});
+   }
+ 
+-  sendCode(token: string, code: CodeForSend): Observable<SimpleResponse<ActionGame>> {
+-    return this.httpClient.post<SimpleResponse<ActionGame>>(this.urlPrime + '/codes/send', code, {headers: {'game-token': token}})
++  /**
++   * Отправляет код
++   * @param token токен
++   * @param code код
++   */
++  sendCode(token: string, code: CodeForSend): Observable<SimpleResponse<any>> {
++    return this.httpClient.post<SimpleResponse<any>>(this.urlPrime + '/codes/send', code, {headers: {'game-token': token}})
+   }
+ }
+Index: src/app/app.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/app.component.html b/src/app/app.component.html
+--- a/src/app/app.component.html	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/app.component.html	(date 1683749734581)
+@@ -1,5 +1,3 @@
+-
+-
+ <div [class.overflow]="currentStateService.isDialogOpened">
+   <app-header></app-header>
+   <div class="main-container">
+Index: src/app/models/user/code-for-send.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/models/user/code-for-send.ts b/src/app/models/user/code-for-send.ts
+--- a/src/app/models/user/code-for-send.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/models/user/code-for-send.ts	(date 1683749734468)
+@@ -1,9 +1,20 @@
++/**
++ * Модель данных кода для отправки
++ */
+ export interface CodeForSend {
++
++  /** Значение кода */
+   code_value: string,
++
++  /** Идентификатор команды в игре */
+   team_level_id: number,
++
++  /** Тип значения кода */
+   code_value_type?: string,
++
++  /** Текущая позиция */
+   current_location?: {
+-    lat: string,
+-    lon: string
++    lat: number,
++    lon: number
+   }
+ }
+Index: src/app/pages/dialogs/auth-dialog/auth-dialog.component.spec.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/pages/dialogs/auth-dialog/auth-dialog.component.spec.ts b/src/app/pages/dialogs/auth-dialog/auth-dialog.component.spec.ts
+new file mode 100644
+--- /dev/null	(date 1683752585727)
++++ b/src/app/pages/dialogs/auth-dialog/auth-dialog.component.spec.ts	(date 1683752585727)
+@@ -0,0 +1,5 @@
++describe('AuthDialogComponent', () => {
++  it('should', () => {
++
++  })
++})
+Index: src/app/models/user/action-game.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/models/user/action-game.ts b/src/app/models/user/action-game.ts
+--- a/src/app/models/user/action-game.ts	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/models/user/action-game.ts	(date 1683749734522)
+@@ -1,25 +1,32 @@
+-/**
+- * Модель данных запущенной игры
+- */
+ import {TeamLevel} from "./team-level";
+ import {Game} from "../admin-game/game";
+ 
++/**
++ * Модель данных запущенной игры
++ */
+ export interface ActionGame {
+ 
+-
++  /** */
+   accepted: number,
+ 
++  /** Идентификатор игры */
+   game_id: number,
+ 
++  /** Идентификатор */
+   id: number,
+ 
++  /** Скрипт последовательности уровней в игре? */
+   level_script: string,
+ 
++  /** Идентификатор команды в игре */
+   team_id: number,
+ 
++  /** Основная информация об игре */
+   game: Game,
+ 
++  /** Уровни игры */
+   team_levels: TeamLevel[],
+ 
++  /** Итоговые результаты */
+   total_scores: any,
+ }
+Index: src/app/app.component.scss
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/app/app.component.scss b/src/app/app.component.scss
+--- a/src/app/app.component.scss	(revision 4c45d493e70374df5bdab77b314e7599a1ce663f)
++++ b/src/app/app.component.scss	(date 1683738978465)
+@@ -2,6 +2,8 @@
+ 
+ .main-container {
+   min-height: calc(100vh - 211px);
++  display: flex;
++  justify-content: center;
+ }
+ 
+ button {

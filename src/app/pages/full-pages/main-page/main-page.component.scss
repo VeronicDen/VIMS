@@ -38,6 +38,13 @@ button {
 
   .games-box {
     width: 610px;
+    display: flex;
+    flex-direction: column;
+
+    .custom-scroll {
+      height: 550px;
+      overflow-y: scroll;
+    }
 
     .buttons {
       display: flex;
@@ -50,10 +57,14 @@ button {
         &:not(.chosen) {
           color: #6a6a6a;
         }
+
+        &:last-child {
+          text-align: right;
+        }
       }
     }
 
-    .current-game {
+    .game {
       margin-bottom: 32px;
 
       .game-name-box {

@@ -1,4 +1,4 @@
-import {Component, ComponentFactoryResolver, OnInit, ViewChild} from '@angular/core';
+import {Component, ComponentFactoryResolver, OnInit, ViewChild,} from '@angular/core';
 import {AuthDialogComponent} from "../../dialogs/auth-dialog/auth-dialog.component";
 import {RefDirective} from "../../../directives/ref.directive";
 import {CurrentStateService} from "../../../services/current-state.service";
@@ -12,6 +12,7 @@ import * as moment from "moment";
 import {ActionApiService} from "../../../api/action-api.service";
 import {Router} from "@angular/router";
 import {LocalStorageService} from "../../../services/local-storage.service";
+import {finalize, mergeMap, of} from "rxjs";
 
 /**
  * Стартовая страница
@@ -29,10 +30,11 @@ export class MainPageComponent implements OnInit {
   /** Массив игр */
   games: PlayerGame[] = [];
 
+  /** Флаг выбора текущих игр */
   isCurrentGamesChose: boolean = true;
 
   /** Ассоциативный массив флагов открытия игр */
-  isGameOpenMap = new Map<PlayerGame, boolean>();
+  isGameOpenMap = new Map<PlayerGame, boolean>;
 
   /** Ассоциативный массив флагов открытия игр */
   isGameUnlockedMap = new Map<number, boolean>();
@@ -47,18 +49,18 @@ export class MainPageComponent implements OnInit {
   refDir: RefDirective
 
   constructor(
+    private actionApiService: ActionApiService,
     private componentFactoryResolver: ComponentFactoryResolver,
-    private router: Router,
     private currentStateService: CurrentStateService,
+    private localStorageService: LocalStorageService,
+    private router: Router,
     private teamApiService: TeamApiService,
     private userApiService: UserApiService,
-    private actionApiService: ActionApiService,
-    private localStorageService: LocalStorageService,
   ) {
   }
 
   ngOnInit(): void {
-    this.getActualInfo()
+    this.getActualInfo();
   }
 
   /**
@@ -105,28 +107,33 @@ export class MainPageComponent implements OnInit {
   getActualInfo(): void {
     this.isGameOpenMap = new Map<PlayerGame, boolean>();
 
-    this.userApiService.getActualGames().subscribe(response => {
-      this.games = response.res.sort(
-        (a, b) => moment(a.creation_date) < moment(b.creation_date) ? -1 : 1);
+    this.userApiService.getActualGames().pipe(
+      mergeMap(response => {
+        this.games = response.res.sort(
+          (a, b) => moment(a.creation_date) < moment(b.creation_date) ? -1 : 1);
 
-      for (const game of this.games) {
-        this.isGameOpenMap.set(game, false);
-      }
+        for (const game of this.games) {
+          this.isGameOpenMap.set(game, false);
+        }
 
-      if (this.currentStateService.isUserLoggedIn) {
+        if (!this.currentStateService.isUserLoggedIn) {
+          return of(null);
+        }
         this.user = this.currentStateService.currentUser;
         this.teams = [];
 
-        this.teamApiService.getTeams().subscribe(response => {
-          for (const team of response.res) {
-            this.teams.push({name: team.caption, code: String(team.id)});
-          }
-          if (this.teams.length != 0)
-            this.selectedTeam = this.teams[0].code;
-
-          this.setGameUnlockedMap();
-        });
+        return this.teamApiService.getTeams();
+      }),
+      finalize(() => this.setGameUnlockedMap())
+    ).subscribe(response => {
+      if (!response) {
+        return;
       }
+      for (const team of response.res) {
+        this.teams.push({name: team.caption, code: String(team.id)});
+      }
+      if (this.teams.length != 0)
+        this.selectedTeam = this.teams[0].code;
     })
   }
 
@@ -135,21 +142,18 @@ export class MainPageComponent implements OnInit {
    * @param gameId идентификатор игры
    */
   applyOrGoToTheGame(gameId: number): void {
-    if (this.user) {
-      if (this.isGameUnlockedMap.get(gameId)) {
-        if (this.games.find(a => a.id == gameId).game_state == 'started') {
-          this.actionApiService.submitRequestToGame(gameId).subscribe(response => {
-            this.localStorageService.game_token = response.res.res;
-            this.router.navigate(['game']);
-          })
-        }
-      } else {
-        this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(response => {
-          this.getActualInfo();
-        })
-      }
-    } else
+    if (!this.user) {
       this.showAuthDialog(false);
+      return;
+    }
+    if (!this.isGameUnlockedMap.get(gameId)) {
+      this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(() => this.getActualInfo());
+    } else if (this.games.find(a => a.id == gameId).game_state == 'started') {
+      this.actionApiService.submitRequestToGame(gameId).subscribe(response => {
+        this.localStorageService.game_token = response.res.res;
+        this.router.navigate(['game']);
+      })
+    }
   }
 
   /**
@@ -158,6 +162,7 @@ export class MainPageComponent implements OnInit {
   setGameUnlockedMap(): void {
     for (const game of this.games) {
       // TODO: сделать фильтрацию по датам
+
       this.isGameUnlockedMap.set(game.id, false);
       if (this.selectedTeam) {
         this.isGameUnlockedMap.set(game.id, !!game.teams.find(a => a.id == this.selectedTeam));

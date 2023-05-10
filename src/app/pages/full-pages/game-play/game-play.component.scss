@@ -5,6 +5,10 @@
   margin: 0 auto;
   padding: 66px 0;
 
+  #second-table {
+    display: none;
+  }
+
   .game-name-box {
     width: 100%;
     margin-bottom: 34px;
@@ -23,6 +27,7 @@
 
   .level-name {
     display: flex;
+    flex-wrap: wrap;
     margin-bottom: 20px;
   }
 
@@ -105,74 +110,66 @@
   }
 
   @include screen('desktop') {
-    .game-box .game-info-box .game-info-element .code-container {
-      input {
+    .game-box .game-info-box {
+      &.general {
         width: 220px;
       }
 
-      button {
-        width: 120px;
+      &.task {
+        width: calc(100% - 250px);
       }
     }
   }
 
   @include screen('tablet-landscape') {
-    .game-box .game-info-box {
-      width: calc((100% - 70px) / 2);
+    .level-name {
+      justify-content: center;
+    }
 
-      .game-info-element .code-container {
-        flex-direction: column;
+    .game-box {
+      flex-direction: column;
 
-        input, button {
+      .game-info-box {
+        &.general {
           width: 100%;
+          margin-bottom: 45px;
         }
 
-        input {
-          margin-bottom: 10px;
+        &.task {
+          width: 100%;
         }
       }
     }
   }
 
   @include screen('tablet-portrait') {
-    .game-box {
-      flex-direction: column;
-
-      .game-info-box {
-        width: 100%;
-
-        h2.task {
-          margin-top: 25px;
-        }
-
-        .game-info-element .code-container {
-          flex-direction: row;
-
-          button {
-            width: 120px;
-          }
-
-          input {
-            width: 290px;
-            margin-bottom: 0;
-          }
-        }
-      }
+    .level-name {
+      justify-content: flex-start;
     }
   }
 
   @include screen('phone') {
     padding-top: 0;
 
-    .game-box .game-info-box .game-info-element .code-container {
-      flex-direction: column;
+    #first-table {
+      display: none;
+    }
 
-      input, button {
-        width: 100%;
-      }
+    #second-table {
+      display: flex;
+    }
+
+    .game-box .game-info-box .game-info-element .code-container {
 
       input {
-        margin-bottom: 10px;
+        border-right: none;
+        width: calc(100% - 40px);
+      }
+
+      button {
+        background: none;
+        border: 1px solid var(--text-color);
+        color: $accent-color;
       }
     }
   }

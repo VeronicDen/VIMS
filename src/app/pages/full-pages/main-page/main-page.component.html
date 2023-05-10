@@ -17,54 +17,55 @@
         <h2>МОИ КОМАНДЫ</h2>
         <p>+</p>
       </div>
-
       <div class="teams">
-        <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam" (onChange)="setGameUnlockedMap()"
+        <p-dropdown *ngIf="teams.length != 0" [options]="teams" [(ngModel)]="selectedTeam"
+                    (onChange)="setGameUnlockedMap()"
                     class="teams" optionLabel="name" optionValue="code" placeholder="Выбор команды">
         </p-dropdown>
       </div>
-
     </ng-template>
   </div>
 
   <div class="games-box">
-
     <div class="buttons">
       <h2 [class.chosen]="isCurrentGamesChose" (click)="choseGames(true)">ТЕКУЩИЕ ИГРЫ</h2>
       <h2 [class.chosen]="!isCurrentGamesChose" (click)="choseGames(false)">ПРОШЕДШИЕ ИГРЫ</h2>
     </div>
 
-    <div class="current-game" *ngFor="let game of isGameOpenMap | keyvalue"
-         [class.unlocked]="user && game.key.game_state == 'started' && isGameUnlockedMap.get(game.key.id)">
-      <div class="game-name-box">
-        <h2 class="name">
-          <span>#{{game.key.id}}</span> {{game.key.caption}}
-        </h2>
-        <button (click)="isGameOpenMap.set(game.key, !game.value)"
-                *ngIf="game.key.description">Описание</button>
-      </div>
-      <div class="game-info-box">
-        <div class="info-item" *ngIf="game.key.author">
-          <h3>Автор: </h3>
-          <p>{{game.key.author}}</p>
+    <div class="custom-scroll">
+      <div class="game" *ngFor="let game of isGameOpenMap | keyvalue"
+           [class.unlocked]="user && game.key.game_state == 'started' && isGameUnlockedMap.get(game.key.id)">
+        <div class="game-name-box">
+          <h2 class="name">
+            <span>#{{game.key.id}}</span> {{game.key.caption}}
+          </h2>
+          <button (click)="isGameOpenMap.set(game.key, !game.value)"
+                  *ngIf="game.key.description">Описание
+          </button>
         </div>
-        <div class="info-item" *ngIf="game.key.beginningOfGame">
-          <h3>Начало игры: </h3>
-          <p>{{game.key.beginningOfGame}}</p>
-        </div>
-        <div class="info-item" *ngIf="game.key.endOfGame">
-          <h3>Конец игры: </h3>
-          <p>{{game.key.endOfGame}}</p>
-        </div>
-        <div class="additional-info" [class.open]="game.value">
-          <div class="info-item">
-            <h3>Описание: </h3>
-            <p>{{game.key.description}}</p>
+        <div class="game-info-box">
+          <div class="info-item" *ngIf="game.key.author">
+            <h3>Автор: </h3>
+            <p>{{game.key.author}}</p>
+          </div>
+          <div class="info-item" *ngIf="game.key.beginningOfGame">
+            <h3>Начало игры: </h3>
+            <p>{{game.key.beginningOfGame}}</p>
+          </div>
+          <div class="info-item" *ngIf="game.key.endOfGame">
+            <h3>Конец игры: </h3>
+            <p>{{game.key.endOfGame}}</p>
+          </div>
+          <div class="additional-info" [class.open]="game.value">
+            <div class="info-item">
+              <h3>Описание: </h3>
+              <p>{{game.key.description}}</p>
+            </div>
           </div>
         </div>
+        <button (click)="user ? applyOrGoToTheGame(game.key.id) : showAuthDialog(false); "
+                class="accent">{{setGameButtonState(game.key.id)}}</button>
       </div>
-      <button (click)="user ? applyOrGoToTheGame(game.key.id) : showAuthDialog(false); "
-              class="accent">{{setGameButtonState(game.key.id)}}</button>
     </div>
   </div>
 </div>

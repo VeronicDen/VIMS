@@ -87,8 +87,7 @@ export class AuthDialogComponent implements OnInit {
       this.currentStateService.currentUser = jwt_decode(this.localStorageService.token);
 
       this.close.emit();
-
-    },error => {
+    },() => {
       this.formGroupLogin.markAsUntouched();
       this.errorMessageText = 'ошибка';
     })
@@ -121,7 +120,7 @@ export class AuthDialogComponent implements OnInit {
       this.changeForm(true);
     },error => {
       this.formGroupRegistration.markAsUntouched();
-      this.errorMessageText = 'ошибка';
+      this.errorMessageText = 'Ошибка';
     })
   }
 

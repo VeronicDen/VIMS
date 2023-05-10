@@ -13,39 +13,39 @@
         <h2>МОИ КОМАНДЫ</h2>
         <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('teams')}">
           <div class="list-container"
-               [ngStyle]="{'left.px': -(activeSlides.get('teams') - 1) * slidersWidths.get('teams')}">
-            <div class="list" *ngFor="let list of listOfCommandArr"
+               [ngStyle]="{'left.px': -(activePages.get('teams') - 1) * slidersWidths.get('teams')}">
+            <div class="list" *ngFor="let list of teamsPages"
                  [ngStyle]="{'width.px': slidersWidths.get('teams')}">
               <p *ngFor="let item of list">{{item}}</p>
             </div>
           </div>
         </div>
-        <app-slider [maxNumberOfSlides]="quantityOfCommandSlides.length"
-                    [activeSlideNumber]="activeSlides.get('teams')"
-                    (activeSlideNumberChange)="activeSlides.set('teams', $event)"></app-slider>
+        <app-slider [maxNumberOfSlides]="teamPagesNumbers.length"
+                    [activeSlideNumber]="activePages.get('teams')"
+                    (activeSlideNumberChange)="activePages.set('teams', $event)"></app-slider>
       </div>
       <div class="games">
         <h2>ИГРЫ</h2>
         <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('games')}">
           <div class="list-container"
-               [ngStyle]="{'left.px': -(activeSlides.get('games') - 1) * slidersWidths.get('games')}">
-            <div class="list" *ngFor="let list of listOfGamesArr"
+               [ngStyle]="{'left.px': -(activePages.get('games') - 1) * slidersWidths.get('games')}">
+            <div class="list" *ngFor="let list of gamesPages"
                  [ngStyle]="{'width.px': slidersWidths.get('games')}">
               <p *ngFor="let item of list">{{item}}</p>
             </div>
           </div>
         </div>
-        <app-slider [maxNumberOfSlides]="quantityOfGamesSlides.length"
-                    [activeSlideNumber]="activeSlides.get('games')"
-                    (activeSlideNumberChange)="activeSlides.set('games', $event)"></app-slider>
+        <app-slider [maxNumberOfSlides]="gamePagesNumbers.length"
+                    [activeSlideNumber]="activePages.get('games')"
+                    (activeSlideNumberChange)="activePages.set('games', $event)"></app-slider>
       </div>
     </div>
     <div class="results">
       <h2>РЕЗУЛЬТАТЫ ИГР</h2>
       <div class="list-box" [ngStyle]="{'width.px': slidersWidths.get('results')}">
         <div class="list-container"
-             [ngStyle]="{'left.px': -(activeSlides.get('results') - 1) * slidersWidths.get('results')}">
-          <div class="list" *ngFor="let list of listOfResultsArr"
+             [ngStyle]="{'left.px': -(activePages.get('results') - 1) * slidersWidths.get('results')}">
+          <div class="list" *ngFor="let list of resultsPages"
                [ngStyle]="{'width.px': slidersWidths.get('results')}">
             <div class="table">
               <div class="header row">
@@ -64,9 +64,9 @@
           </div>
         </div>
       </div>
-      <app-slider [maxNumberOfSlides]="quantityOfResultsSlides.length"
-                  [activeSlideNumber]="activeSlides.get('results')"
-                  (activeSlideNumberChange)="activeSlides.set('results', $event)"></app-slider>
+      <app-slider [maxNumberOfSlides]="resultPagesNumbers.length"
+                  [activeSlideNumber]="activePages.get('results')"
+                  (activeSlideNumberChange)="activePages.set('results', $event)"></app-slider>
     </div>
   </div>
 </div>

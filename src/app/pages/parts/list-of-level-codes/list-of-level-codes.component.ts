@@ -41,7 +41,11 @@ export class ListOfLevelCodesComponent implements OnInit {
   codes: Code[] = [];
 
   /** Возможные коды результатов */
-  resultCodes: Option<string>[];
+  resultCodes: Option<string>[] = [
+    {name: 'NUMBER', code: 'POINTS'},
+    {name: 'TIME', code: 'TIME'},
+    {name: 'LINK', code: 'INFOS'}
+  ];
 
   /** Код нового результата */
   newResultCode: string;
@@ -53,7 +57,10 @@ export class ListOfLevelCodesComponent implements OnInit {
   newResultType: string;
 
   /** Возможные типы кодов */
-  codeTypes: Option<string>[];
+  codeTypes: Option<string>[] = [
+    {name: 'SIMPLE', code: CodeType.SIMPLE},
+    {name: 'LOCATION', code: CodeType.LOCATION},
+  ];
 
   /** Ассоциативный массив результатов */
   resultMap = new Map<number, {name: string, element: CodeResult[]}>();
@@ -79,14 +86,6 @@ export class ListOfLevelCodesComponent implements OnInit {
   /** Возвращает слово в правильной форме */
   pluralCase = Utils.pluralCase;
 
-  /** Массив полей 'таблицы' для передвижения стрелками */
-  @ViewChildren(ArrowDivDirective)
-  inputs: QueryList<ArrowDivDirective>
-
-  /** Верхняя строка над таблицей */
-  @ViewChild('mainInput')
-  mainInput: ElementRef
-
   /** Количество колонок в таблиуе кодов */
   columnsCode: number = 4;
 
@@ -96,12 +95,20 @@ export class ListOfLevelCodesComponent implements OnInit {
   /** Последний выбранный элемент таблицы */
   savedDiv: ArrowDivDirective;
 
+  /** Массив полей 'таблицы' для передвижения стрелками */
+  @ViewChildren(ArrowDivDirective)
+  inputs: QueryList<ArrowDivDirective>
+
+  /** Верхняя строка над таблицей */
+  @ViewChild('mainInput')
+  mainInput: ElementRef
+
   constructor(
+    private componentFactoryResolver: ComponentFactoryResolver,
+    private confirmationService: ConfirmationService,
     private currentStateService: CurrentStateService,
     private gameApiService: GameApiService,
-    private confirmationService: ConfirmationService,
     private keyboardService: KeyboardService,
-    private componentFactoryResolver: ComponentFactoryResolver,
   ) {
   }
 
@@ -111,16 +118,6 @@ export class ListOfLevelCodesComponent implements OnInit {
 
     this.getActualInfo();
 
-    this.codeTypes = [
-      {name: 'SIMPLE', code: CodeType.SIMPLE},
-      {name: 'LOCATION', code: CodeType.LOCATION},
-    ]
-
-    this.resultCodes = [
-      {name: 'NUMBER', code: 'POINTS'},
-      {name: 'TIME', code: 'TIME'},
-      {name: 'LINK', code: 'INFOS'}
-    ]
     this.newResultCode = this.resultCodes[0].code;
     this.setResultTypes();
 
@@ -139,7 +136,7 @@ export class ListOfLevelCodesComponent implements OnInit {
    */
   getActualInfo(): void {
     this.gameApiService.getCodes(this.gameId, this.levelId).subscribe(response => {
-      this.codes = response.res.sort((a, b) => a.code_order < b.code_order ? -1 : 1);
+      this.codes = response.res;
       this.rowsResult = this.codes.length;
       this.setResultsMap();
     })
@@ -370,6 +367,9 @@ export class ListOfLevelCodesComponent implements OnInit {
     this.mainInput.nativeElement.focus();
   }
 
+  /**
+   * Устанавливает возможные типы результатов
+   */
   setResultTypes(): void {
     if (this.newResultCode == 'INFOS')
       this.resultTypes = [{name: '@', code: ResultType.LINK}];

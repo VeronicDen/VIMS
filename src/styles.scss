@@ -459,8 +459,6 @@ textarea:read-only {
 
 .custom-scroll {
   &::-webkit-scrollbar-track {
-    //border-radius: 4px;
-    //background: #252525;
     background: var(--slider-inactive-icon-color);
   }
 
@@ -469,13 +467,7 @@ textarea:read-only {
   }
 
   &::-webkit-scrollbar-thumb {
-    //border-radius: 4px;
-    //background: #B6B6B6;
     background: var(--slider-active-icon-color);
-  }
-
-  &:hover::-webkit-scrollbar-thumb {
-    //background: #6a7d9b;
   }
 }
 
@@ -510,6 +502,9 @@ textarea:read-only {
   }
 }
 
+.p-disabled.p-dropdown {
+  background-image: none;
+}
 
 .p-dropdown-items-wrapper {
   max-height: 188px !important;
@@ -517,7 +512,6 @@ textarea:read-only {
 
 .p-dropdown-panel {
   width: 360px;
-  //left: -1px !important;
   background: #EBEBEB;
   border-radius: 0;
   border-top: #B6B6B6;
@@ -654,11 +648,6 @@ p-dropdownitem {
 
 .theme-light .p-dropdown-open {
   background-image: url("assets/icons/dropdown-icon-up.svg");
-}
-
-.theme-light .add-new-item-in-table .p-dropdown:not(.p-disabled).p-focus {
-  //border-color: #000000;
-  //border-bottom: #FFFFFF;
 }
 
 .block,
@@ -849,13 +838,14 @@ p-dropdownitem {
   .ql-snow.ql-toolbar button.ql-active, .p-editor-container .ql-snow.ql-toolbar .ql-picker-label.ql-active, .p-editor-container .ql-snow.ql-toolbar .ql-picker-item.ql-selected {
     color: $accent-color !important;
   }
+
   .ql-snow.ql-toolbar button.ql-active .ql-stroke, .p-editor-container .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke, .p-editor-container .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
     stroke: $accent-color !important;
   }
+
   .ql-snow.ql-toolbar button.ql-active .ql-fill {
     fill: $accent-color !important;
   }
-
 
   @include screen('phone') {
     .ql-bold,
@@ -864,7 +854,6 @@ p-dropdownitem {
     }
   }
 }
-
 
 .ql-container {
   font-size: 16px;
@@ -884,17 +873,14 @@ p-dropdownitem {
     background-color: var(--dialog-background-color);
   }
 
-  .p-dialog-header {
-    .p-dialog-header-icon {
+  .p-dialog-header .p-dialog-header-icon {
 
-      &:enabled:hover {
-        background: none;
-      }
+    &:enabled:hover {
+      background: none;
+    }
 
-      &:focus {
-        box-shadow: none;
-      }
-
+    &:focus {
+      box-shadow: none;
     }
   }
 

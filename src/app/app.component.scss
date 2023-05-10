@@ -2,6 +2,8 @@
 
 .main-container {
   min-height: calc(100vh - 211px);
+  display: flex;
+  justify-content: center;
 }
 
 button {

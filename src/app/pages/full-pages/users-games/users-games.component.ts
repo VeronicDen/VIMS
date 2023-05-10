@@ -26,10 +26,10 @@ export class UsersGamesComponent implements OnInit {
   /** Массив всех игр пользователя */
   games: Game[] = [];
 
-  /** Массив массивов игр для вывода в слайдер */
-  gamesArrsArr: Game[][] = [];
+  /** Массив страниц игр */
+  gamesPages: Game[][] = [];
 
-  /** Ширина слайдов таблицы игр */
+  /** Ширина страниц слайдера таблицы игр */
   slidersTableWidth: number;
 
   @ViewChild(RefDirective)
@@ -50,7 +50,7 @@ export class UsersGamesComponent implements OnInit {
     this.getActualInfo();
   }
 
-  @HostListener('window:resize', ['$event']) onResize(e) {
+  @HostListener('window:resize', ['$event']) onResize() {
     this.setSlidersTableWidth();
   }
 
@@ -68,7 +68,7 @@ export class UsersGamesComponent implements OnInit {
           if (this.games[j])
             arr.push(this.games[j])
         }
-        this.gamesArrsArr.push(arr);
+        this.gamesPages.push(arr);
       }
       this.showSlider();
     })
@@ -122,7 +122,7 @@ export class UsersGamesComponent implements OnInit {
 
     const component = this.refDir.viewContainerRef.createComponent(modalFactory);
 
-    component.instance.maxNumberOfSlides = this.gamesArrsArr.length;
+    component.instance.maxNumberOfSlides = this.gamesPages.length;
     component.instance.activeSlideNumber = this.activeSlide;
     component.instance.activeSlideNumberChange.subscribe(() => {
       this.activeSlide = component.instance.activeSlideNumber;

@@ -5,7 +5,6 @@ import {CurrentStateService} from "../../../services/current-state.service";
 import {Infos} from "../../../models/admin-game/infos";
 import {ConfirmationService} from "primeng/api";
 import {RefDirective} from "../../../directives/ref.directive";
-import {ToastComponent} from "../../../components/toast/toast.component";
 import {Utils} from "../../../shared/utils";
 
 /**
@@ -35,7 +34,7 @@ export class LevelInformationBlocksComponent implements OnInit {
   levelsForLinks: Option<number>[] = [];
 
   /** Массив блоков информации */
-  blocks: {info: Infos, isHTML: boolean}[] = [];
+  blocks: { info: Infos, isHTML: boolean }[] = [];
 
   /** Флаг ошибки при сохранении нескольких блоков */
   isSaveErrorInFor: boolean = false;
@@ -63,7 +62,6 @@ export class LevelInformationBlocksComponent implements OnInit {
         if (this.levelId != +level.id)
           this.levelsForLinks.push({name: level.caption, code: level.id})
       }
-      console.log(this.levelsForLinks)
     });
 
     this.getActualInfo();
@@ -76,7 +74,6 @@ export class LevelInformationBlocksComponent implements OnInit {
     this.gameApiService.getInfoBlocks(this.gameId, this.levelId).subscribe(response => {
       this.blocks = [];
       for (const info of response.res.sort((a, b) => +a.inner_id > +b.inner_id ? 1 : -1)) {
-        console.log(info)
         this.blocks.push({
           info: info,
           isHTML: false
@@ -121,9 +118,9 @@ export class LevelInformationBlocksComponent implements OnInit {
     this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(() => {
       if (!isInFor)
         this.showToast(false, this.componentFactoryResolver, this.refDir);
-    }, error => {
+    }, () => {
       if (isInFor)
-        this.isSaveErrorInFor = false;
+        this.isSaveErrorInFor = true;
       else
         this.showToast(true, this.componentFactoryResolver, this.refDir);
     });
@@ -138,8 +135,10 @@ export class LevelInformationBlocksComponent implements OnInit {
     }
 
     setTimeout(() => {
-      if (this.isSaveErrorInFor)
+      if (this.isSaveErrorInFor) {
         this.showToast(true, this.componentFactoryResolver, this.refDir);
+        this.isSaveErrorInFor = false;
+      }
       else {
         this.showToast(false, this.componentFactoryResolver, this.refDir);
         this.getActualInfo();
@@ -162,7 +161,7 @@ export class LevelInformationBlocksComponent implements OnInit {
       acceptButtonStyleClass: 'filled accent',
       rejectButtonStyleClass: 'filled',
       accept: () => {
-        this.gameApiService.deleteInfoBlock(this.gameId, this.levelId, infoId).subscribe(response => {
+        this.gameApiService.deleteInfoBlock(this.gameId, this.levelId, infoId).subscribe(() => {
           this.getActualInfo();
         })
       },

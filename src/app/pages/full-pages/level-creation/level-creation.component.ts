@@ -1,10 +1,11 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CurrentStateService} from "../../../services/current-state.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {GameApiService} from "../../../api/game-api.service";
 import {Game} from "../../../models/admin-game/game";
 import {Level} from "../../../models/admin-game/level";
 import {ConfirmationService} from "primeng/api";
+import {forkJoin} from "rxjs";
 
 /**
  * Компонент редактирования уровня
@@ -23,10 +24,10 @@ export class LevelCreationComponent implements OnInit {
   game: Game;
 
   constructor(
-    private currentStateService: CurrentStateService,
     private activatedRoute: ActivatedRoute,
-    private gameApiService: GameApiService,
     private confirmationService: ConfirmationService,
+    private currentStateService: CurrentStateService,
+    private gameApiService: GameApiService,
     private router: Router,
     ) { }
 
@@ -38,12 +39,12 @@ export class LevelCreationComponent implements OnInit {
       this.currentStateService.currentLevelId = params['level-id'];
       this.currentStateService.currentGameId = params['game-id'];
 
-      this.gameApiService.getGame(params['game-id']).subscribe(response => {
-        this.game = response.res;
-      })
-
-      this.gameApiService.getLevel(params['game-id'], params['level-id']).subscribe(response => {
-        this.level = response.res;
+      forkJoin({
+        game: this.gameApiService.getGame(params['game-id']),
+        level: this.gameApiService.getLevel(params['game-id'], params['level-id'])
+      }).subscribe(({game, level}) => {
+        this.game = game.res;
+        this.level = level.res;
       })
     })
   }

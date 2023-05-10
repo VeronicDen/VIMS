@@ -7,7 +7,7 @@
     <p-dropdown [options]="levelsOption" [(ngModel)]="actualLevel" (onChange)="setActualLevel()"
                 optionLabel="name" optionValue="code" class="main-level"></p-dropdown>
     <p-dropdown [disabled]="childLevelsOption.length < 2" [options]="childLevelsOption"
-                [(ngModel)]="actualChildLevel" (onChange)="setActualTask($event.value)"
+                [(ngModel)]="actualChildLevel" (onChange)="setActualData($event.value)"
                 optionLabel="name" optionValue="code"></p-dropdown>
   </div>
 
@@ -17,29 +17,33 @@
         <p class="label">Код уровня:  </p>
         <div class="code-container">
           <input type="text" placeholder="Код"
-                 [(ngModel)]="code" (keydown.enter)="setCode()">
+                 [(ngModel)]="code" (keydown.enter)="se()">
           <button class="filled accent mdi mdi-24px mdi-send"
-                  title="Отправить" (click)="setCode()"></button>
+                  title="Отправить" (click)="se()"></button>
         </div>
-        <div class="error-box">{{codeError}}</div>
+        <div class="error-box">{{errorMessage}}</div>
       </div>
       <div class="condition">
         <div class="game-info-element">
           <p class="label">Текущее количество очков:</p>
           <div class="scores" *ngFor="let score of scores | keyvalue">
-            {{getScore(score)}}
+            {{setScore(score)}}
           </div>
         </div>
         <div class="game-info-element">
           <p class="label">Условия прохождения:</p>
-          <p>{{passCondition}}</p>
+          <p>{{passCondition ? passCondition : 'Условия не определены'}}</p>
         </div>
         <div class="game-info-element">
           <p class="label">Условия слива:</p>
-          <p>{{failedConditionScript}}</p>
+          <p>{{failedCondition ? failedCondition : 'Условия не определены'}}</p>
+        </div>
+        <div class="game-info-element">
+          <p class="label">Условия принятия кода:</p>
+          <p>{{codeAcceptationScript ? codeAcceptationScript : 'Условия не определены'}}</p>
         </div>
       </div>
-      <div class="custom-scroll">
+      <div class="custom-scroll" id="first-table">
         <div class="table" *ngIf="codesInfo">
           <div class="code" *ngFor="let info of codesInfo">
             <div class="row">
@@ -48,7 +52,6 @@
             <div class="row">
               <div>{{info.info}}</div>
             </div>
-
           </div>
         </div>
       </div>
@@ -56,6 +59,18 @@
     <div class="game-info-box task">
       <h2 class="task">ЗАДАНИЕ</h2>
       <div class="game-info-element" [innerHtml]="task">
+      </div>
+    </div>
+    <div class="custom-scroll" id="second-table">
+      <div class="table" *ngIf="codesInfo">
+        <div class="code" *ngFor="let info of codesInfo">
+          <div class="row">
+            <div>{{info.count}}</div>
+          </div>
+          <div class="row">
+            <div>{{info.info}}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
