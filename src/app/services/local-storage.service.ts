@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {LocalStorageKeys} from "../shared/local-storage-keys";
+import {LocalStorageKeys} from "../models/enums/local-storage-keys";
 
 /**
  * Сервис для работы с localStorage

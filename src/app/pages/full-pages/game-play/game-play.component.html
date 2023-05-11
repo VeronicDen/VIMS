@@ -17,9 +17,9 @@
         <p class="label">Код уровня:  </p>
         <div class="code-container">
           <input type="text" placeholder="Код"
-                 [(ngModel)]="code" (keydown.enter)="se()">
+                 [(ngModel)]="code" (keydown.enter)="sendCode()">
           <button class="filled accent mdi mdi-24px mdi-send"
-                  title="Отправить" (click)="se()"></button>
+                  title="Отправить" (click)="sendCode()"></button>
         </div>
         <div class="error-box">{{errorMessage}}</div>
       </div>

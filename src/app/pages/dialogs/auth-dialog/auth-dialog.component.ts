@@ -118,7 +118,7 @@ export class AuthDialogComponent implements OnInit {
 
     this.authApiService.registerUser(user).subscribe(() => {
       this.changeForm(true);
-    },error => {
+    },() => {
       this.formGroupRegistration.markAsUntouched();
       this.errorMessageText = 'Ошибка';
     })

@@ -114,8 +114,10 @@ export class GamePlayComponent implements OnInit {
       this.levelsOption.push({name: level.level.level_info.caption, code: level})
     }
 
-    //Если уровень не выбран или выбран, но такого больше нет
-    if (!this.actualLevel && !game.team_levels.find(a => a.level.id == this.actualLevel?.level.id))
+    //Если уровень не выбран или выбран, но такого больше нет, назначается первый из массива
+    if (this.actualLevel && !!game.team_levels.find(a => a.level.id == this.actualLevel?.level.id))
+      this.actualLevel = game.team_levels.find(a => a.level.id == this.actualLevel?.level.id);
+    else
       this.actualLevel = this.levels[0];
 
     this.setActualLevel();
@@ -136,7 +138,9 @@ export class GamePlayComponent implements OnInit {
       this.childLevelsOption.push({name: level.level.level_info.caption, code: level})
     }
 
-    if (!this.actualChildLevel && !this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id))
+    if (this.actualChildLevel && !!this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id))
+      this.actualChildLevel = this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id)
+    else
       this.actualChildLevel = this.actualLevel.child_levels[0];
 
     this.setActualData(this.actualChildLevel);
@@ -205,7 +209,7 @@ export class GamePlayComponent implements OnInit {
    * Отпрапвляет код
    */
   sendCode() {
-    if (this.code != '')
+    if (this.code == '')
       return;
 
     let code: CodeForSend = {
@@ -221,7 +225,8 @@ export class GamePlayComponent implements OnInit {
         }
         else {*/
         code.current_location = {
-          lon: position.coords.longitude, lat: position.coords.latitude
+          //lon: position.coords.longitude, lat: position.coords.latitude
+          lon: 37, lat: 55
         };
         /*}*/
       }, () => {
@@ -232,9 +237,6 @@ export class GamePlayComponent implements OnInit {
           this.errorMessage = 'получить местоположение не удалось';
         }
       })
-      setTimeout(() => {
-        this.errorMessage = '';
-      }, 4000)
     }
 
     if (isError)
@@ -242,23 +244,26 @@ export class GamePlayComponent implements OnInit {
 
     setTimeout(() => {
       this.actionApiService.sendCode(this.localStorageService.game_token, code).subscribe(response => {
+        console.log(response.res.team_info)
         this.getActualInfo(response.res.team_info);
       }, error => {
         this.code = '';
         if (error.error.error == "wrong-code") {
           this.errorMessage = error.error.comments;
         } else if (error.error.error == "can-not-accept") {
-          this.errorMessage = 'вы находитесь далеко от места'
+          this.errorMessage = 'вы находитесь далеко от места';
+        } else if (error.error.error == "duplicate-code") {
+          this.errorMessage = error.error.comments;
         } else {
           this.errorMessage = 'неопределенная ошибка'
         }
-        setTimeout(() => {
-          this.errorMessage = '';
-        }, 4000)
       })
     }, 1500)
 
     this.code = '';
+    setTimeout(() => {
+      this.errorMessage = '';
+    }, 4000)
   }
 
   /**
