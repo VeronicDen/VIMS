@@ -5,6 +5,7 @@ import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest}
 import {CurrentStateService} from "../services/current-state.service";
 import {LocalStorageService} from "../services/local-storage.service";
 import jwt_decode from "jwt-decode";
+import {ServerError} from "../shared/server-error";
 
 /**
  * Интерсептор для работы с токенами
@@ -36,6 +37,12 @@ export class AuthInterceptor implements HttpInterceptor {
       if (error instanceof HttpErrorResponse && !request.url.includes(`refresh-access`) &&
         !request.url.includes(`sign-in`) && !request.url.includes('sign-up') && error.status === 401) {
         return this.handle401Error(authReq, next);
+      }
+      if (error.status === 400 || error.status === 409) {
+        return throwError(new ServerError(error.error.comments, error.error.error, error));
+      }
+      if (error.status === 500) {
+        return throwError(new ServerError('Внутренняя ошибка сервера', error.error.error, error));
       }
       return throwError(error);
     }));

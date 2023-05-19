@@ -14,15 +14,15 @@
         <input type="text" id="levelName" formControlName="caption">
       </div>
       <div class="form-item">
-        <label for="code_acceptation">Условия принятия кода</label>
-        <textarea type="text" id="code_acceptation" formControlName="code_acceptation"></textarea>
+        <label for="codeAcceptation">Условия принятия кода</label>
+        <textarea type="text" id="codeAcceptation" formControlName="codeAcceptation"></textarea>
       </div>
 
-      <app-checkbox>
+      <app-checkbox formControlName="isInner">
         <p class="checkbox-text">Уровень-ссылка</p>
       </app-checkbox>
 
-      <app-checkbox>
+      <app-checkbox formControlName="isGeo">
         <p class="checkbox-text">Отслеживать геолокацию</p>
       </app-checkbox>
 
@@ -62,7 +62,7 @@
           <p>+</p>
         </div>
 
-        <div class="table" *ngIf="currentLevel?.success_result_values.length > 0">
+        <div class="table" *ngIf="currentLevel?.success_result_values?.length > 0">
           <div class="row header">
             <div class="code">Код</div>
             <div class="type">Вид</div>
@@ -92,7 +92,7 @@
           <p>+</p>
         </div>
 
-        <div class="table" *ngIf="currentLevel?.failed_result_values.length > 0">
+        <div class="table" *ngIf="currentLevel?.failed_result_values?.length > 0">
           <div class="row header">
             <div class="code">Код</div>
             <div class="type">Вид</div>

@@ -11,7 +11,7 @@
 
   .game-name-box {
     width: 100%;
-    margin-bottom: 34px;
+    margin-bottom: 14px;
     padding-bottom: 10px;
     border-bottom: 1px solid $accent-color;
 
@@ -25,10 +25,29 @@
     }
   }
 
+  .geo-info {
+    display: flex;
+    justify-content: right;
+    color: $accent-color;
+    text-align: right;
+  }
+
+  .map-box {
+    .map {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 12px;
+    }
+  }
+
   .level-name {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-top: 20px;
   }
 
   .game-box {
@@ -139,6 +158,14 @@
           width: 100%;
         }
       }
+
+      #first-table {
+        display: none;
+      }
+
+      #second-table {
+        display: flex;
+      }
     }
   }
 
@@ -151,25 +178,22 @@
   @include screen('phone') {
     padding-top: 0;
 
-    #first-table {
-      display: none;
-    }
-
-    #second-table {
-      display: flex;
-    }
-
-    .game-box .game-info-box .game-info-element .code-container {
-
-      input {
-        border-right: none;
-        width: calc(100% - 40px);
+    .game-box .game-info-box .game-info-element {
+      p:not(.label) {
+        overflow-wrap: break-word;
       }
 
-      button {
-        background: none;
-        border: 1px solid var(--text-color);
-        color: $accent-color;
+      .code-container {
+        input {
+          border-right: none;
+          width: calc(100% - 40px);
+        }
+
+        button {
+          background: none;
+          border: 1px solid var(--text-color);
+          color: $accent-color;
+        }
       }
     }
   }

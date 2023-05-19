@@ -473,6 +473,15 @@ textarea:read-only {
 
 //ГОТОВЫЕ ЭЛЕМЕНТЫ
 
+
+//КАРТЫ
+.leaflet-top, .leaflet-bottom {
+  //z-index: 300;
+  display: none;
+}
+
+//ДРОП
+
 .p-dropdown {
   width: 360px;
   height: 30px;
@@ -800,16 +809,33 @@ p-dropdownitem {
   .p-dropdown-panel {
     width: 250px;
   }
+
+  @include screen('phone') {
+    display: flex;
+    flex-direction: column;
+
+    .p-dropdown {
+      width: 100% !important;
+      background-position: calc(100% - 22px) center !important;
+    }
+
+    .p-dropdown-panel {
+      width: 100% !important;
+    }
+  }
 }
 
 //Редактор
 
 .p-editor-container {
+  z-index: 0 !important;
+
   .p-editor-content,
   .p-editor-toolbar {
     border-radius: 0 !important;
     border-color: var(--text-color) !important;
     background-color: var(--background-color) !important;
+    z-index: 0 !important;
   }
 
   .ql-snow {
@@ -857,10 +883,12 @@ p-dropdownitem {
 
 .ql-container {
   font-size: 16px;
+  z-index: 0 !important;
 }
 
 .ql-editor {
   background-color: var(--background-color) !important;
+  z-index: 0 !important;
   padding: 10px;
 }
 
@@ -921,6 +949,56 @@ p-dropdownitem {
 
       span {
         margin: 0;
+      }
+    }
+  }
+}
+
+//Toast
+
+.p-toast {
+
+  .p-toast-message {
+    .p-toast-message-content {
+      display: flex;
+      align-items: center;
+
+      .p-toast-message-text {
+        margin-left: 0;
+
+        .p-toast-detail {
+          margin-top: 0;
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
+
+    .p-toast-message-icon {
+      display: none;
+    }
+
+    .p-toast-icon-close{
+      &:hover {
+        background: none;
+      }
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    &.p-toast-message-error {
+      background: $accent-color;
+      border: none;
+    }
+
+    &.p-toast-message-success {
+      background: var(--slider-inactive-icon-color);
+      border: none;
+
+      .p-toast-icon-close {
+        display: none;
       }
     }
   }

@@ -8,6 +8,7 @@ import {Level} from 'src/app/models/admin-game/level';
 import {CodeResult} from "../../../models/admin-game/code-result";
 import {Utils} from "../../../shared/utils";
 import {RefDirective} from "../../../directives/ref.directive";
+import {ToastService} from "../../../services/toast.service";
 
 /**
  * Компонент настроек уровня
@@ -51,11 +52,11 @@ export class LevelSettingsComponent implements OnInit {
   /** Скрипт слива */
   failedScript: string;
 
-  /** Сообщение об ошибке при сохранении скриптов */
+  /** Сообщение об ошибке при сохранении скриптов прохождения и слови */
   errorMessage: string = '';
 
-  /** Вызывает оповещение */
-  showToast = Utils.showToast;
+  /** Сообщение об ошибке при сохранении скрипта условий прохождения */
+  acceptationErrorMessage: string = '';
 
   @ViewChild(RefDirective)
   refDir: RefDirective
@@ -65,6 +66,7 @@ export class LevelSettingsComponent implements OnInit {
     private localStorageService: LocalStorageService,
     private gameApiService: GameApiService,
     private componentFactoryResolver: ComponentFactoryResolver,
+    private toastService: ToastService,
   ) {
   }
 
@@ -75,8 +77,9 @@ export class LevelSettingsComponent implements OnInit {
     this.formGroupInfo = new FormGroup({
       id: new FormControl('', []),
       caption: new FormControl('', []),
-      isInner: new FormControl(true, []),
-      code_acceptation: new FormControl('', [])
+      codeAcceptation: new FormControl('', []),
+      isInner: new FormControl(false, []),
+      isGeo: new FormControl(false, []),
     });
 
     this.getActualInfo();
@@ -90,8 +93,9 @@ export class LevelSettingsComponent implements OnInit {
       this.currentLevel = response.res;
       this.formGroupInfo.controls.caption.setValue(this.currentLevel.caption);
       this.formGroupInfo.controls.id.setValue(this.currentLevel.inner_id);
-      this.formGroupInfo.controls.isInner.setValue(this.currentLevel.level_type != `INNER`);
-      this.formGroupInfo.controls.code_acceptation.setValue(this.currentLevel.code_acceptation_script);
+      this.formGroupInfo.controls.codeAcceptation.setValue(this.currentLevel.code_acceptation_script);
+      this.formGroupInfo.controls.isInner.setValue(this.currentLevel.level_type == `INNER`);
+      this.formGroupInfo.controls.isGeo.setValue(this.currentLevel.use_location);
     })
   }
 
@@ -126,14 +130,10 @@ export class LevelSettingsComponent implements OnInit {
    * @param result результат
    */
   deleteResult(isSuccess: boolean, result: CodeResult): void {
-    if (isSuccess) {
-      this.currentLevel.success_result_values.splice(this.currentLevel.success_result_values.findIndex(
-        a => a.result_type == result.result_type && a.result_code == result.result_code
-        && a.result_value == result.result_value), 1)
-    } else {
-      this.currentLevel.failed_result_values.splice(this.currentLevel.failed_result_values.findIndex(
-        a => a.result_type == result.result_type && a.result_code == result.result_code
-          && a.result_value == result.result_value), 1)
+    const codeResults = isSuccess ? this.currentLevel.success_result_values : this.currentLevel.failed_result_values;
+    const idx = this.currentLevel.success_result_values.indexOf(result);
+    if (idx !== -1) {
+      codeResults.splice(idx, 1);
     }
   }
 
@@ -147,19 +147,15 @@ export class LevelSettingsComponent implements OnInit {
       level_type: this.formGroupInfo.controls.isInner.value ? 'INNER' : 'SIMPLE',
       condition_script: this.currentLevel.condition_script,
       failed_condition_script: this.currentLevel.failed_condition_script,
-      code_acceptation_script: this.formGroupInfo.controls.code_acceptation.value,
+      code_acceptation_script: this.formGroupInfo.controls.codeAcceptation.value,
       success_result_values: this.currentLevel.success_result_values,
-      failed_result_values: this.currentLevel.failed_result_values
+      failed_result_values: this.currentLevel.failed_result_values,
+      use_location: this.formGroupInfo.controls.isGeo.value,
     }
 
     this.gameApiService.putLevel(level, this.gameId, this.levelId).subscribe(() => {
-      this.showToast(false, this.componentFactoryResolver, this.refDir);
+      this.toastService.showSuccessToast('Изменения успешно сохранены');
       this.getActualInfo();
-    }, error => {
-      this.errorMessage = error.error.comments;
-      setTimeout(() => {
-        this.errorMessage = '';
-      }, 4000)
     })
   }
 }

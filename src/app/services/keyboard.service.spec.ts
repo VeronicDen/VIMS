@@ -1,5 +1,0 @@
-describe('LevelCreationComponent', () => {
-  it ('', () => {
-    expect();
-  })
-})

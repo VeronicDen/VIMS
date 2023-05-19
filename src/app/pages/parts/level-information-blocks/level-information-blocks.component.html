@@ -15,7 +15,7 @@
       <label>Название</label>
       <input type="text" placeholder="Название" [(ngModel)]="block.info.info_caption">
     </div>
-    <div class="form-item">
+    <div class="form-item" *ngIf="!isCurrentLevelLink">
       <label>Тип</label>
       <p-dropdown [options]="blockTypes" [(ngModel)]="block.info.info_type"
                   optionLabel="name" optionValue="code">

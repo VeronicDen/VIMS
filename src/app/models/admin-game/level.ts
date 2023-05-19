@@ -42,4 +42,7 @@ export interface Level {
 
   /** Коды */
   codes?: Code[],
+
+  /** Флаг использования геолокации */
+  use_location: boolean,
 }

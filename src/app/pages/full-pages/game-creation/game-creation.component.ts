@@ -9,7 +9,8 @@ import {Level} from "../../../models/admin-game/level";
 import {Utils} from "../../../shared/utils";
 import {Game} from "../../../models/admin-game/game";
 import {FormControl, FormGroup} from "@angular/forms";
-import {ConfirmationService} from "primeng/api";
+import {ConfirmationService, MessageService} from "primeng/api";
+import {ToastService} from "../../../services/toast.service";
 
 /**
  * Компонент редактирования игры
@@ -52,9 +53,6 @@ export class GameCreationComponent implements OnInit {
   /** Возвращает слово в правильной форме */
   pluralCase = Utils.pluralCase;
 
-  /** Вызывает оповещение */
-  showToast = Utils.showToast;
-
   @ViewChild(RefDirective)
   refDir: RefDirective;
 
@@ -65,7 +63,9 @@ export class GameCreationComponent implements OnInit {
     private currentStateService: CurrentStateService,
     private gameApiService: GameApiService,
     private router: Router,
-  ) { }
+    private toastService: ToastService,
+  ) {
+  }
 
   ngOnInit(): void {
     if (!this.currentStateService.isUserLoggedIn)
@@ -92,6 +92,7 @@ export class GameCreationComponent implements OnInit {
       this.gameName = this.currentGame.caption;
       this.formGroupInfo.controls.caption.setValue(this.currentGame.caption);
       this.formGroupInfo.controls.script.setValue(this.currentGame.game_yaml);
+      this.isGameStarted = this.currentGame.game_state == 'started';
     })
 
     this.gameApiService.getLevels(this.gameId).subscribe(response => {
@@ -142,6 +143,7 @@ export class GameCreationComponent implements OnInit {
       code_acceptation_script: '',
       success_result_values: [],
       failed_result_values: [],
+      use_location: false,
     }
 
     for (let i = 0; i < this.numberOfNewLevels; i++) {
@@ -182,10 +184,8 @@ export class GameCreationComponent implements OnInit {
    */
   saveInfo(): void {
     this.gameApiService.putGame(this.currentGame.id, this.formGroupInfo.controls.caption.value,
-      this.formGroupInfo.controls.script.value).subscribe( () => {
-        this.showToast(false, this.componentFactoryResolver, this.refDir);
-    }, () => {
-      this.showToast(true, this.componentFactoryResolver, this.refDir);
+      this.formGroupInfo.controls.script.value).subscribe(() => {
+      this.toastService.showSuccessToast('Изменения успешно сохранены');
     });
   }
 
@@ -201,13 +201,42 @@ export class GameCreationComponent implements OnInit {
       failed_result_values: level.failed_result_values,
       inner_id: level.inner_id,
       level_type: level.level_type,
-      success_result_values: level.success_result_values
+      success_result_values: level.success_result_values,
+      use_location: level.use_location,
     }
 
     this.gameApiService.putLevel(currentLevel, this.gameId, level.id).subscribe(() => {
-      this.showToast(false, this.componentFactoryResolver, this.refDir);
-    }, () => {
-      this.showToast(true, this.componentFactoryResolver, this.refDir);
+      this.toastService.showSuccessToast('Изменения успешно сохранены');
+    })
+  }
+
+  /**
+   * Запускает игру
+   */
+  startGame(): void {
+    this.confirmationService.confirm({
+      message: 'Вы уверены, что хотите запустить игру?',
+      header: 'Запуск игры',
+      acceptLabel: 'ДА',
+      rejectLabel: 'НЕТ',
+      acceptIcon: 'none',
+      rejectIcon: 'none',
+      acceptButtonStyleClass: 'filled accent',
+      rejectButtonStyleClass: 'filled',
+      accept: () => {
+        this.gameApiService.startGame(this.gameId).subscribe(() => {
+          this.isGameStarted = true;
+        })
+      },
+    });
+  }
+
+  /**
+   * Вернуть игру
+   */
+  clearGame(): void {
+    this.gameApiService.clearGame(this.gameId).subscribe(resp => {
+      console.log(resp);
     })
   }
 }

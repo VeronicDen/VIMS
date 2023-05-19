@@ -1,27 +1,57 @@
 @import "src/app/shared/theme-colors/theme";
 @import "src/app/shared/responsive.mixin";
 
-div {
+.container {
+  //width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   position: fixed;
   bottom: 50px;
-  left: calc(50% - 100px);
-  z-index: 100000;
 
-  min-height: 40px;
-  padding: 15px 40px;
+  .body {
+    z-index: 1000000;
 
-  background: var(--slider-inactive-icon-color);
-  animation: ani 2s forwards;
+    max-width: 350px;
+    padding: 7px;
+    margin: 0 auto;
 
-  &.error {
-    background: $accent-color !important;
-    color: $text-color-dark;
+    background: var(--slider-inactive-icon-color);
+
+    p {
+      margin: 5px 33px 8px 33px;
+    }
+
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: right;
+    }
+
+    &.error {
+      background: $accent-color !important;
+      color: $text-color-dark;
+
+      animation: long 1s forwards !important;
+    }
+
+    &:not(.error) {
+      animation: short 2s forwards;
+    }
   }
 }
 
-@keyframes ani {
+
+@keyframes short {
   0% {opacity: 0;}
   30% {opacity: 0.9;}
   70% {opacity: 0.9;}
   100% {opacity: 0;}
+}
+
+@keyframes long {
+  0% {opacity: 0;}
+  100% {opacity: 0.9;}
 }

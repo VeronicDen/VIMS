@@ -6,9 +6,9 @@
     <p class="game-name"><span>СТРАНИЦА ИГРЫ</span> {{gameName}}</p>
 
     <div class="button-box">
-      <button class="filled accent" *ngIf="!isGameStarted" (click)="isGameStarted = true">НАЧАТЬ ИГРУ</button>
+      <button class="filled accent" *ngIf="!isGameStarted" (click)="startGame()">НАЧАТЬ ИГРУ</button>
       <button class="outline accent" *ngIf="isGameStarted" (click)="isGameStarted = false">ЗАКОНЧИТЬ ИГРУ</button>
-      <button class="outline" *ngIf="isGameStarted">ВЕРНУТЬ ИГРУ</button>
+      <button class="outline" *ngIf="isGameStarted" (click)="clearGame()">ВЕРНУТЬ ИГРУ</button>
       <button (click)="showCommandDialog()">КОМАНДЫ</button>
     </div>
   </div>
@@ -46,10 +46,10 @@
         <p>Создать</p>
         <input type="number" placeholder="0" [readonly]="isGameStarted" [(ngModel)]="numberOfNewLevels">
         <p>{{pluralCase(numberOfNewLevels, {one: 'уровень', few: 'уровня', other: 'уровней'})}}</p>
-        <button class="outline" [disabled]="isGameStarted" (click)="addLevels()">СОЗДАТЬ</button>
+        <button class="outline" [disabled]="isGameStarted || !numberOfNewLevels" (click)="addLevels()">СОЗДАТЬ</button>
       </div>
 
-      <div class="table" *ngIf="levels.length > 0">
+      <div class="table" *ngIf="levels.length > 0, else emptyBlock">
         <div class="row header">
           <div class="id">ID</div>
           <div class="name">Название</div>
@@ -80,6 +80,9 @@
           </div>
         </div>
       </div>
+      <ng-template #emptyBlock>
+        <p>В игре пока нет уровней</p>
+      </ng-template>
     </div>
   </div>
 </div>

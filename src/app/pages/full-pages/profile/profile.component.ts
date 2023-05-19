@@ -70,12 +70,12 @@ export class ProfileComponent implements OnInit {
       'Тренировка DaIGR vol.2', 'THE BOURNE IDENTITY', 'The Fractured but Whole', 'IC#100']
     const listOfResults: GameResult[] = [
       {date: '01.01.22', name: 'Игра 1', team: 'Команда 1', place: '1/10'},
-      {date: '01.01.22', name: 'Игра 2', team: 'Команда 2', place: '2/10'},
-      {date: '01.01.22', name: 'Игра 3', team: 'Команда 3', place: '3/10'},
-      {date: '01.01.22', name: 'Игра 4', team: 'Команда 4', place: '4/10'},
-      {date: '01.01.22', name: 'Игра 5', team: 'Команда 5', place: '5/10'},
-      {date: '01.01.22', name: 'Игра 6', team: 'Команда 6', place: '6/10'},
-      {date: '01.01.22', name: 'Игра 7', team: 'Команда 7', place: '7/10'},
+      {date: '21.01.22', name: 'Игра 2', team: 'Команда 2', place: '2/10'},
+      {date: '31.01.22', name: 'Игра 3', team: 'Команда 3', place: '3/10'},
+      {date: '24.01.22', name: 'Игра 4', team: 'Команда 4', place: '4/10'},
+      {date: '25.01.22', name: 'Игра 5', team: 'Команда 5', place: '5/10'},
+      {date: '27.12.22', name: 'Игра 6', team: 'Команда 6', place: '6/10'},
+      {date: '29.01.22', name: 'Игра 7', team: 'Команда 7', place: '7/10'},
       {date: '01.01.22', name: 'Игра 8', team: 'Команда 8', place: '8/10'},
       {date: '01.01.22', name: 'Игра 9', team: 'Команда 9', place: '9/10'},
       {date: '01.01.22', name: 'Игра 10', team: 'Команда 10', place: '10/10'},

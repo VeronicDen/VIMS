@@ -13,6 +13,7 @@ import {ActionApiService} from "../../../api/action-api.service";
 import {Router} from "@angular/router";
 import {LocalStorageService} from "../../../services/local-storage.service";
 import {finalize, mergeMap, of} from "rxjs";
+import {GameButtonsName} from "../../../models/enums/game-buttons-name";
 
 /**
  * Стартовая страница
@@ -36,8 +37,8 @@ export class MainPageComponent implements OnInit {
   /** Ассоциативный массив флагов открытия игр */
   isGameOpenMap = new Map<PlayerGame, boolean>;
 
-  /** Ассоциативный массив флагов открытия игр */
-  isGameUnlockedMap = new Map<number, boolean>();
+  /** Ассоциативный массив названий кнопок */
+  gameButtonNameMap = new Map<number, string>();
 
   /** Список команд для выпадающего меню */
   teams: Option<string>[] = [];
@@ -124,7 +125,7 @@ export class MainPageComponent implements OnInit {
 
         return this.teamApiService.getTeams();
       }),
-      finalize(() => this.setGameUnlockedMap())
+      finalize(() => this.setGameButtonNameMap())
     ).subscribe(response => {
       if (!response) {
         return;
@@ -138,17 +139,13 @@ export class MainPageComponent implements OnInit {
   }
 
   /**
-   * Регистрирует пользователя на игру
+   * Регистрирует пользователя на игру или открывает страницу запущеной
    * @param gameId идентификатор игры
    */
   applyOrGoToTheGame(gameId: number): void {
-    if (!this.user) {
-      this.showAuthDialog(false);
-      return;
-    }
-    if (!this.isGameUnlockedMap.get(gameId)) {
+    if (this.gameButtonNameMap.get(gameId) == GameButtonsName.preregistration)
       this.teamApiService.applyToGame(gameId, +this.selectedTeam).subscribe(() => this.getActualInfo());
-    } else if (this.games.find(a => a.id == gameId).game_state == 'started') {
+    else if (this.gameButtonNameMap.get(gameId) == GameButtonsName.ready) {
       this.actionApiService.submitRequestToGame(gameId).subscribe(response => {
         this.localStorageService.game_token = response.res.res;
         this.router.navigate(['game']);
@@ -156,40 +153,45 @@ export class MainPageComponent implements OnInit {
     }
   }
 
+
   /**
-   * Заполняет ассоциативный массив разблокированных игр
+   * Заполняет ассоциативный массив названий кнопок
    */
-  setGameUnlockedMap(): void {
+  setGameButtonNameMap(): void {
+    this.gameButtonNameMap = new Map<number, string>();
     for (const game of this.games) {
       // TODO: сделать фильтрацию по датам
 
-      this.isGameUnlockedMap.set(game.id, false);
-      if (this.selectedTeam) {
-        this.isGameUnlockedMap.set(game.id, !!game.teams.find(a => a.id == this.selectedTeam));
+      if (!this.user)
+        this.gameButtonNameMap.set(game.id, GameButtonsName.preregistration);
+      else {
+        if (game.teams.some(a => a.id == +this.selectedTeam)) {
+          if (game.teams.some(a => a.id == +this.selectedTeam && a.accepted == 1)) {
+            if (game.game_state == 'started')
+              this.gameButtonNameMap.set(game.id, GameButtonsName.ready);
+            else
+              this.gameButtonNameMap.set(game.id, GameButtonsName.approved);
+          }
+          else
+            this.gameButtonNameMap.set(game.id, GameButtonsName.submitted);
+        } else {
+          this.gameButtonNameMap.set(game.id, GameButtonsName.preregistration);
+        }
       }
     }
-  }
-
-  /**
-   * Назначает текст кнопки игры
-   * @param gameId идентификатор игры
-   */
-  setGameButtonState(gameId: number): string {
-    if (this.user && this.isGameUnlockedMap.get(gameId)) {
-      if (this.games.find(a => a.id == gameId).game_state == 'started')
-        return 'ПЕРЕЙТИ';
-      else {
-        if (this.games.find(a => a.id == gameId).teams.find(a => a.id == this.selectedTeam).accepted == 1)
-          return 'ВЫ ЗАРЕГИСТРИРОВАНЫ';
-        else
-          return 'ВЫ ПОДАЛИ ЗАЯВКУ';
-      }
-    } else
-      return 'ЗАРЕГИСТРИРОВАТЬСЯ';
   }
 
   choseGames(isCurGames: boolean) {
     this.isCurrentGamesChose = isCurGames;
     //TODO: сделать фильтрацию по датам
+  }
+
+  getAuthors(authors: { login: string; role: string; user_id: number }[]): string {
+    let result = '';
+    for (const author of authors) {
+      if (author.role == 'CREATOR')
+        result += result == '' ? author.login : ', ' + author.login;
+    }
+    return result;
   }
 }

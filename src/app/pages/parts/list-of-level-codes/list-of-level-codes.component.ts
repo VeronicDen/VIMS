@@ -19,6 +19,9 @@ import {ConfirmationService} from "primeng/api";
 import {ArrowDivDirective} from "../../../directives/arrow-div.directive";
 import {KeyboardService} from "../../../services/keyboard.service";
 import {RefDirective} from "../../../directives/ref.directive";
+import {forkJoin} from "rxjs";
+import {Variables} from "../../../models/user/variables";
+import {ToastService} from "../../../services/toast.service";
 
 /**
  * Компонент списка кодов
@@ -40,12 +43,11 @@ export class ListOfLevelCodesComponent implements OnInit {
   /** Массив кодов */
   codes: Code[] = [];
 
+  /** Переменные */
+  variables: Variables[];
+
   /** Возможные коды результатов */
-  resultCodes: Option<string>[] = [
-    {name: 'NUMBER', code: 'POINTS'},
-    {name: 'TIME', code: 'TIME'},
-    {name: 'LINK', code: 'INFOS'}
-  ];
+  resultCodes: Option<string>[] = [];
 
   /** Код нового результата */
   newResultCode: string;
@@ -63,7 +65,7 @@ export class ListOfLevelCodesComponent implements OnInit {
   ];
 
   /** Ассоциативный массив результатов */
-  resultMap = new Map<number, {name: string, element: CodeResult[]}>();
+  resultMap = new Map<number, { name: string, element: CodeResult[] }>();
 
   /** Количество кодов для создания */
   numberOfNewCodes: number;
@@ -76,9 +78,6 @@ export class ListOfLevelCodesComponent implements OnInit {
 
   /** Текст ошибки */
   errorText: string;
-
-  /** Вызывает оповещение */
-  showToast = Utils.showToast;
 
   @ViewChild(RefDirective)
   refDir: RefDirective
@@ -109,6 +108,7 @@ export class ListOfLevelCodesComponent implements OnInit {
     private currentStateService: CurrentStateService,
     private gameApiService: GameApiService,
     private keyboardService: KeyboardService,
+    private toastService: ToastService,
   ) {
   }
 
@@ -117,9 +117,6 @@ export class ListOfLevelCodesComponent implements OnInit {
     this.gameId = this.currentStateService.currentGameId;
 
     this.getActualInfo();
-
-    this.newResultCode = this.resultCodes[0].code;
-    this.setResultTypes();
 
     if (this.codes) {
       this.chosenItem = this.codes[0];
@@ -135,10 +132,23 @@ export class ListOfLevelCodesComponent implements OnInit {
    * Получает актуальную информацию
    */
   getActualInfo(): void {
-    this.gameApiService.getCodes(this.gameId, this.levelId).subscribe(response => {
-      this.codes = response.res;
+    forkJoin({
+      codes: this.gameApiService.getCodes(this.gameId, this.levelId),
+      game: this.gameApiService.getGame(this.gameId)
+    }).subscribe(({codes, game}) => {
+      this.codes = codes.res;
       this.rowsResult = this.codes.length;
       this.setResultsMap();
+
+      if (game.res.variables) {
+        this.variables = game.res.variables;
+        for (const variable of game.res.variables) {
+          if (variable.code != 'DISTANCE')
+            this.resultCodes.push({name: variable.code, code: variable.code})
+        }
+        this.newResultCode = this.resultCodes[0].code;
+        this.setResultTypes();
+      }
     })
   }
 
@@ -237,7 +247,7 @@ export class ListOfLevelCodesComponent implements OnInit {
    * Обновляет массив результатов
    */
   setResultsMap(): void {
-    this.resultMap = new Map<number, {name: string; element: CodeResult[]}>();
+    this.resultMap = new Map<number, { name: string; element: CodeResult[] }>();
 
     for (const code of this.codes) {
       let index = 0;
@@ -282,16 +292,11 @@ export class ListOfLevelCodesComponent implements OnInit {
   saveChanges(): void {
     this.gameApiService.setCode(this.gameId, this.levelId, this.codes).subscribe(
       response => {
-        this.showToast(false, this.componentFactoryResolver, this.refDir);
+        this.toastService.showSuccessToast('Изменения успешно сохранены');
         this.codes = response.res;
         this.setResultsMap();
-      },
-      () => {
-        this.errorText = 'Все поля должны быть заполнены';
-        setTimeout(() => {
-          this.errorText = '';
-        }, 3000)
-      })
+      }
+    )
   }
 
   /**

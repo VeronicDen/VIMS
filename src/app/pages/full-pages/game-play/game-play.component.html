@@ -3,6 +3,13 @@
     <p class="game-name"><span>ИГРА </span>{{gameName}}</p>
   </div>
 
+  <div class="geo-info">{{geoInfo}}</div>
+
+  <div class="map-box" [style.display]="isMapInit && isLittleWidth ? 'block' : 'none'">
+    <div id="upMap" class="map"></div>
+    <button class="outline" (click)="setMapOptions()">ОБНОВИТЬ ГЕОЛОКАЦИЮ</button>
+  </div>
+
   <div class="level-name">
     <p-dropdown [options]="levelsOption" [(ngModel)]="actualLevel" (onChange)="setActualLevel()"
                 optionLabel="name" optionValue="code" class="main-level"></p-dropdown>
@@ -14,7 +21,7 @@
   <div class="game-box">
     <div class="game-info-box general">
       <div class="game-info-element">
-        <p class="label">Код уровня:  </p>
+        <p class="label">Код уровня: </p>
         <div class="code-container">
           <input type="text" placeholder="Код"
                  [(ngModel)]="code" (keydown.enter)="sendCode()">
@@ -41,6 +48,10 @@
         <div class="game-info-element">
           <p class="label">Условия принятия кода:</p>
           <p>{{codeAcceptationScript ? codeAcceptationScript : 'Условия не определены'}}</p>
+        </div>
+        <div class="map-box" [style.display]="isMapInit && !isLittleWidth ? 'block' : 'none'">
+          <div id="downMap" class="map"></div>
+          <button class="outline" (click)="setMapOptions()">ОБНОВИТЬ ГЕОЛОКАЦИЮ</button>
         </div>
       </div>
       <div class="custom-scroll" id="first-table">

@@ -10,7 +10,16 @@ export interface PlayerGame {
   caption: string;
 
   /** Автор */
-  author?: string;
+  authors: {
+    /** Логин автора */
+    login: string,
+
+    /** Роль автора */
+    role: string,
+
+    /** Идентификатор пользователя */
+    user_id: number
+  }[];
 
   /** Время и дата начала игры */
   beginningOfGame?: string;
@@ -28,5 +37,15 @@ export interface PlayerGame {
   id: number;
 
   /** Команды в игре */
-  teams: any[];
+  teams: {
+
+    /** Идентификатор команды */
+    id: number,
+
+    /** Название команды */
+    caption: string,
+
+    /** Состояние команды в игре */
+    accepted: number,
+  }[];
 }

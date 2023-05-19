@@ -1,46 +1,47 @@
-import {APP_INITIALIZER, NgModule} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
-
-import {AppComponent} from './app.component';
-import {UiStyleToggleService} from "./ui/ui-style-toggle.service";
-import {RouterModule, Routes} from "@angular/router";
-import {LocalStorageService} from "./services/local-storage.service";
-import {MainPageComponent} from './pages/full-pages/main-page/main-page.component';
-import {HeaderModule} from "./components/header/header.module";
-import {FooterModule} from "./components/footer/footer.module";
-import {AuthDialogComponent} from './pages/dialogs/auth-dialog/auth-dialog.component';
-import {RefDirective} from './directives/ref.directive';
-import {ProfileComponent} from './pages/full-pages/profile/profile.component';
-import {DialogModule} from "./components/dialog/dialog.module";
-import {SliderModule} from "./components/slider/slider.module";
-import {ChangePasswordDialogComponent} from './pages/dialogs/change-password-dialog/change-password-dialog.component';
-import {ReactiveFormsModule} from "@angular/forms";
-import {UsersGamesComponent} from './pages/full-pages/users-games/users-games.component';
-import {PaginatorModule} from "primeng/paginator";
-import {GameCreationComponent} from './pages/full-pages/game-creation/game-creation.component';
-import {CommandInGameDialogComponent} from './pages/dialogs/teams-in-game-dialog/teams-in-game-dialog.component';
-import {NewTeamDialogComponent} from './pages/dialogs/new-team-dialog/new-team-dialog.component';
-import {LevelCreationComponent} from './pages/full-pages/level-creation/level-creation.component';
-import {LevelSettingsComponent} from './pages/parts/level-settings/level-settings.component';
-import {
-  LevelInformationBlocksComponent
-} from './pages/parts/level-information-blocks/level-information-blocks.component';
-import {ListOfLevelCodesComponent} from './pages/parts/list-of-level-codes/list-of-level-codes.component';
-import {DropdownModule} from 'primeng/dropdown';
-import {EditorModule} from 'primeng/editor';
-import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import {ConfirmationService} from 'primeng/api';
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {CheckboxModule} from "./components/checkbox/checkbox.module";
-import {ApiModule} from "./api/api.module";
-import {HTTP_INTERCEPTORS} from "@angular/common/http";
-import {AuthInterceptor} from "./api/auth.interceptor";
-import {StartupService} from "./services/startup.service";
-import { IdDirective } from './directives/id.directive';
 import { ArrowDivDirective } from './directives/arrow-div.directive';
 import { GamePlayComponent } from './pages/full-pages/game-play/game-play.component';
 import { HelpPageComponent } from './pages/full-pages/help-page/help-page.component';
+import { IdDirective } from './directives/id.directive';
+import { ToastModule } from 'primeng/toast';
+import {APP_INITIALIZER, ErrorHandler, NgModule} from '@angular/core';
+import {ApiModule} from "./api/api.module";
+import {AppComponent} from './app.component';
+import {AuthDialogComponent} from './pages/dialogs/auth-dialog/auth-dialog.component';
+import {AuthInterceptor} from "./api/auth.interceptor";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {BrowserModule} from '@angular/platform-browser';
+import {ChangePasswordDialogComponent} from './pages/dialogs/change-password-dialog/change-password-dialog.component';
+import {CheckboxModule} from "./components/checkbox/checkbox.module";
+import {CommandInGameDialogComponent} from './pages/dialogs/teams-in-game-dialog/teams-in-game-dialog.component';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import {CurrentStateService} from "./services/current-state.service";
+import {DialogModule} from "./components/dialog/dialog.module";
+import {DropdownModule} from 'primeng/dropdown';
+import {EditorModule} from 'primeng/editor';
+import {FooterModule} from "./components/footer/footer.module";
+import {GameCreationComponent} from './pages/full-pages/game-creation/game-creation.component';
+import {GlobalErrorHandler} from "./services/global-error-handler";
+import {HTTP_INTERCEPTORS} from "@angular/common/http";
+import {HeaderModule} from "./components/header/header.module";
+import {LevelCreationComponent} from './pages/full-pages/level-creation/level-creation.component';
+import {LevelInformationBlocksComponent} from './pages/parts/level-information-blocks/level-information-blocks.component';
+import {LevelSettingsComponent} from './pages/parts/level-settings/level-settings.component';
+import {ListOfLevelCodesComponent} from './pages/parts/list-of-level-codes/list-of-level-codes.component';
+import {LocalStorageService} from "./services/local-storage.service";
+import {MainPageComponent} from './pages/full-pages/main-page/main-page.component';
+import {NewTeamDialogComponent} from './pages/dialogs/new-team-dialog/new-team-dialog.component';
+import {OpenStreetMapService} from "./services/open-street-map.service";
+import {PaginatorModule} from "primeng/paginator";
+import {ProfileComponent} from './pages/full-pages/profile/profile.component';
+import {ReactiveFormsModule} from "@angular/forms";
+import {RefDirective} from './directives/ref.directive';
+import {RouterModule, Routes} from "@angular/router";
+import {SliderModule} from "./components/slider/slider.module";
+import {StartupService} from "./services/startup.service";
+import {UiStyleToggleService} from "./ui/ui-style-toggle.service";
+import {UsersGamesComponent} from './pages/full-pages/users-games/users-games.component';
+import {ToastService} from "./services/toast.service";
 
 export function themeFactory(themeService: UiStyleToggleService) {
   return () => themeService.setThemeOnStart();
@@ -98,46 +99,50 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    RefDirective,
-    MainPageComponent,
-    AuthDialogComponent,
-    ProfileComponent,
-    ChangePasswordDialogComponent,
-    UsersGamesComponent,
-    GameCreationComponent,
-    CommandInGameDialogComponent,
-    NewTeamDialogComponent,
-    LevelCreationComponent,
-    LevelSettingsComponent,
-    LevelInformationBlocksComponent,
-    ListOfLevelCodesComponent,
-    IdDirective,
     ArrowDivDirective,
+    AuthDialogComponent,
+    ChangePasswordDialogComponent,
+    CommandInGameDialogComponent,
+    GameCreationComponent,
     GamePlayComponent,
     HelpPageComponent,
+    IdDirective,
+    LevelCreationComponent,
+    LevelInformationBlocksComponent,
+    LevelSettingsComponent,
+    ListOfLevelCodesComponent,
+    MainPageComponent,
+    NewTeamDialogComponent,
+    ProfileComponent,
+    RefDirective,
+    UsersGamesComponent,
   ],
   imports: [
-    BrowserModule,
-    RouterModule.forRoot(routes),
-    HeaderModule,
-    FooterModule,
-    DialogModule,
-    SliderModule,
-    ReactiveFormsModule,
-    PaginatorModule,
+    ApiModule,
     BrowserAnimationsModule,
+    BrowserModule,
+    CheckboxModule,
+    ConfirmDialogModule,
+    DialogModule,
     DropdownModule,
     EditorModule,
-    ConfirmDialogModule,
-    CheckboxModule,
-    ApiModule,
+    FooterModule,
+    HeaderModule,
+    PaginatorModule,
+    ReactiveFormsModule,
+    RouterModule.forRoot(routes),
+    SliderModule,
+    ToastModule,
   ],
   providers: [
-    LocalStorageService,
-    UiStyleToggleService,
-    StartupService,
+    MessageService,
     ConfirmationService,
     CurrentStateService,
+    LocalStorageService,
+    OpenStreetMapService,
+    StartupService,
+    UiStyleToggleService,
+    ToastService,
     {
       provide: APP_INITIALIZER,
       useFactory: themeFactory,
@@ -154,6 +159,10 @@ const routes: Routes = [
       useFactory: (startupService: StartupService) => () => startupService.run(),
       deps: [StartupService],
       multi: true
+    },
+    {
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandler,
     },
   ],
   exports: [],

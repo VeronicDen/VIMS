@@ -13,18 +13,24 @@ export class ToastComponent implements OnInit {
 
   /** Флаг ошибки */
   @Input()
-  isError: boolean = false;
+  isError: boolean;
 
   /** Текст сообщения */
+  @Input()
   text: string;
 
   constructor() { }
 
   ngOnInit(): void {
-    this.text = this.isError ? 'Ошибка при сохранении' : 'Изменения успешно сохранены';
-    setTimeout(() => {
-      this.close.emit();
-    }, 2000)
+    this.text = this.isError ? this.text : 'Изменения успешно сохранены';
+
+
+
+    /*if (!this.isError) {
+      setTimeout(() => {
+        this.close.emit();
+      }, 2000)
+    }*/
   }
 
 }

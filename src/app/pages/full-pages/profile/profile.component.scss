@@ -113,7 +113,7 @@
 
   @include screen('phone') {
     padding-top: 0;
-    margin: 0;
+    margin: 0 auto;
 
     .main-info-box {
       .texts {
@@ -126,12 +126,15 @@
 
       .results .table {
         .date {
-          margin-right: 15px;
+          width: 41px !important;
+          margin-right: 10px;
+
+          overflow: hidden;
         }
 
         .game {
-          width: calc(100% - 155px);
-          margin-right: 15px;
+          width: calc(100% - 141px) !important;
+          margin-right: 10px !important;
         }
 
         .team {

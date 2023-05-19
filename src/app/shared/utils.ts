@@ -1,6 +1,7 @@
 import {ToastComponent} from "../components/toast/toast.component";
 import {ComponentFactoryResolver} from "@angular/core";
 import {RefDirective} from "../directives/ref.directive";
+import {Observable} from "rxjs";
 
 export class Utils {
 
@@ -52,21 +53,16 @@ export class Utils {
     ][(number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5]];
   }
 
-
   /**
-   * Показывает оповещение о результате сохранения
-   * @param isError флаг ошибки сохранения
-   * @param componentFactoryResolver
-   * @param refDir
+   * Возвращает геолокацию пользователя
    */
-  static showToast(isError: boolean, componentFactoryResolver: ComponentFactoryResolver, refDir: RefDirective): void {
-    const modalFactory = componentFactoryResolver.resolveComponentFactory(ToastComponent);
-    refDir.viewContainerRef.clear();
-
-    const component = refDir.viewContainerRef.createComponent(modalFactory);
-    component.instance.isError = isError;
-    component.instance.close.subscribe(() => {
-      refDir.viewContainerRef.clear();
-    })
+  static getPosition(): Observable<any> {
+    return Observable.create(observer => {
+      window.navigator.geolocation.getCurrentPosition(position => {
+          observer.next(position);
+          observer.complete();
+        },
+        error => observer.error(error));
+    });
   }
 }

@@ -161,7 +161,7 @@ export class GameApiService {
   }
 
   /**
-   * Подтверждает участие команды в игре
+   * Отправляет запрос на подтверждение участия команды в игре
    * @param gameId идентификатор игры
    * @param gameTeamId идентификатор уровня
    */
@@ -170,11 +170,27 @@ export class GameApiService {
   }
 
   /**
-   * Отказывает команде в участии в игре
+   * Отправляет запрос на отказ участия команды в участии в игре
    * @param gameId идентификатор игры
    * @param gameTeamId идентификатор уровня
    */
   rejectTeam(gameId: number, gameTeamId: number): Observable<SimpleResponse<any>> {
     return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/teams/${gameTeamId}/reject`, {});
+  }
+
+  /**
+   * Отправляет запрос на запуск игры
+   * @param gameId идентификатор игры
+   */
+  startGame(gameId: number): Observable<SimpleResponse<any>> {
+    return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/start`, {});
+  }
+
+  /**
+   * Отправляет запрос на возврат игры
+   * @param gameId идентификатор игры
+   */
+  clearGame(gameId: number): Observable<SimpleResponse<any>> {
+    return this.httpClient.post<SimpleResponse<any>>(`${this.urlPrime}/${gameId}/clear`, {});
   }
 }

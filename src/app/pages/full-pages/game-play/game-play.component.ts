@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {Option} from "../../../models/option";
 import {ActionApiService} from "../../../api/action-api.service";
 import {LocalStorageService} from "../../../services/local-storage.service";
@@ -11,6 +11,9 @@ import {KeyValue} from "@angular/common";
 import {Variables} from "../../../models/user/variables";
 import {Utils} from "../../../shared/utils";
 import {ActionGame} from "../../../models/user/action-game";
+import * as Leaflet from "leaflet";
+import {OpenStreetMapService} from "../../../services/open-street-map.service";
+import {ServerError} from "../../../shared/server-error";
 
 @Component({
   selector: 'app-game-play',
@@ -70,11 +73,29 @@ export class GamePlayComponent implements OnInit {
   /** Флаг необходимости геолокации при отправки ответа */
   isGeoRequired: boolean = false;
 
+  /** Флаг успешной инициализации карты */
+  isMapInit: boolean = false;
+
+  /** Информация об ошибках получения геолокации */
+  geoInfo: string = '';
+
   /** Переменные */
   variables: Variables[] = [];
 
+  /** Настройки карты */
+  map: Leaflet.Map;
+
+  /** Настройки маркеров карты */
+  markers: Leaflet.Marker[] = [];
+
+  /** Флаг открытия на маленьком экране */
+  isLittleWidth: boolean;
+
   /** Возвращает число строкой с незначащими нулями */
   setNumberWithZeroAsString = Utils.setNumberWithZeroAsString;
+
+  /** Возвращает геолокацию пользователя */
+  getPosition = Utils.getPosition;
 
   constructor(
     private actionApiService: ActionApiService,
@@ -82,6 +103,7 @@ export class GamePlayComponent implements OnInit {
     private localStorageService: LocalStorageService,
     private router: Router,
     private sanitized: DomSanitizer,
+    private openStreetMapService: OpenStreetMapService,
   ) {
   }
 
@@ -103,6 +125,22 @@ export class GamePlayComponent implements OnInit {
     })
   }
 
+  @HostListener('window:resize', ['$event']) onResize() {
+    if (this.isGeoRequired) {
+      this.setWidth();
+    }
+  }
+
+  /**
+   * Устанавливает флаг ширины экрана
+   */
+  setWidth(): void {
+    if (this.isLittleWidth != innerWidth <= 960) {
+      this.isLittleWidth = innerWidth <= 960;
+      this.setMapOptions();
+    }
+  }
+
   /**
    * Получает актуальную информацию
    * @param game Вся информация об игре
@@ -115,7 +153,7 @@ export class GamePlayComponent implements OnInit {
     }
 
     //Если уровень не выбран или выбран, но такого больше нет, назначается первый из массива
-    if (this.actualLevel && !!game.team_levels.find(a => a.level.id == this.actualLevel?.level.id))
+    if (this.actualLevel && game.team_levels.some(a => a.level.id == this.actualLevel?.level.id))
       this.actualLevel = game.team_levels.find(a => a.level.id == this.actualLevel?.level.id);
     else
       this.actualLevel = this.levels[0];
@@ -138,7 +176,7 @@ export class GamePlayComponent implements OnInit {
       this.childLevelsOption.push({name: level.level.level_info.caption, code: level})
     }
 
-    if (this.actualChildLevel && !!this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id))
+    if (this.actualChildLevel && this.actualLevel.child_levels.some(a => a.level.id == this.actualChildLevel?.level.id))
       this.actualChildLevel = this.actualLevel.child_levels.find(a => a.level.id == this.actualChildLevel?.level.id)
     else
       this.actualChildLevel = this.actualLevel.child_levels[0];
@@ -173,6 +211,11 @@ export class GamePlayComponent implements OnInit {
     this.failedCondition = level.level.level_info.failed_condition_script;
     this.codeAcceptationScript = level.level.level_info.code_acceptation_script;
     this.isGeoRequired = !!this.codeAcceptationScript?.includes('DISTANCE');
+
+    if (this.isGeoRequired) {
+      this.setWidth();
+    }
+
     this.codeLevelId = level.level.id;
 
     this.codesInfo = [];
@@ -184,20 +227,19 @@ export class GamePlayComponent implements OnInit {
 
         let second = 'бонус: ';
 
-        if (this.variables.length > 0) {
-          second = this.variables.find(a => a.code == code.result_code).caption + ': ' + '_' + ', ';
-          switch (code.result_type) {
-            case 'SIMPLE':
-              second += 'время: ';
-              break;
-            case ('BONUS'):
-              second += 'бонус: ';
-              break;
-            case ('@'):
-              second += 'откроет: ';
-              break;
-          }
+        second = this.variables.find(a => a.code == code.result_code).caption + ': ' + '_' + ', ';
+        switch (code.result_type) {
+          case 'SIMPLE':
+            second += 'время: ';
+            break;
+          case ('BONUS'):
+            second += 'бонус: ';
+            break;
+          case ('@'):
+            second += 'откроет: ';
+            break;
         }
+
         second += '_';
 
         this.codesInfo.push({count: first, info: second})
@@ -208,62 +250,60 @@ export class GamePlayComponent implements OnInit {
   /**
    * Отпрапвляет код
    */
-  sendCode() {
-    if (this.code == '')
-      return;
+  async sendCode() {
+    let isError: boolean = false;
 
     let code: CodeForSend = {
       code_value: this.code,
       team_level_id: this.codeLevelId,
     }
 
-    let isError: boolean = false;
-    if (this.isGeoRequired) {
-      navigator.geolocation.getCurrentPosition(position => {
-        /*if (position.coords.accuracy >= 30) {
-          this.codeError = 'слишком большая погрешность';
-        }
-        else {*/
+    try {
+      if (!this.isGeoRequired) {
+        return;
+      }
+      const position = await this.getPosition().toPromise();
+      if (position.coords.accuracy >= 30) {
+        this.errorMessage = 'слишком большая погрешность';
+      } else {
         code.current_location = {
-          //lon: position.coords.longitude, lat: position.coords.latitude
-          lon: 37, lat: 55
+          lon: position.coords.longitude, lat: position.coords.latitude
+          //lat: 56.7538,lon: 37.1990
         };
-        /*}*/
-      }, () => {
-        isError = true;
-        if (GeolocationPositionError.PERMISSION_DENIED) {
-          this.errorMessage = 'вы запретили трекинг своей геопозиции';
-        } else {
-          this.errorMessage = 'получить местоположение не удалось';
+      }
+    } catch {
+      if (GeolocationPositionError.PERMISSION_DENIED) {
+        this.errorMessage = 'вы запретили трекинг своей геопозиции';
+      } else {
+        this.errorMessage = 'получить местоположение не удалось';
+      }
+    } finally {
+      try {
+        if (this.errorMessage.length !== 0) {
+          return;
         }
-      })
-    }
-
-    if (isError)
-      return;
-
-    setTimeout(() => {
-      this.actionApiService.sendCode(this.localStorageService.game_token, code).subscribe(response => {
-        console.log(response.res.team_info)
+        const response = await this.actionApiService.sendCode(this.localStorageService.game_token, code).toPromise();
         this.getActualInfo(response.res.team_info);
-      }, error => {
         this.code = '';
-        if (error.error.error == "wrong-code") {
-          this.errorMessage = error.error.comments;
-        } else if (error.error.error == "can-not-accept") {
+      } catch (error: any) {
+        if (!('code' in error)) {
+          return;
+        }
+        if (error.code == "wrong-code") {
+          this.errorMessage = error.message;
+        } else if (error.code == "can-not-accept") {
           this.errorMessage = 'вы находитесь далеко от места';
-        } else if (error.error.error == "duplicate-code") {
-          this.errorMessage = error.error.comments;
+        } else if (error.code == "duplicate-code" || error.code == "wrong-location") {
+          this.errorMessage = error.message;
         } else {
           this.errorMessage = 'неопределенная ошибка'
         }
-      })
-    }, 1500)
-
-    this.code = '';
-    setTimeout(() => {
-      this.errorMessage = '';
-    }, 4000)
+      } finally {
+        setTimeout(() => {
+          this.errorMessage = '';
+        }, 4000)
+      }
+    }
   }
 
   /**
@@ -274,9 +314,37 @@ export class GamePlayComponent implements OnInit {
     if (element.key == 'TIME') {
       return 'Время: ' + Math.floor((+element.value + this.timeDifInScores) / 3600) + ':' +
         this.setNumberWithZeroAsString(Math.floor((+element.value + this.timeDifInScores) / 60) -
-        Math.floor((+element.value + this.timeDifInScores) / 3600) * 60, 2) + ':' +
+          Math.floor((+element.value + this.timeDifInScores) / 3600) * 60, 2) + ':' +
         this.setNumberWithZeroAsString((+element.value + this.timeDifInScores) % 60, 2);
     }
     return 'Баллы: ' + element.value;
+  }
+
+  /**
+   * Устанавливает настройки карты
+   */
+  setMapOptions(): void {
+    if (this.map) {
+      this.map.remove();
+      this.markers = [];
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+      this.map = this.openStreetMapService.initMap(this.isLittleWidth ? 'upMap' : 'downMap');
+      if (position.coords.accuracy >= 30)
+        this.geoInfo = 'слишком большая погрешность геолокации';
+      const newMarker = this.openStreetMapService.createMarker(
+        new Leaflet.LatLng(Number(position.coords.latitude), Number(position.coords.longitude)), true);
+      this.markers.push(newMarker.addTo(this.map));
+      this.map.setView(this.markers[0].getLatLng());
+      this.isMapInit = true;
+    }, () => {
+      this.isMapInit = false;
+      if (GeolocationPositionError.PERMISSION_DENIED) {
+        this.geoInfo = 'вы запретили трекинг своей геолокации';
+      } else {
+        this.geoInfo = 'получить геолокацию не удалось';
+      }
+    })
   }
 }

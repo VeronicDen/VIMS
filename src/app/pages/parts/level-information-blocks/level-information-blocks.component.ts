@@ -6,6 +6,7 @@ import {Infos} from "../../../models/admin-game/infos";
 import {ConfirmationService} from "primeng/api";
 import {RefDirective} from "../../../directives/ref.directive";
 import {Utils} from "../../../shared/utils";
+import {ToastService} from "../../../services/toast.service";
 
 /**
  * Компонент информации об уровне
@@ -39,8 +40,8 @@ export class LevelInformationBlocksComponent implements OnInit {
   /** Флаг ошибки при сохранении нескольких блоков */
   isSaveErrorInFor: boolean = false;
 
-  /** Вызывает оповещение */
-  showToast = Utils.showToast;
+  /** Флаг типа уровня (обычный или ссылка) */
+  isCurrentLevelLink: boolean = false;
 
   @ViewChild(RefDirective)
   refDir: RefDirective
@@ -50,6 +51,7 @@ export class LevelInformationBlocksComponent implements OnInit {
     private gameApiService: GameApiService,
     private confirmationService: ConfirmationService,
     private componentFactoryResolver: ComponentFactoryResolver,
+    private toastService: ToastService,
   ) {
   }
 
@@ -61,6 +63,8 @@ export class LevelInformationBlocksComponent implements OnInit {
       for (const level of response.res) {
         if (this.levelId != +level.id)
           this.levelsForLinks.push({name: level.caption, code: level.id})
+        else
+          this.isCurrentLevelLink = level.level_type == "INNER";
       }
     });
 
@@ -105,7 +109,7 @@ export class LevelInformationBlocksComponent implements OnInit {
    * @param block измененный блок информации
    * @param isInFor вызывается ли функция из цикла
    */
-  saveChangedBlock(block: Infos, isInFor: boolean): void {
+  async saveChangedBlock(block: Infos, isInFor: boolean): Promise<void> {
     const infoBlock: Infos = {
       inner_id: block.inner_id,
       info_caption: block.info_caption,
@@ -114,36 +118,30 @@ export class LevelInformationBlocksComponent implements OnInit {
       condition_script: block.condition_script,
       linked_level_id: block.linked_level_id,
     }
-
-    this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).subscribe(() => {
+    try {
+      await this.gameApiService.putInfoBlock(this.gameId, this.levelId, block.id, infoBlock).toPromise();
       if (!isInFor)
-        this.showToast(false, this.componentFactoryResolver, this.refDir);
-    }, () => {
+        this.toastService.showSuccessToast('Изменения успешно сохранены');
+    } catch {
       if (isInFor)
         this.isSaveErrorInFor = true;
-      else
-        this.showToast(true, this.componentFactoryResolver, this.refDir);
-    });
+    }
   }
 
   /**
    * Сохраняет все блоки
    */
-  saveAllChanges(): void {
+  async saveAllChanges(): Promise<void> {
     for (const block of this.blocks) {
-      this.saveChangedBlock(block.info, true);
+      await this.saveChangedBlock(block.info, true);
     }
-
-    setTimeout(() => {
-      if (this.isSaveErrorInFor) {
-        this.showToast(true, this.componentFactoryResolver, this.refDir);
-        this.isSaveErrorInFor = false;
-      }
-      else {
-        this.showToast(false, this.componentFactoryResolver, this.refDir);
-        this.getActualInfo();
-      }
-    }, 1000)
+    if (this.isSaveErrorInFor) {
+      //this.showToast(true, this.componentFactoryResolver, this.refDir);
+      this.isSaveErrorInFor = false;
+    } else {
+      this.toastService.showSuccessToast('Изменения успешно сохранены');
+      this.getActualInfo();
+    }
   }
 
   /**
