@@ -959,6 +959,8 @@ p-dropdownitem {
 .p-toast {
 
   .p-toast-message {
+    border-radius: 0;
+
     .p-toast-message-content {
       display: flex;
       align-items: center;

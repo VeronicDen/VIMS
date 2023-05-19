@@ -1,7 +1,6 @@
 import {ErrorHandler, Injectable} from '@angular/core';
 import {MessageService} from "primeng/api";
 import {ToastService} from "./toast.service";
-import {ServerError} from "../shared/server-error";
 
 /**
  * Глобальный обработчик ошибок
@@ -15,8 +14,8 @@ export class GlobalErrorHandler implements ErrorHandler {
   ) {}
 
   handleError(error: any): void {
-    console.log(error);
-    if (error instanceof ServerError) {
+    /* if (error instanceof ServerError) */
+    if ('code' in error) {
       this.toastService.showErrorToast(error.message);
     } else {
       this.toastService.showErrorToast('Произошла ошибка');

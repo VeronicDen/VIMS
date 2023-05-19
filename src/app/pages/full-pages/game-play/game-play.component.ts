@@ -13,7 +13,6 @@ import {Utils} from "../../../shared/utils";
 import {ActionGame} from "../../../models/user/action-game";
 import * as Leaflet from "leaflet";
 import {OpenStreetMapService} from "../../../services/open-street-map.service";
-import {ServerError} from "../../../shared/server-error";
 
 @Component({
   selector: 'app-game-play',
@@ -289,14 +288,18 @@ export class GamePlayComponent implements OnInit {
         if (!('code' in error)) {
           return;
         }
-        if (error.code == "wrong-code") {
-          this.errorMessage = error.message;
-        } else if (error.code == "can-not-accept") {
-          this.errorMessage = 'вы находитесь далеко от места';
-        } else if (error.code == "duplicate-code" || error.code == "wrong-location") {
-          this.errorMessage = error.message;
-        } else {
-          this.errorMessage = 'неопределенная ошибка'
+
+        switch (error.code) {
+          case "wrong-code":
+          case "duplicate-code":
+          case "wrong-location":
+            this.errorMessage = error.message;
+            break;
+          case "can-not-accept":
+            this.errorMessage = 'вы находитесь далеко от места';
+            break;
+          default:
+            this.errorMessage = 'неопределенная ошибка';
         }
       } finally {
         setTimeout(() => {
