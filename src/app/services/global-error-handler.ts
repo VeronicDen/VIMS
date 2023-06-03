@@ -18,6 +18,7 @@ export class GlobalErrorHandler implements ErrorHandler {
     if ('code' in error) {
       this.toastService.showErrorToast(error.message);
     } else {
+      console.log(error)
       this.toastService.showErrorToast('Произошла ошибка');
     }
   }

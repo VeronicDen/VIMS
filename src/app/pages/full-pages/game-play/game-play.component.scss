@@ -5,7 +5,8 @@
   margin: 0 auto;
   padding: 66px 0;
 
-  #second-table {
+  #second-table,
+  #second-code {
     display: none;
   }
 
@@ -30,6 +31,10 @@
     justify-content: right;
     color: $accent-color;
     text-align: right;
+
+    &:last-of-type {
+      font-size: 12px;
+    }
   }
 
   .map-box {
@@ -48,6 +53,36 @@
     display: flex;
     flex-wrap: wrap;
     margin-top: 20px;
+  }
+
+  .code-container {
+    display: flex;
+    justify-content: space-between;
+
+    input {
+      width: calc(100% - 55px);
+      height: 40px;
+    }
+
+    button {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+    }
+  }
+
+  .game-info-element {
+    margin-top: 25px;
+
+    p.label {
+      color: $accent-color;
+      margin-bottom: 12px;
+    }
+
+    .error-box {
+      height: 22px;
+      margin-top: 10px;
+    }
   }
 
   .game-box {
@@ -71,35 +106,7 @@
         margin-top: 2px;
       }
 
-      .game-info-element {
-        margin-top: 25px;
 
-        p.label {
-          color: $accent-color;
-          margin-bottom: 12px;
-        }
-
-        .code-container {
-          display: flex;
-          justify-content: space-between;
-
-          input {
-            width: calc(100% - 55px);
-            height: 40px;
-          }
-
-          button {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-          }
-        }
-
-        .error-box {
-          height: 22px;
-          margin-top: 10px;
-        }
-      }
     }
 
     .custom-scroll {
@@ -141,8 +148,14 @@
   }
 
   @include screen('tablet-landscape') {
+    padding-bottom: 10px;
+
     .level-name {
       justify-content: center;
+    }
+
+    .geo-info:last-of-type {
+      font-size: 10px;
     }
 
     .game-box {
@@ -152,6 +165,12 @@
         &.general {
           width: 100%;
           margin-bottom: 45px;
+
+          .code {
+            background: var(--background-color);
+            position: sticky;
+            bottom: 0;
+          }
         }
 
         &.task {
@@ -167,6 +186,24 @@
         display: flex;
       }
     }
+
+    #first-code {
+      display: none;
+    }
+
+    #second-code {
+      position: sticky;
+      bottom: 0;
+
+      display: flex;
+      flex-direction: column;
+
+      width: 100%;
+      padding: 25px 0;
+      background: var(--background-color);
+
+      z-index: 1000;
+    }
   }
 
   @include screen('tablet-portrait') {
@@ -178,7 +215,7 @@
   @include screen('phone') {
     padding-top: 0;
 
-    .game-box .game-info-box .game-info-element {
+    .game-info-element {
       p:not(.label) {
         overflow-wrap: break-word;
       }

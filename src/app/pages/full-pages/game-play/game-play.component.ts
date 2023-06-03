@@ -76,7 +76,7 @@ export class GamePlayComponent implements OnInit {
   isMapInit: boolean = false;
 
   /** Информация об ошибках получения геолокации */
-  geoInfo: string = '';
+  geoInfo: string[] = [];
 
   /** Переменные */
   variables: Variables[] = [];
@@ -331,22 +331,28 @@ export class GamePlayComponent implements OnInit {
       this.map.remove();
       this.markers = [];
     }
+    this.geoInfo = [];
 
     navigator.geolocation.getCurrentPosition(position => {
       this.map = this.openStreetMapService.initMap(this.isLittleWidth ? 'upMap' : 'downMap');
       if (position.coords.accuracy >= 30)
-        this.geoInfo = 'слишком большая погрешность геолокации';
+        this.geoInfo.push('слишком большая погрешность геолокации');
+
+      this.geoInfo.push(position.coords.latitude.toFixed(4) + ' : ' +
+        position.coords.longitude.toFixed(4) + ' ± ' + position.coords.accuracy.toFixed(2));
+
       const newMarker = this.openStreetMapService.createMarker(
         new Leaflet.LatLng(Number(position.coords.latitude), Number(position.coords.longitude)), true);
       this.markers.push(newMarker.addTo(this.map));
       this.map.setView(this.markers[0].getLatLng());
       this.isMapInit = true;
+      window.dispatchEvent(new Event("resize"));
     }, () => {
       this.isMapInit = false;
       if (GeolocationPositionError.PERMISSION_DENIED) {
-        this.geoInfo = 'вы запретили трекинг своей геолокации';
+        this.geoInfo.push('вы запретили трекинг своей геолокации');
       } else {
-        this.geoInfo = 'получить геолокацию не удалось';
+        this.geoInfo.push('получить геолокацию не удалось');
       }
     })
   }

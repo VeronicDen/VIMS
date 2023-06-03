@@ -14,12 +14,13 @@ export class OpenStreetMapService {
    * Инициирует карту
    * @param mapId идентификатор карты
    * @param zoom приближение
+   * @param center координаты центра
    */
-  initMap(mapId: string, zoom = 16): Leaflet.Map {
+  initMap(mapId: string, zoom = 16, center: number[] = [0, 0]): Leaflet.Map {
     return new Leaflet.Map(mapId, {
       layers: [new Leaflet.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')],
       zoom,
-      center: new Leaflet.LatLng(0, 0),
+      center: new Leaflet.LatLng(center[0], center[1]),
     });
   }
 

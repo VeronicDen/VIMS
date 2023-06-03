@@ -236,7 +236,7 @@ export class GameCreationComponent implements OnInit {
    */
   clearGame(): void {
     this.gameApiService.clearGame(this.gameId).subscribe(resp => {
-      console.log(resp);
+      this.getActualInfo();
     })
   }
 }

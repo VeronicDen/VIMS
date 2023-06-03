@@ -3,7 +3,9 @@
     <p class="game-name"><span>ИГРА </span>{{gameName}}</p>
   </div>
 
-  <div class="geo-info">{{geoInfo}}</div>
+  <p class="geo-info" *ngFor="let info of geoInfo">
+    {{info}}
+  </p>
 
   <div class="map-box" [style.display]="isMapInit && isLittleWidth ? 'block' : 'none'">
     <div id="upMap" class="map"></div>
@@ -20,7 +22,7 @@
 
   <div class="game-box">
     <div class="game-info-box general">
-      <div class="game-info-element">
+      <div class="game-info-element" id="first-code">
         <p class="label">Код уровня: </p>
         <div class="code-container">
           <input type="text" placeholder="Код"
@@ -84,5 +86,16 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="game-info-element" id="second-code">
+    <p class="label">Код уровня: </p>
+    <div class="code-container">
+      <input type="text" placeholder="Код"
+             [(ngModel)]="code" (keydown.enter)="sendCode()">
+      <button class="filled accent mdi mdi-24px mdi-send"
+              title="Отправить" (click)="sendCode()"></button>
+    </div>
+    <div class="error-box">{{errorMessage}}</div>
   </div>
 </div>

@@ -16,15 +16,25 @@
       <div class="form-item">
         <label for="codeAcceptation">Условия принятия кода</label>
         <textarea type="text" id="codeAcceptation" formControlName="codeAcceptation"></textarea>
+
+        <div class="map-container" *ngIf="formGroupInfo.controls.isGeo.value" >
+          <div id="map" class="map" [style.display]="isMapOpen ? 'block' : 'none'"></div>
+          <div class="coords" [style.display]="isMapOpen ? 'block' : 'none'">{{this.coords}}</div>
+          <button class="outline"  (click)="setMapOptions()">
+            {{isMapOpen ? 'СКРЫТЬ КАРТУ' : 'ОТКРЫТЬ КАРТУ'}}
+          </button>
+        </div>
       </div>
 
-      <app-checkbox formControlName="isInner">
-        <p class="checkbox-text">Уровень-ссылка</p>
-      </app-checkbox>
+      <div class="checkbox">
+        <app-checkbox formControlName="isInner">
+          <p class="checkbox-text">Уровень-ссылка</p>
+        </app-checkbox>
 
-      <app-checkbox formControlName="isGeo">
-        <p class="checkbox-text">Отслеживать геолокацию</p>
-      </app-checkbox>
+        <app-checkbox formControlName="isGeo" (ngModelChange)="clearMap($event)">
+          <p class="checkbox-text">Отслеживать геолокацию</p>
+        </app-checkbox>
+      </div>
 
       <button class="filled accent" (click)="saveChanges()">СОХРАНИТЬ</button>
     </form>

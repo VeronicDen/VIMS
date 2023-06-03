@@ -9,6 +9,8 @@ import {CodeResult} from "../../../models/admin-game/code-result";
 import {Utils} from "../../../shared/utils";
 import {RefDirective} from "../../../directives/ref.directive";
 import {ToastService} from "../../../services/toast.service";
+import * as Leaflet from "leaflet";
+import {OpenStreetMapService} from "../../../services/open-street-map.service";
 
 /**
  * Компонент настроек уровня
@@ -58,6 +60,17 @@ export class LevelSettingsComponent implements OnInit {
   /** Сообщение об ошибке при сохранении скрипта условий прохождения */
   acceptationErrorMessage: string = '';
 
+  /** Флаг открытия карты */
+  isMapOpen: boolean = false;
+
+  /** Настройки карты */
+  map: Leaflet.Map;
+
+  /** Маркер карты */
+  marker: Leaflet.Marker;
+
+  coords: string = '';
+
   @ViewChild(RefDirective)
   refDir: RefDirective
 
@@ -67,6 +80,7 @@ export class LevelSettingsComponent implements OnInit {
     private gameApiService: GameApiService,
     private componentFactoryResolver: ComponentFactoryResolver,
     private toastService: ToastService,
+    private openStreetMapService: OpenStreetMapService,
   ) {
   }
 
@@ -157,5 +171,40 @@ export class LevelSettingsComponent implements OnInit {
       this.toastService.showSuccessToast('Изменения успешно сохранены');
       this.getActualInfo();
     })
+  }
+
+  /**
+   * Устанавливает настройки карты
+   */
+  setMapOptions(): void {
+    this.isMapOpen = !this.isMapOpen;
+    if (this.isMapOpen == false)
+      return;
+
+    if (this.map) {
+      this.map.remove();
+      this.marker = null;
+      this.coords = '';
+    }
+
+    this.map = this.openStreetMapService.initMap('map');
+    this.map.setView([55.75222, 37.61556]);
+    this.map.on('click', e => {
+      if (this.marker)
+        this.marker.removeFrom(this.map);
+
+      const newMarker = this.openStreetMapService.createMarker(
+        new Leaflet.LatLng(e.latlng.lat, e.latlng.lng), true);
+      this.marker = newMarker.addTo(this.map);
+      this.coords = 'Координаты: ' + e.latlng.lat.toFixed(3) + ', ' + e.latlng.lng.toFixed(3);
+    })
+    window.dispatchEvent(new Event("resize"));
+  }
+
+  /** Отчистка карты */
+  clearMap(event: Event) {
+    if (!event) {
+      this.isMapOpen = false;
+    }
   }
 }

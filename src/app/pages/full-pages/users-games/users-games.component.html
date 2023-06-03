@@ -18,12 +18,15 @@
           <div class="row header" [ngStyle]="{'width.px': slidersTableWidth}">
             <div class="number">Номер</div>
             <div class="game">Игра</div>
+            <div class="status"></div>
           </div>
 
           <div class="row" *ngFor="let game of gamesPages[activeSlide - 1]"
                (click)="goToGame(game.id)" [ngStyle]="{'width.px': slidersTableWidth}">
             <div class="number">#{{game.id}}</div>
             <div class="game">{{game.caption}}</div>
+            <div class="status" [class.started]="game.game_state == 'started'"
+                 [class.finished]="game.game_state == 'finished'"></div>
           </div>
         </div>
       </div>
