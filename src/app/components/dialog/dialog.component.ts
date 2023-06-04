@@ -18,6 +18,10 @@ export class DialogComponent implements OnInit {
   @Input()
   dialogWidth: number = 440;
 
+  /** Ширина диалогового окна */
+  @Input()
+  dialogMargin: number = 4;
+
   constructor() { }
 
   ngOnInit(): void {

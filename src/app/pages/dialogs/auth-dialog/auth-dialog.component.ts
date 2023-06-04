@@ -21,6 +21,10 @@ export class AuthDialogComponent implements OnInit {
   @Input()
   isRegistration: boolean;
 
+  /** Флаг вызова из хедера */
+  @Input()
+  isFromHeader: boolean = false;
+
   /** Событие закрытия диалога */
   @Output()
   close = new EventEmitter<void>();

@@ -1,6 +1,3 @@
-import {ToastComponent} from "../components/toast/toast.component";
-import {ComponentFactoryResolver} from "@angular/core";
-import {RefDirective} from "../directives/ref.directive";
 import {Observable} from "rxjs";
 
 export class Utils {

@@ -512,7 +512,7 @@ textarea:read-only {
 }
 
 .p-disabled.p-dropdown {
-  background-image: none;
+  background-image: none !important;
 }
 
 .p-dropdown-items-wrapper {
@@ -828,7 +828,7 @@ p-dropdownitem {
 //Редактор
 
 .p-editor-container {
-  z-index: 0 !important;
+  margin-bottom: 5px !important;
 
   .p-editor-content,
   .p-editor-toolbar {

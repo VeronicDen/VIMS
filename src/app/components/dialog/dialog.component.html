@@ -1,4 +1,4 @@
 <div class="backdrop" (click)="close.emit()"></div>
-<div class="box" [style.width.px]="dialogWidth">
+<div class="box" [style.width.px]="dialogWidth" [style.margin-top.rem]="dialogMargin">
   <ng-content></ng-content>
 </div>

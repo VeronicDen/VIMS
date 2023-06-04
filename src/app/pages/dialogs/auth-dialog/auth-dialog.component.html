@@ -1,4 +1,4 @@
-<app-dialog (close)="close.emit()">
+<app-dialog (close)="close.emit()" [dialogMargin]="isFromHeader ? 10.5 : 4">
   <div class="header">
     <button [class.active]="!isRegistration"
             (click)="changeForm(true)">Вход</button>

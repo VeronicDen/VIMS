@@ -79,6 +79,8 @@
           font-size: 16px;
           font-weight: 400;
 
+          margin-left: 10px;
+
           color: $additional-color;
         }
       }
@@ -243,6 +245,10 @@
       }
     }
 
+    .script-label-box button{
+      font-size: 11px !important;
+    }
+
     .add-new-item-in-table {
       flex-wrap: wrap;
       justify-content: center;
@@ -252,12 +258,13 @@
       }
 
       input {
-        margin: 0 15px;
+        width: 40px;
+        margin: 0 5px;
       }
 
       button {
         width: 60%;
-        margin: 15px 0 0 0;
+        margin: 15px 10px 0 10px;
       }
     }
   }

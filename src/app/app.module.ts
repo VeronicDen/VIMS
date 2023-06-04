@@ -1,8 +1,6 @@
-import { ArrowDivDirective } from './directives/arrow-div.directive';
-import { GamePlayComponent } from './pages/full-pages/game-play/game-play.component';
-import { HelpPageComponent } from './pages/full-pages/help-page/help-page.component';
-import { IdDirective } from './directives/id.directive';
-import { ToastModule } from 'primeng/toast';
+import {GamePlayComponent} from './pages/full-pages/game-play/game-play.component';
+import {HelpPageComponent} from './pages/full-pages/help-page/help-page.component';
+import {ToastModule} from 'primeng/toast';
 import {APP_INITIALIZER, ErrorHandler, NgModule} from '@angular/core';
 import {ApiModule} from "./api/api.module";
 import {AppComponent} from './app.component';
@@ -35,13 +33,13 @@ import {OpenStreetMapService} from "./services/open-street-map.service";
 import {PaginatorModule} from "primeng/paginator";
 import {ProfileComponent} from './pages/full-pages/profile/profile.component';
 import {ReactiveFormsModule} from "@angular/forms";
-import {RefDirective} from './directives/ref.directive';
 import {RouterModule, Routes} from "@angular/router";
 import {SliderModule} from "./components/slider/slider.module";
 import {StartupService} from "./services/startup.service";
 import {UiStyleToggleService} from "./ui/ui-style-toggle.service";
 import {UsersGamesComponent} from './pages/full-pages/users-games/users-games.component';
 import {ToastService} from "./services/toast.service";
+import {DirectiveModule} from "./directives/directive.module";
 
 export function themeFactory(themeService: UiStyleToggleService) {
   return () => themeService.setThemeOnStart();
@@ -99,14 +97,12 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    ArrowDivDirective,
     AuthDialogComponent,
     ChangePasswordDialogComponent,
     CommandInGameDialogComponent,
     GameCreationComponent,
     GamePlayComponent,
     HelpPageComponent,
-    IdDirective,
     LevelCreationComponent,
     LevelInformationBlocksComponent,
     LevelSettingsComponent,
@@ -114,7 +110,6 @@ const routes: Routes = [
     MainPageComponent,
     NewTeamDialogComponent,
     ProfileComponent,
-    RefDirective,
     UsersGamesComponent,
   ],
   imports: [
@@ -124,6 +119,7 @@ const routes: Routes = [
     CheckboxModule,
     ConfirmDialogModule,
     DialogModule,
+    DirectiveModule,
     DropdownModule,
     EditorModule,
     FooterModule,
